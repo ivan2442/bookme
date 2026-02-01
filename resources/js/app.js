@@ -91,8 +91,9 @@ function renderShops() {
     shopList.innerHTML = '';
     state.shops.forEach((shop) => {
         const card = document.createElement('div');
-        card.className = 'shop-card';
+        card.className = 'shop-card cursor-pointer hover:border-emerald-200 transition-colors group';
         card.dataset.shopCard = '1';
+        card.dataset.id = shop.id;
         card.dataset.city = shop.city || '';
         card.dataset.category = shop.category || '';
         card.dataset.name = (shop.name || '').toLowerCase();
@@ -104,7 +105,7 @@ function renderShops() {
         card.innerHTML = `
             <div class="flex items-center justify-between gap-2">
                 <div>
-                    <p class="font-semibold text-lg text-slate-900">${shop.name}</p>
+                    <p class="font-semibold text-lg text-slate-900 group-hover:text-emerald-600 transition-colors">${shop.name}</p>
                     <p class="text-sm text-slate-600">${shop.city ?? ''} • ${shop.category ?? ''}</p>
                 </div>
                 <span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">⭐ ${rating}</span>
@@ -112,25 +113,29 @@ function renderShops() {
             <p class="text-sm text-slate-600 mt-3">${shop.description ?? 'Bez popisu'}</p>
             <div class="flex flex-wrap gap-2 mt-4">
                 ${tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}
-                <span class="tag bg-slate-900 text-white hover:bg-slate-800">Voľné: ${nextSlot}</span>
+                <span class="tag bg-slate-900 text-white group-hover:bg-emerald-600">Voľné: ${nextSlot}</span>
             </div>
-            <div class="mt-4 flex items-center justify-between">
-                <button class="link subtle" data-quick-book="${shop.id}">Rezervovať rýchlo</button>
-                <a class="link" href="#services">Zobraziť služby</a>
+            <div class="mt-4 flex items-center justify-end">
+                <span class="text-emerald-600 font-semibold text-sm">Zobraziť služby →</span>
             </div>
         `;
-        shopList.appendChild(card);
-    });
 
-    shopList.querySelectorAll('[data-quick-book]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const shopId = button.dataset.quickBook;
+        card.addEventListener('click', () => {
+            const shopId = shop.id;
             if (shopSelect && shopId) {
                 shopSelect.value = shopId;
                 populateServicesForShop(shopId);
+                renderServices(shopId);
             }
-            document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+
+            const servicesSection = document.getElementById('services');
+            if (servicesSection) {
+                servicesSection.classList.remove('hidden');
+                servicesSection.scrollIntoView({ behavior: 'smooth' });
+            }
         });
+
+        shopList.appendChild(card);
     });
 
     applyFilters();
@@ -148,15 +153,21 @@ function populateCategorySelect() {
     });
 }
 
-function renderServices() {
+function renderServices(shopId = null) {
     if (!servicesList) return;
-    if (!state.services.length) {
-        servicesList.innerHTML = '<p class="text-sm text-slate-500">Žiadne služby nenájdené.</p>';
+
+    let servicesToRender = state.services;
+    if (shopId) {
+        servicesToRender = state.services.filter((s) => String(s.profile_id) === String(shopId));
+    }
+
+    if (!servicesToRender.length) {
+        servicesList.innerHTML = '<p class="text-sm text-slate-500">Žiadne služby nenájdené pre túto prevádzku.</p>';
         return;
     }
 
     servicesList.innerHTML = '';
-    state.services.forEach((service) => {
+    servicesToRender.forEach((service) => {
         const duration = service.base_duration_minutes ?? 30;
         const price = service.base_price ?? 0;
         const employeeNames =
@@ -207,7 +218,12 @@ function renderServices() {
                 }
                 populateVariants(serviceId);
             }
-            document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+
+            const bookingSection = document.getElementById('booking');
+            if (bookingSection) {
+                bookingSection.classList.remove('hidden');
+                bookingSection.scrollIntoView({ behavior: 'smooth' });
+            }
         });
     });
 }
@@ -581,6 +597,21 @@ bookingForm?.addEventListener('submit', (event) => {
                     icon: 'success',
                     confirmButtonColor: '#10b981',
                     confirmButtonText: 'Zavrieť'
+                }).then(() => {
+                    // Reset formy
+                    if (bookingForm) {
+                        bookingForm.reset();
+                        bookingOutput.textContent = 'Vyber službu a čas, systém preverí dostupnosť a potvrdí ti termín.';
+                    }
+
+                    // Skryť sekcie kroku 2 a 3
+                    const servicesSection = document.getElementById('services');
+                    const bookingSection = document.getElementById('booking');
+                    if (servicesSection) servicesSection.classList.add('hidden');
+                    if (bookingSection) bookingSection.classList.add('hidden');
+
+                    // Vyscrollovať hore
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
             }
         })

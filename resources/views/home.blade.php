@@ -99,7 +99,7 @@
             </div>
             <div class="space-y-2">
                 <label class="text-sm text-slate-600 font-medium">Kľúčové slovo</label>
-                <input id="filter-query" type="text" placeholder="strih, masáž, pneuservis..." class="input-control" />
+                <input id="filter-query" type="text" placeholder="strih, masáž, barber..." class="input-control" />
             </div>
             <p class="text-xs text-slate-500">Filtrování prebieha priamo na stránke, live pri písaní.</p>
         </div>
@@ -109,7 +109,7 @@
     </div>
 </section>
 
-<section id="services" class="py-12 space-y-6">
+<section id="services" class="py-12 space-y-6 hidden">
     <div class="flex items-center gap-3">
         <span class="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-700 font-semibold">2</span>
         <div>
@@ -122,7 +122,7 @@
     </div>
 </section>
 
-<section id="booking" class="py-12 space-y-6">
+<section id="booking" class="py-12 space-y-6 hidden">
     <div class="flex items-center gap-3">
         <span class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-semibold">3</span>
         <div>
