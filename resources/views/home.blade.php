@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="pt-16 pb-10 relative">
+<section class="pt-4 lg:pt-16 pb-10 relative">
     <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -left-24 top-10 h-48 w-48 rounded-full bg-emerald-300/40 blur-3xl"></div>
         <div class="absolute right-0 bottom-10 h-56 w-56 rounded-full bg-orange-200/40 blur-3xl"></div>
@@ -13,31 +13,31 @@
                 Rezervácia do 3 minút, bez telefonovania
             </div>
             <h1 class="font-display text-4xl md:text-5xl leading-tight text-slate-900">
-                BookMe spája prevádzky a klientov cez jeden jednoduchý kalendár.
+                BookMe spája prevádzky a ich klientov.
             </h1>
             <p class="text-lg text-slate-600 max-w-2xl">
-                Vyhľadaj prevádzku, vyber službu a čas, potvrď jedným klikom. Funguje pre kaderníctva, wellness, autoservis aj fitness trénerov.
+                Vyhľadaj prevádzku, vyber službu a čas, potvrď jedným klikom.
             </p>
             <div class="flex flex-wrap gap-3">
-                <a href="#booking" class="px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
-                <a href="#services" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold hover:border-emerald-200 hover:shadow-md transition">Pozrieť služby</a>
+                <a href="#booking" class="w-full md:w-auto mt-36 mb-0 md:mt-36 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
+                {{-- <a href="#services" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold hover:border-emerald-200 hover:shadow-md transition">Pozrieť služby</a> --}}
             </div>
-            <div class="grid grid-cols-3 gap-4 max-w-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl">
                 <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
                     <p class="text-2xl font-semibold text-slate-900">24/7</p>
                     <p class="text-sm text-slate-600">Rezervácie nonstop</p>
                 </div>
-                <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
+             {{--   <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
                     <p class="text-2xl font-semibold text-slate-900">Bez double-book</p>
                     <p class="text-sm text-slate-600">Sloty sú zamknuté</p>
-                </div>
+                </div>--}}
                 <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
                     <p class="text-2xl font-semibold text-slate-900">Notifikácie</p>
                     <p class="text-sm text-slate-600">E-mail + SMS pripomienky</p>
                 </div>
             </div>
         </div>
-        <div class="bg-white/80 backdrop-blur rounded-3xl border border-emerald-100/60 shadow-xl shadow-emerald-100/60 p-6 space-y-4">
+        {{--<div class="bg-white/80 backdrop-blur rounded-3xl border border-emerald-100/60 shadow-xl shadow-emerald-100/60 p-6 space-y-4">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase text-slate-500 tracking-widest">Live náhľad</p>
@@ -73,7 +73,7 @@
                 </div>
             </div>
             <p class="text-xs text-slate-500">Ďalšie kroky: potvrdenie e-mailom, 24h pripomienka a ICS export.</p>
-        </div>
+        </div>--}}
     </div>
 </section>
 
@@ -255,7 +255,7 @@
     </div>
 </section>
 
-@if(isset($latestArticles) && $latestArticles->count() > 0)
+{{-- @if(isset($latestArticles) && $latestArticles->count() > 0)
 <section id="blog" class="py-16 space-y-10 border-t border-slate-100 mt-12">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div class="space-y-2">
@@ -301,6 +301,6 @@
         @endforeach
     </div>
 </section>
-@endif
+@endif --}}
 
 @endsection

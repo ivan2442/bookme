@@ -610,8 +610,8 @@ bookingForm?.addEventListener('submit', (event) => {
                     if (servicesSection) servicesSection.classList.add('hidden');
                     if (bookingSection) bookingSection.classList.add('hidden');
 
-                    // Vyscrollovať hore
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    // Reload stránky pre úplný reset
+                    location.reload();
                 });
             }
         })
@@ -656,6 +656,39 @@ variantSelect?.addEventListener('change', () => {
     }
 });
 dateInput?.addEventListener('change', fetchAvailability);
+
+// Scroll to search section on "Začať rezerváciu" click
+document.querySelectorAll('a[href="#booking"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+        const searchSection = document.getElementById('search');
+        if (searchSection) {
+            e.preventDefault();
+            searchSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Close mobile menu if open
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+        }
+    });
+});
+
+// Mobile menu toggle
+const mobileMenuButton = document.getElementById('mobile-menu-button');
+const mobileMenu = document.getElementById('mobile-menu');
+if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking on any link inside it
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+        });
+    });
+}
 
 fetchShops();
 

@@ -44,10 +44,10 @@
                     <p class="text-sm text-slate-500">Rezervácie, ktoré zapadnú do dňa</p>
                 </div>
             </div>
-            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700">
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
                 <a class="hover:text-slate-900 transition" href="/#search">Vyhľadať prevádzku</a>
                 <a class="hover:text-slate-900 transition" href="/#services">Služby</a>
-                <a class="hover:text-slate-900 transition" href="{{ route('articles.index') }}">Blog</a>
+                {{-- <a class="hover:text-slate-900 transition" href="{{ route('articles.index') }}">Blog</a> --}}
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a>
@@ -59,9 +59,37 @@
                 @endauth
             </nav>
             <div class="hidden sm:flex gap-3 items-center">
-                <a href="#booking" class="px-4 py-2 text-sm font-semibold rounded-full bg-white shadow-sm border border-white/60 hover:border-emerald-200 hover:shadow-lg transition">Začať rezerváciu</a>
+                <a href="#booking" class="px-6 py-2.5 text-sm font-bold rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-200/50 border border-emerald-400 hover:bg-emerald-600 hover:shadow-emerald-300/60 transition-all transform hover:scale-105">Začať rezerváciu</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" type="button" class="text-slate-700 hover:text-slate-900 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path id="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </header>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-2 mt-4">
+            <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">Vyhľadať prevádzku</a>
+            <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#services">Služby</a>
+            {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}
+            @auth
+                @if(auth()->user()->role === 'admin')
+                    <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a>
+                @else
+                    <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
+                @endif
+            @else
+                <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('auth.login') }}">Prihlásiť sa</a>
+            @endauth
+            <div class="pt-2 border-t border-slate-100">
+                <a href="#booking" class="block py-2 text-center text-sm font-semibold rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition">Začať rezerváciu</a>
+            </div>
+        </div>
 
         <main class="max-w-6xl mx-auto px-4">
             @yield('content')
@@ -70,7 +98,7 @@
         <footer class="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-600">
             <div class="flex flex-col md:flex-row justify-between gap-3 border-t border-slate-200 pt-6">
                 <p>BookMe — online rezervácie bez telefonátov.</p>
-                <p class="text-slate-500">Laravel 11 · MySQL · Sanctum · Tailwind</p>
+                <p class="text-slate-500">&copy 2026 WsTechnology.dev All Rights Reserved</p>
             </div>
         </footer>
     </div>
