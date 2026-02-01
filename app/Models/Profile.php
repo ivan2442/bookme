@@ -32,6 +32,7 @@ class Profile extends Model
         'timezone',
         'status',
         'logo_path',
+        'banner_path',
         'settings',
     ];
 

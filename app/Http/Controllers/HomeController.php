@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\Profile;
 
 class HomeController extends Controller
 {
@@ -15,5 +16,15 @@ class HomeController extends Controller
             ->get();
 
         return view('home', compact('latestArticles'));
+    }
+
+    public function showProfile($slug)
+    {
+        $profile = Profile::with(['services.variants', 'employees', 'calendarSetting', 'schedules'])
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->firstOrFail();
+
+        return view('profiles.show', compact('profile'));
     }
 }

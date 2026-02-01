@@ -22,7 +22,7 @@
                 <a href="#booking" class="w-full md:w-auto mt-36 mb-0 md:mt-36 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
                 {{-- <a href="#services" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold hover:border-emerald-200 hover:shadow-md transition">Pozrieť služby</a> --}}
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
                 <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
                     <p class="text-2xl font-semibold text-slate-900">24/7</p>
                     <p class="text-sm text-slate-600">Rezervácie nonstop</p>
@@ -221,7 +221,7 @@
                 Vyber službu a čas, systém preverí dostupnosť a potvrdí ti termín.
             </div>--}}
         </form>
-        <div class="p-6 bg-slate-900 text-white rounded-2xl shadow-lg space-y-4">
+      {{--  <div class="p-6 bg-slate-900 text-white rounded-2xl shadow-lg space-y-4">
             <p class="text-sm uppercase tracking-widest text-emerald-200">Náhľad pripomienky</p>
             <div class="rounded-xl bg-slate-800/60 border border-slate-700 p-4 space-y-2">
                 <p class="text-slate-200 text-sm">Ahoj, tvoj termín je potvrdený.</p>
@@ -251,7 +251,7 @@
                     <p class="text-slate-300 text-xs">fronta cez Redis/queue</p>
                 </div>
             </div>
-        </div>
+        </div>--}}
     </div>
 </section>
 

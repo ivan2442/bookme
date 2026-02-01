@@ -24,7 +24,7 @@
                     <span class="text-[10px] uppercase font-bold text-slate-400">ID: {{ $profile->id }}</span>
                 </div>
 
-                <form method="POST" action="{{ route('owner.calendar.settings.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('owner.calendar.settings.store') }}" class="space-y-4" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="profile_id" value="{{ $profile->id }}">
                     @php $settings = $profile->calendarSetting; @endphp
@@ -67,6 +67,26 @@
                     </div>
 
                     <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="label">Logo prevádzky</label>
+                                <input type="file" name="logo" class="input-control !p-2 text-xs">
+                                @if($profile->logo_path)
+                                    <p class="text-[10px] text-emerald-600">Logo je nahrané</p>
+                                @endif
+                            </div>
+                            <div class="space-y-1">
+                                <label class="label">Banner prevádzky</label>
+                                <input type="file" name="banner" class="input-control !p-2 text-xs">
+                                @if($profile->banner_path)
+                                    <p class="text-[10px] text-emerald-600">Banner je nahraný</p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="label">Popis prevádzky</label>
+                            <textarea name="description" class="input-control" rows="3" placeholder="Popis prevádzky...">{{ old('description', $profile->description) }}</textarea>
+                        </div>
                         <div class="flex items-center justify-between">
                             <div>
                                 <label class="font-semibold text-slate-900 block">Vyžadovať potvrdenie</label>

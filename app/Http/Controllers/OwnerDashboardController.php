@@ -346,16 +346,40 @@ class OwnerDashboardController extends Controller
             'min_notice_minutes' => ['required', 'integer', 'min:0', 'max:1440'],
             'cancellation_limit_hours' => ['required', 'integer', 'min:0', 'max:720'],
             'requires_confirmation' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'max:2048'],
+            'banner' => ['nullable', 'image', 'max:5120'],
         ]);
 
         if (!in_array($data['profile_id'], $profileIds)) {
             abort(403);
         }
 
+        $profile = Profile::findOrFail($data['profile_id']);
+
+        $updateData = [
+            'description' => $data['description'] ?? null,
+        ];
+
+        if ($request->hasFile('logo')) {
+            $updateData['logo_path'] = $request->file('logo')->store('profiles/logos', 'public');
+        }
+
+        if ($request->hasFile('banner')) {
+            $updateData['banner_path'] = $request->file('banner')->store('profiles/banners', 'public');
+        }
+
+        $profile->update($updateData);
+
         CalendarSetting::updateOrCreate(
             ['profile_id' => $data['profile_id']],
             [
-                ...$data,
+                'slot_interval_minutes' => $data['slot_interval_minutes'],
+                'buffer_before_minutes' => $data['buffer_before_minutes'],
+                'buffer_after_minutes' => $data['buffer_after_minutes'],
+                'max_advance_days' => $data['max_advance_days'],
+                'min_notice_minutes' => $data['min_notice_minutes'],
+                'cancellation_limit_hours' => $data['cancellation_limit_hours'],
                 'requires_confirmation' => $request->boolean('requires_confirmation'),
             ]
         );

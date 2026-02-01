@@ -102,6 +102,12 @@ function renderShops() {
         const nextSlot = shop.next_slot ?? 'čoskoro';
         const tags = shop.tags ?? [];
 
+        let description = shop.description ?? 'Bez popisu';
+        const rawDescription = description;
+        if (description.length > 230) {
+            description = description.substring(0, 230) + '...';
+        }
+
         card.innerHTML = `
             <div class="flex items-center justify-between gap-2">
                 <div>
@@ -110,17 +116,21 @@ function renderShops() {
                 </div>
                 <span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">⭐ ${rating}</span>
             </div>
-            <p class="text-sm text-slate-600 mt-3">${shop.description ?? 'Bez popisu'}</p>
+            <p class="text-sm text-slate-600 mt-3 whitespace-pre-line">${description}</p>
             <div class="flex flex-wrap gap-2 mt-4">
                 ${tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}
                 <span class="tag bg-slate-900 text-white group-hover:bg-emerald-600">Voľné: ${nextSlot}</span>
             </div>
-            <div class="mt-4 flex items-center justify-end">
+            <div class="mt-4 flex items-center justify-between">
+                <a href="/prevadzka/${shop.slug}" class="text-slate-500 hover:text-emerald-600 font-semibold text-sm transition-colors stop-propagation">Zobraziť detail</a>
                 <span class="text-emerald-600 font-semibold text-sm">Zobraziť služby →</span>
             </div>
         `;
 
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+            if (e.target.classList.contains('stop-propagation')) {
+                return;
+            }
             const shopId = shop.id;
             if (shopSelect && shopId) {
                 shopSelect.value = shopId;

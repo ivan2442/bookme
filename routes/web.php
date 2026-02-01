@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/clanky', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('/clanky/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/prevadzka/{slug}', [HomeController::class, 'showProfile'])->name('profiles.show');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login.submit');

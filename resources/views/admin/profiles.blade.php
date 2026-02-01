@@ -31,7 +31,7 @@
     <div class="space-y-4">
         <div class="card space-y-4">
             <h2 class="font-semibold text-lg text-slate-900">Pridať prevádzku</h2>
-            <form method="POST" action="{{ route('admin.profiles.store') }}" class="space-y-3">
+            <form method="POST" action="{{ route('admin.profiles.store') }}" class="space-y-3" enctype="multipart/form-data">
                 @csrf
                 <div class="grid sm:grid-cols-2 gap-3">
                     <div>
@@ -71,6 +71,22 @@
                     <div>
                         <label class="label">Timezone</label>
                         <input type="text" name="timezone" class="input-control" value="{{ old('timezone', 'Europe/Bratislava') }}">
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 gap-3">
+                    <div>
+                        <label class="label">Popis prevádzky</label>
+                        <textarea name="description" class="input-control" rows="3" placeholder="Krátky popis prevádzky, ktorý uvidia klienti...">{{ old('description') }}</textarea>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="label">Logo prevádzky</label>
+                        <input type="file" name="logo" class="input-control !p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="label">Banner prevádzky</label>
+                        <input type="file" name="banner" class="input-control !p-2 text-xs">
                     </div>
                 </div>
                 <div class="grid sm:grid-cols-1 gap-3">
@@ -134,13 +150,13 @@
 </div>
 
 <!-- Edit Modal -->
-<div id="edit-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+<div id="edit-modal" class="fixed inset-0 z-[9999] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeEditModal()"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-slate-100">
+        <div class="relative inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-slate-100">
             <div class="bg-white p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-slate-900" id="modal-title">Upraviť prevádzku</h3>
@@ -149,7 +165,7 @@
                     </button>
                 </div>
 
-                <form id="edit-form" method="POST" action="" class="space-y-4">
+                <form id="edit-form" method="POST" action="" class="space-y-4" enctype="multipart/form-data">
                     @csrf
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
@@ -209,6 +225,24 @@
                             </select>
                         </div>
                     </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Logo prevádzky</label>
+                            <input type="file" name="logo" class="input-control !p-2 text-xs">
+                            <p id="edit-logo-status" class="text-[10px] text-emerald-600 hidden">Logo je nahrané</p>
+                        </div>
+                        <div>
+                            <label class="label">Banner prevádzky</label>
+                            <input type="file" name="banner" class="input-control !p-2 text-xs">
+                            <p id="edit-banner-status" class="text-[10px] text-emerald-600 hidden">Banner je nahraný</p>
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-1 gap-3">
+                        <div>
+                            <label class="label">Popis prevádzky</label>
+                            <textarea name="description" id="edit-description" class="input-control" rows="3"></textarea>
+                        </div>
+                    </div>
 
                     <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
                         <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
@@ -241,6 +275,20 @@
         document.getElementById('edit-phone').value = profile.phone || '';
         document.getElementById('edit-timezone').value = profile.timezone || 'Europe/Bratislava';
         document.getElementById('edit-owner_id').value = profile.owner_id || '';
+        document.getElementById('edit-description').value = profile.description || '';
+
+        // Status nahraných obrázkov
+        if (profile.logo_path) {
+            document.getElementById('edit-logo-status').classList.remove('hidden');
+        } else {
+            document.getElementById('edit-logo-status').classList.add('hidden');
+        }
+
+        if (profile.banner_path) {
+            document.getElementById('edit-banner-status').classList.remove('hidden');
+        } else {
+            document.getElementById('edit-banner-status').classList.add('hidden');
+        }
 
 
         modal.classList.remove('hidden');

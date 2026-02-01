@@ -289,7 +289,10 @@ class AdminController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'city' => ['nullable', 'string', 'max:255'],
             'address_line1' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'timezone' => ['nullable', 'string', 'max:64'],
+            'logo' => ['nullable', 'image', 'max:2048'],
+            'banner' => ['nullable', 'image', 'max:5120'],
         ]);
 
         try {
@@ -327,8 +330,11 @@ class AdminController extends Controller
                 'phone' => $data['phone'] ?? null,
                 'city' => $data['city'] ?? null,
                 'address_line1' => $data['address_line1'] ?? null,
+                'description' => $data['description'] ?? null,
                 'timezone' => $data['timezone'] ?? 'Europe/Bratislava',
                 'status' => 'published',
+                'logo_path' => $request->hasFile('logo') ? $request->file('logo')->store('profiles/logos', 'public') : null,
+                'banner_path' => $request->hasFile('banner') ? $request->file('banner')->store('profiles/banners', 'public') : null,
             ]);
 
             // Vytvorenie základných nastavení kalendára
@@ -372,11 +378,14 @@ class AdminController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'city' => ['nullable', 'string', 'max:255'],
             'address_line1' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'timezone' => ['nullable', 'string', 'max:64'],
             'status' => ['required', 'string', 'in:draft,published,inactive'],
+            'logo' => ['nullable', 'image', 'max:2048'],
+            'banner' => ['nullable', 'image', 'max:5120'],
         ]);
 
-        $profile->update([
+        $updateData = [
             'owner_id' => $data['owner_id'],
             'name' => $data['name'],
             'slug' => $data['slug'],
@@ -385,9 +394,20 @@ class AdminController extends Controller
             'phone' => $data['phone'] ?? null,
             'city' => $data['city'] ?? null,
             'address_line1' => $data['address_line1'] ?? null,
+            'description' => $data['description'] ?? null,
             'timezone' => $data['timezone'] ?? 'Europe/Bratislava',
             'status' => $data['status'],
-        ]);
+        ];
+
+        if ($request->hasFile('logo')) {
+            $updateData['logo_path'] = $request->file('logo')->store('profiles/logos', 'public');
+        }
+
+        if ($request->hasFile('banner')) {
+            $updateData['banner_path'] = $request->file('banner')->store('profiles/banners', 'public');
+        }
+
+        $profile->update($updateData);
 
         return back()->with('status', 'Prevádzka bola upravená.');
     }

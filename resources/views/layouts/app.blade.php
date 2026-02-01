@@ -37,20 +37,20 @@
             </script>
         @endif
         <header class="max-w-6xl mx-auto px-4 pt-6 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
+            <a href="/" id="logo" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-200/60 flex items-center justify-center text-slate-900 font-semibold">B</div>
                 <div>
                     <p class="font-display text-lg leading-tight">BookMe</p>
                     <p class="text-sm text-slate-500">Rezervácie, ktoré zapadnú do dňa</p>
                 </div>
-            </div>
+            </a>
             <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
                 <a class="hover:text-slate-900 transition" href="/#search">Vyhľadať prevádzku</a>
                 <a class="hover:text-slate-900 transition" href="/#services">Služby</a>
                 {{-- <a class="hover:text-slate-900 transition" href="{{ route('articles.index') }}">Blog</a> --}}
                 @auth
                     @if(auth()->user()->role === 'admin')
-                        <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a>
+                        {{-- <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a> --}}
                     @else
                         <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
                     @endif
@@ -79,7 +79,7 @@
             {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}
             @auth
                 @if(auth()->user()->role === 'admin')
-                    <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a>
+                    {{-- <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a> --}}
                 @else
                     <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
                 @endif
