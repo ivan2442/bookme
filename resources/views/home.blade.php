@@ -217,9 +217,9 @@
                     Dokončiť rezerváciu
                 </button>
             </div>
-            <div class="text-sm text-slate-600 bg-emerald-50 border border-emerald-100 rounded-xl p-3" data-booking-output>
+           {{-- <div class="text-sm text-slate-600 bg-emerald-50 border border-emerald-100 rounded-xl p-3" data-booking-output>
                 Vyber službu a čas, systém preverí dostupnosť a potvrdí ti termín.
-            </div>
+            </div>--}}
         </form>
         <div class="p-6 bg-slate-900 text-white rounded-2xl shadow-lg space-y-4">
             <p class="text-sm uppercase tracking-widest text-emerald-200">Náhľad pripomienky</p>

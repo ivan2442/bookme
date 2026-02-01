@@ -66,6 +66,19 @@
                         </div>
                     </div>
 
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="font-semibold text-slate-900 block">Vyžadovať potvrdenie</label>
+                                <p class="text-xs text-slate-500">Ak je vypnuté, rezervácie sa potvrdia automaticky.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="requires_confirmation" value="1" class="sr-only peer" @checked(old('requires_confirmation', $settings->requires_confirmation ?? false))>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+                    </div>
+
                     <button class="w-full px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition">
                         Uložiť nastavenia
                     </button>

@@ -62,8 +62,9 @@ class AppointmentService
         }
 
         $employeeId = $data['employee_id'] ?? null;
+        $requiresConfirmation = (bool) ($settings?->requires_confirmation ?? false);
 
-        return DB::transaction(function () use ($data, $variant, $service, $profile, $startAt, $endAt, $duration, $employeeId, $timezone) {
+        return DB::transaction(function () use ($data, $variant, $service, $profile, $startAt, $endAt, $duration, $employeeId, $timezone, $requiresConfirmation) {
             $hasAppointments = Appointment::query()
                 ->where('profile_id', $profile->id)
                 ->whereNotIn('status', ['cancelled'])
@@ -123,7 +124,7 @@ class AppointmentService
                 'customer_phone' => $data['customer_phone'] ?? null,
                 'start_at' => $startAt,
                 'end_at' => $endAt,
-                'status' => 'pending',
+                'status' => $requiresConfirmation ? 'pending' : 'confirmed',
                 'price' => ($service->base_price ?? 0) + ($variant?->price ?? 0),
                 'currency' => $service->currency ?? $variant?->currency,
                 'confirmation_code' => (string) Str::uuid(),

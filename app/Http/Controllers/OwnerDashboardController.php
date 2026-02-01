@@ -345,6 +345,7 @@ class OwnerDashboardController extends Controller
             'max_advance_days' => ['required', 'integer', 'min:1', 'max:365'],
             'min_notice_minutes' => ['required', 'integer', 'min:0', 'max:1440'],
             'cancellation_limit_hours' => ['required', 'integer', 'min:0', 'max:720'],
+            'requires_confirmation' => ['nullable', 'boolean'],
         ]);
 
         if (!in_array($data['profile_id'], $profileIds)) {
@@ -353,7 +354,10 @@ class OwnerDashboardController extends Controller
 
         CalendarSetting::updateOrCreate(
             ['profile_id' => $data['profile_id']],
-            $data
+            [
+                ...$data,
+                'requires_confirmation' => $request->boolean('requires_confirmation'),
+            ]
         );
 
         return back()->with('status', 'Kalendár bol uložený.');

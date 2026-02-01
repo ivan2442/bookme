@@ -18,6 +18,7 @@ class CalendarSetting extends Model
         'max_advance_days',
         'min_notice_minutes',
         'cancellation_limit_hours',
+        'requires_confirmation',
         'timezone',
         'preferences',
     ];
