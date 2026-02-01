@@ -1,0 +1,804 @@
+import './bootstrap';
+import moment from 'moment';
+import Lightpick from 'lightpick';
+import 'lightpick/css/lightpick.css';
+
+
+const cityInput = document.getElementById('filter-city');
+const categorySelect = document.getElementById('filter-category');
+const queryInput = document.getElementById('filter-query');
+const shopList = document.querySelector('[data-shop-list]');
+const servicesList = document.querySelector('[data-services-list]');
+const shopSelect = document.querySelector('[data-shop-select]');
+const serviceSelect = document.querySelector('[data-service-select]');
+const variantSelect = document.querySelector('[data-variant-select]');
+const variantWrapper = document.querySelector('[data-variant-wrapper]');
+const timeGrid = document.querySelector('[data-time-grid]');
+const timeInput = document.querySelector('[data-time-input]');
+const dateInput = document.querySelector('[data-date-input]');
+const employeeInput = document.querySelector('[data-employee-input]');
+const bookingForm = document.querySelector('[data-booking-form]');
+const bookingOutput = document.querySelector('[data-booking-output]');
+const timePlaceholder = document.querySelector('[data-time-placeholder]');
+const calendarGrid = document.querySelector('[data-cal-grid]');
+const calendarMonth = document.querySelector('[data-cal-month]');
+const calendarPrev = document.querySelector('[data-cal-prev]');
+const calendarNext = document.querySelector('[data-cal-next]');
+const TIME_ZONE = 'Europe/Bratislava';
+
+const timeFormatter = new Intl.DateTimeFormat('sk-SK', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: TIME_ZONE,
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat('sk-SK', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: TIME_ZONE,
+});
+
+function formatIsoDate(date) {
+    const year = date.toLocaleString('en-US', { year: 'numeric', timeZone: TIME_ZONE });
+    const month = date.toLocaleString('en-US', { month: '2-digit', timeZone: TIME_ZONE });
+    const day = date.toLocaleString('en-US', { day: '2-digit', timeZone: TIME_ZONE });
+    return `${year}-${month}-${day}`;
+}
+
+let state = {
+    shops: [],
+    services: [],
+    serviceById: {},
+    variantsByService: {},
+    employeesByVariant: {},
+    variantMap: {},
+    calendarStart: null,
+    closedDays: [],
+};
+
+function applyFilters() {
+    const city = cityInput?.value.toLowerCase().trim() ?? '';
+    const category = categorySelect?.value.toLowerCase().trim() ?? '';
+    const query = queryInput?.value.toLowerCase().trim() ?? '';
+
+    shopList?.querySelectorAll('[data-shop-card]').forEach((card) => {
+        const cardCity = (card.dataset.city || '').toLowerCase();
+        const cardCategory = (card.dataset.category || '').toLowerCase();
+        const cardName = (card.dataset.name || '').toLowerCase();
+
+        const matchesCity = city === '' || cardCity.includes(city);
+        const matchesCategory = category === '' || cardCategory === category;
+        const matchesQuery = query === '' || cardName.includes(query);
+
+        card.style.display = matchesCity && matchesCategory && matchesQuery ? '' : 'none';
+    });
+}
+
+cityInput?.addEventListener('input', applyFilters);
+categorySelect?.addEventListener('change', applyFilters);
+queryInput?.addEventListener('input', applyFilters);
+
+function renderShops() {
+    if (!shopList) return;
+    if (!state.shops.length) {
+        shopList.innerHTML = '<p class="text-sm text-slate-500">Žiadne prevádzky nenájdené.</p>';
+        return;
+    }
+
+    shopList.innerHTML = '';
+    state.shops.forEach((shop) => {
+        const card = document.createElement('div');
+        card.className = 'shop-card';
+        card.dataset.shopCard = '1';
+        card.dataset.city = shop.city || '';
+        card.dataset.category = shop.category || '';
+        card.dataset.name = (shop.name || '').toLowerCase();
+
+        const rating = shop.rating ?? '4.8';
+        const nextSlot = shop.next_slot ?? 'čoskoro';
+        const tags = shop.tags ?? [];
+
+        card.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+                <div>
+                    <p class="font-semibold text-lg text-slate-900">${shop.name}</p>
+                    <p class="text-sm text-slate-600">${shop.city ?? ''} • ${shop.category ?? ''}</p>
+                </div>
+                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">⭐ ${rating}</span>
+            </div>
+            <p class="text-sm text-slate-600 mt-3">${shop.description ?? 'Bez popisu'}</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                ${tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}
+                <span class="tag bg-slate-900 text-white hover:bg-slate-800">Voľné: ${nextSlot}</span>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+                <button class="link subtle" data-quick-book="${shop.id}">Rezervovať rýchlo</button>
+                <a class="link" href="#services">Zobraziť služby</a>
+            </div>
+        `;
+        shopList.appendChild(card);
+    });
+
+    shopList.querySelectorAll('[data-quick-book]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const shopId = button.dataset.quickBook;
+            if (shopSelect && shopId) {
+                shopSelect.value = shopId;
+                populateServicesForShop(shopId);
+            }
+            document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    applyFilters();
+}
+
+function populateCategorySelect() {
+    if (!categorySelect) return;
+    const categories = Array.from(new Set(state.shops.map((shop) => shop.category).filter(Boolean)));
+    categorySelect.innerHTML = '<option value="">Všetky</option>';
+    categories.forEach((category) => {
+        const opt = document.createElement('option');
+        opt.value = category;
+        opt.textContent = category;
+        categorySelect.appendChild(opt);
+    });
+}
+
+function renderServices() {
+    if (!servicesList) return;
+    if (!state.services.length) {
+        servicesList.innerHTML = '<p class="text-sm text-slate-500">Žiadne služby nenájdené.</p>';
+        return;
+    }
+
+    servicesList.innerHTML = '';
+    state.services.forEach((service) => {
+        const duration = service.base_duration_minutes ?? 30;
+        const price = service.base_price ?? 0;
+        const employeeNames =
+            (service.employees || []).map((e) => e.name).join(', ') ||
+            '';
+
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.dataset.serviceCard = '1';
+        card.dataset.shopId = service.profile_id;
+        card.dataset.serviceId = service.id;
+        card.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-widest text-slate-500">${service.shop_name ?? ''}</p>
+                    <p class="font-semibold text-lg text-slate-900">${service.name}</p>
+                </div>
+                <span class="px-2 py-1 rounded-full bg-slate-900 text-white text-xs font-semibold">${service.category ?? ''}</span>
+            </div>
+            <div class="flex items-center justify-between mt-3 text-sm text-slate-600">
+                <span>Dĺžka</span>
+                <span class="font-semibold text-slate-900">${duration} min</span>
+            </div>
+            <div class="flex items-center justify-between text-sm text-slate-600">
+                <span>Cena</span>
+                <span class="font-semibold text-slate-900">€${Number(price).toFixed(2)}</span>
+            </div>
+            ${
+                employeeNames
+                    ? `<p class="text-xs text-slate-500 mt-2">Zamestnanci: ${employeeNames}</p>`
+                    : ''
+            }
+            <button class="mt-4 px-3 py-2 w-full rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition" data-choose-service="${service.id}">
+                Vybrať termín
+            </button>
+        `;
+        servicesList.appendChild(card);
+    });
+
+    servicesList.querySelectorAll('[data-choose-service]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const serviceId = button.dataset.chooseService;
+            const service = state.services.find((s) => String(s.id) === String(serviceId));
+            if (serviceSelect && serviceId) {
+                serviceSelect.value = serviceId;
+                if (shopSelect) {
+                    shopSelect.value = service.profile_id;
+                }
+                populateVariants(serviceId);
+            }
+            document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
+
+function populateShopSelect() {
+    if (!shopSelect) return;
+    shopSelect.innerHTML = '<option value="">Vyber prevádzku</option>';
+    state.shops.forEach((shop) => {
+        const opt = document.createElement('option');
+        opt.value = shop.id;
+        opt.textContent = `${shop.name} — ${shop.city ?? ''}`;
+        shopSelect.appendChild(opt);
+    });
+}
+
+function populateServiceSelect() {
+    if (!serviceSelect) return;
+    serviceSelect.innerHTML = '<option value="">Vyber službu</option>';
+    state.services.forEach((service) => {
+        const opt = document.createElement('option');
+        opt.value = service.id;
+        opt.textContent = `${service.name} (${service.shop_name ?? ''})`;
+        serviceSelect.appendChild(opt);
+    });
+}
+
+function populateServicesForShop(shopId) {
+    if (!serviceSelect) return;
+    serviceSelect.innerHTML = '<option value="">Vyber službu</option>';
+    state.services
+        .filter((s) => String(s.profile_id) === String(shopId))
+        .forEach((service) => {
+            const opt = document.createElement('option');
+            opt.value = service.id;
+            opt.textContent = `${service.name} (${service.shop_name ?? ''})`;
+            serviceSelect.appendChild(opt);
+        });
+}
+
+function populateVariants(serviceId) {
+    if (!variantSelect) return;
+    const variants = state.variantsByService[serviceId] || [];
+    variantSelect.innerHTML = '<option value="">Žiadny (použiť základ služby)</option>';
+    variants.forEach((variant) => {
+        const opt = document.createElement('option');
+        opt.value = variant.id;
+        opt.textContent = `${variant.name} — ${variant.duration_minutes} min (€${Number(variant.price ?? 0).toFixed(2)})`;
+        variantSelect.appendChild(opt);
+    });
+
+    if (variants[0]) {
+        variantSelect.value = variants[0].id;
+        assignEmployeeForVariant(variants[0].id);
+        fetchAvailability(true);
+    } else {
+        if (variantWrapper) {
+            variantWrapper.style.display = 'none';
+        }
+        variantSelect.value = '';
+        assignEmployeeForService(serviceId);
+        fetchAvailability(true);
+        return;
+    }
+
+    if (variantWrapper) {
+        variantWrapper.style.display = '';
+    }
+}
+
+function assignEmployeeForVariant(variantId) {
+    if (!employeeInput) return;
+    const employees = state.employeesByVariant[variantId] || [];
+    employeeInput.value = employees[0]?.id ?? '';
+}
+
+function assignEmployeeForService(serviceId) {
+    if (!employeeInput) return;
+    const service = state.serviceById[serviceId];
+    const employees =
+        service?.employees ||
+        [];
+    employeeInput.value = employees[0]?.id ?? '';
+}
+
+async function fetchShops() {
+    try {
+        const response = await axios.get('/api/shops', { params: { per_page: 50 } });
+        const data = response.data?.data ?? response.data ?? [];
+        state.shops = data.map((shop) => ({
+            ...shop,
+            shop_name: shop.name,
+        }));
+        state.services = [];
+        state.serviceById = {};
+        state.variantsByService = {};
+        state.employeesByVariant = {};
+        state.variantMap = {};
+
+        state.shops.forEach((shop) => {
+            (shop.services || []).forEach((service) => {
+                if (!service.is_active) {
+                    return;
+                }
+                const employees = (service.employees && service.employees.length > 0) ? service.employees : (shop.employees || []);
+                state.services.push({
+                    ...service,
+                    profile_id: shop.id,
+                    shop_name: shop.name,
+                    base_price: service.base_price,
+                    base_duration_minutes: service.base_duration_minutes,
+                    employees,
+                });
+                state.serviceById[service.id] = {
+                    ...service,
+                    profile_id: shop.id,
+                    shop_name: shop.name,
+                    employees,
+                };
+                state.variantsByService[service.id] = service.variants || [];
+                (service.variants || []).forEach((variant) => {
+                    state.employeesByVariant[variant.id] = variant.employees || [];
+                    state.variantMap[variant.id] = {
+                        ...variant,
+                        service_id: service.id,
+                    };
+                });
+            });
+        });
+
+        renderShops();
+        renderServices();
+        populateShopSelect();
+        populateServiceSelect();
+        populateCategorySelect();
+    } catch (error) {
+        console.error('Nepodarilo sa načítať prevádzky', error);
+        if (shopList) {
+            shopList.innerHTML = '<p class="text-sm text-red-500">Nepodarilo sa načítať prevádzky.</p>';
+        }
+    }
+}
+
+async function fetchWeekAvailability() {
+    if (!shopSelect?.value || !serviceSelect?.value || !state.calendarStart) {
+        return;
+    }
+
+    const startIso = formatIsoDate(state.calendarStart);
+
+    try {
+        const response = await axios.post('/api/availability', {
+            profile_id: shopSelect.value,
+            service_id: serviceSelect.value,
+            service_variant_id: variantSelect.value || null,
+            employee_id: employeeInput?.value || null,
+            date: startIso,
+            days: 7,
+        });
+
+        if (response.data?.closed_days) {
+            state.closedDays = response.data.closed_days;
+            renderCalendar();
+        }
+    } catch (error) {
+        console.error('Chyba pri načítaní týždennej dostupnosti', error);
+    }
+}
+
+async function fetchAvailability(autoSelectNearest = false) {
+    if (!shopSelect?.value || !serviceSelect?.value) {
+        resetSlots('Vyber prevádzku a službu.');
+        return;
+    }
+
+    let date = dateInput?.value || formatIsoDate(new Date());
+
+    try {
+        const response = await axios.post('/api/availability', {
+            profile_id: shopSelect.value,
+            service_id: serviceSelect.value,
+            service_variant_id: variantSelect.value || null,
+            employee_id: employeeInput?.value || null,
+            date,
+            days: autoSelectNearest ? 14 : 1,
+        });
+
+    let slots = response.data?.slots ?? [];
+        const closedDays = response.data?.closed_days ?? [];
+
+        // Update state with closed days if we received them
+        closedDays.forEach(d => {
+            if (!state.closedDays.includes(d)) state.closedDays.push(d);
+        });
+
+        if (autoSelectNearest && slots.length > 0) {
+            const firstAvailableSlot = slots.find(s => s.status === 'available');
+            if (firstAvailableSlot) {
+                const availableDate = firstAvailableSlot.start_at.split('T')[0];
+                if (availableDate !== date) {
+                    date = availableDate;
+                    if (dateInput) dateInput.value = date;
+
+                    // Update calendar UI range if necessary
+                    const start = startOfWeek(new Date(date));
+                    if (state.calendarStart && state.calendarStart.getTime() !== start.getTime()) {
+                        state.calendarStart = start;
+                    }
+                }
+            }
+        }
+
+        // Filter slots for the selected date only
+        const filteredSlots = slots.filter(s => s.start_at.startsWith(date));
+
+        renderCalendar();
+        renderSlots(filteredSlots);
+    } catch (error) {
+        console.error('Chyba pri načítaní dostupnosti', error);
+        resetSlots('Nepodarilo sa načítať dostupnosť.');
+    }
+}
+
+function resetSlots(message) {
+    if (!timeGrid) return;
+    timeGrid.innerHTML = `<span class="text-sm text-slate-500">${message}</span>`;
+    timeInput && (timeInput.value = '');
+}
+
+function renderSlots(slots) {
+    if (!timeGrid) return;
+    if (!slots.length) {
+        resetSlots('Žiadne voľné termíny pre vybraný deň.');
+        return;
+    }
+    timeGrid.innerHTML = '';
+
+    const morning = [];
+    const afternoon = [];
+
+    slots.forEach((slot) => {
+        const startDate = new Date(slot.start_at);
+        const hour = parseInt(
+            new Intl.DateTimeFormat('en-GB', { hour: '2-digit', hour12: false, timeZone: TIME_ZONE }).format(startDate),
+            10
+        );
+        if (hour < 12) {
+            morning.push(slot);
+        } else {
+            afternoon.push(slot);
+        }
+    });
+
+    const renderGroup = (label, group) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'slot-group';
+        const heading = document.createElement('p');
+        heading.className = 'slot-group-heading';
+        heading.textContent = label;
+        wrapper.appendChild(heading);
+
+        const row = document.createElement('div');
+        row.className = 'flex flex-wrap gap-2';
+
+        group.forEach((slot) => {
+            const button = document.createElement('button');
+            const start = new Date(slot.start_at);
+            const time = timeFormatter.format(start);
+            const isAvailable = slot.status === 'available' || slot.available === true;
+            button.type = 'button';
+            button.className = 'time-chip';
+            button.dataset.time = slot.start_at;
+            button.textContent = time;
+            if (!isAvailable) {
+                button.disabled = true;
+                button.classList.add('is-disabled');
+                button.title = 'Obsadené';
+            } else {
+                button.addEventListener('click', () => {
+                    timeGrid.querySelectorAll('.time-chip').forEach((b) => b.classList.remove('is-active'));
+                    button.classList.add('is-active');
+                    if (timeInput) {
+                        timeInput.value = slot.start_at;
+                    }
+                });
+            }
+            row.appendChild(button);
+        });
+
+        wrapper.appendChild(row);
+        timeGrid.appendChild(wrapper);
+    };
+
+    if (morning.length) {
+        renderGroup('Dopoludnie', morning);
+    }
+    if (afternoon.length) {
+        renderGroup('Popoludnie', afternoon);
+    }
+}
+
+bookingForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!bookingOutput) {
+        return;
+    }
+
+    const formData = new FormData(bookingForm);
+    const payload = Object.fromEntries(formData.entries());
+
+    if (!payload.start_at) {
+        bookingOutput.textContent = 'Vyber čas, aby sme zamkli slot.';
+        return;
+    }
+
+    bookingOutput.textContent = `Overujem slot...`;
+
+    const selectedVariant = state.variantMap[payload.service_variant_id];
+    const selectedService =
+        state.serviceById[selectedVariant?.service_id] ||
+        state.services.find((s) => String(s.id) === String(payload.service_id));
+    const durationMinutes = selectedService?.base_duration_minutes || 30;
+    const price = selectedService?.base_price ?? 0;
+    let endTimeReadable = '';
+    try {
+        const startDate = new Date(payload.start_at);
+        const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
+        endTimeReadable = `${timeFormatter.format(startDate)} - ${timeFormatter.format(endDate)}`;
+    } catch (e) {
+        endTimeReadable = '';
+    }
+
+    axios
+        .post('/api/appointments', {
+            profile_id: payload.shop_id,
+            service_id: payload.service_id,
+            service_variant_id: payload.service_variant_id,
+            employee_id: payload.employee_id || null,
+            start_at: payload.start_at,
+            date: payload.date || null,
+            customer_name: payload.customer_name,
+            customer_email: payload.customer_email,
+            customer_phone: payload.customer_phone,
+            notes: payload.notes,
+        })
+        .then((response) => {
+            const appointment = response.data;
+            const successMessage = `Termín potvrdený: ${appointment.service?.name ?? 'Služba'} ${dateTimeFormatter.format(
+                new Date(appointment.start_at),
+            )} ${endTimeReadable ? `(${endTimeReadable})` : ''}, cena €${Number(price).toFixed(2)}.`;
+
+            bookingOutput.textContent = successMessage;
+
+            if (typeof Swal !== 'undefined') {
+                const title = appointment.service?.name ?? 'Služba';
+                const start = appointment.start_at;
+                const shopName = state.shops.find(s => String(s.id) === String(payload.shop_id))?.name ?? 'BookMe';
+
+                Swal.fire({
+                    title: 'Rezervácia úspešná!',
+                    html: `
+                        <p class="mb-4">${successMessage}</p>
+                        <div class="flex flex-col gap-2 mt-4">
+                            <button onclick="downloadIcs('${title}', '${start}', ${durationMinutes}, '${shopName}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
+                                📱 Pridať do iOS kalendára
+                            </button>
+                            <button onclick="openGoogleCalendar('${title}', '${start}', ${durationMinutes}, '${shopName}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
+                                🤖 Pridať do Android kalendára
+                            </button>
+                        </div>
+                    `,
+                    icon: 'success',
+                    confirmButtonColor: '#10b981',
+                    confirmButtonText: 'Zavrieť'
+                });
+            }
+        })
+        .catch((error) => {
+            console.error('Chyba pri rezervácii', error);
+            const errors = error.response?.data?.errors;
+            const message = error.response?.data?.message || (errors ? JSON.stringify(errors) : 'Nepodarilo sa vytvoriť rezerváciu.');
+    bookingOutput.textContent = message;
+        });
+});
+
+shopSelect?.addEventListener('change', () => {
+    const shopId = shopSelect.value;
+    if (shopId) {
+        populateServicesForShop(shopId);
+        fetchWeekAvailability();
+    } else {
+        populateServiceSelect();
+    }
+    variantSelect && (variantSelect.innerHTML = '<option value=\"\">Vyber variant</option>');
+    resetSlots('Vyber variant.');
+});
+
+serviceSelect?.addEventListener('change', () => {
+    const serviceId = serviceSelect.value;
+    if (serviceId) {
+        populateVariants(serviceId);
+        fetchWeekAvailability();
+    } else {
+        variantSelect && (variantSelect.innerHTML = '<option value=\"\">Vyber variant</option>');
+        resetSlots('Vyber službu.');
+    }
+});
+
+variantSelect?.addEventListener('change', () => {
+    if (variantSelect.value) {
+        assignEmployeeForVariant(variantSelect.value);
+        fetchAvailability();
+    } else {
+        assignEmployeeForService(serviceSelect.value);
+        fetchAvailability();
+    }
+});
+dateInput?.addEventListener('change', fetchAvailability);
+
+fetchShops();
+
+function startOfWeek(date) {
+    const d = new Date(date);
+    const day = (d.getDay() + 6) % 7; // Monday=0
+    d.setDate(d.getDate() - day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+function setSelectedDate(date, updateCalendarRange = false) {
+    if (dateInput) {
+        const iso = formatIsoDate(date);
+        dateInput.value = iso;
+    }
+    if (updateCalendarRange) {
+        state.calendarStart = startOfWeek(date);
+    }
+    fetchAvailability();
+    fetchWeekAvailability();
+    renderCalendar();
+}
+
+function renderCalendar() {
+    if (!calendarGrid || !calendarMonth) return;
+    const today = new Date();
+    if (!state.calendarStart) {
+        state.calendarStart = startOfWeek(today);
+    }
+    const start = state.calendarStart;
+    const monthFormatter = new Intl.DateTimeFormat('sk-SK', { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
+    calendarMonth.textContent = monthFormatter.format(start);
+
+    calendarGrid.querySelectorAll('.calendar-item').forEach((el) => el.remove());
+
+    for (let i = 0; i < 7; i++) {
+        const day = new Date(start);
+        day.setDate(start.getDate() + i);
+        const dayNum = day.getDate();
+        const iso = formatIsoDate(day);
+        const isPast = day < new Date(today.toDateString());
+        const isClosed = state.closedDays.includes(iso);
+
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'calendar-item';
+        item.textContent = dayNum;
+        if (isPast) {
+            item.classList.add('disabled');
+        }
+        if (isClosed) {
+            item.classList.add('closed');
+        }
+        if (dateInput?.value === iso || (!dateInput?.value && i === 0)) {
+            item.classList.add('active');
+        }
+
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isPast || isClosed) return;
+            setSelectedDate(day);
+        });
+
+        calendarGrid.appendChild(item);
+    }
+}
+
+function bindCalendarNav() {
+    if (!calendarPrev || !calendarNext) return;
+    calendarPrev.addEventListener('click', (e) => {
+        e.preventDefault();
+        const newDate = new Date(state.calendarStart);
+        newDate.setDate(newDate.getDate() - 7);
+        const today = new Date();
+        if (newDate < startOfWeek(today)) {
+            state.calendarStart = startOfWeek(today);
+        } else {
+            state.calendarStart = newDate;
+        }
+        renderCalendar();
+        fetchWeekAvailability();
+    });
+    calendarNext.addEventListener('click', (e) => {
+        e.preventDefault();
+        const newDate = new Date(state.calendarStart);
+        newDate.setDate(newDate.getDate() + 7);
+        state.calendarStart = newDate;
+        renderCalendar();
+        fetchWeekAvailability();
+    });
+}
+
+function initSelectedDate() {
+    const today = new Date();
+    state.calendarStart = startOfWeek(today);
+    if (dateInput && !dateInput.value) {
+        dateInput.value = formatIsoDate(today);
+    }
+
+    // Pomocné funkcie pre kalendár
+    window.downloadIcs = function(title, start, duration, shopName) {
+        const startDate = new Date(start);
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        const format = (d) => d.toISOString().replace(/-|:|\.\d+/g, '');
+
+        const icsMsg = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'BEGIN:VEVENT',
+            `DTSTART:${format(startDate)}`,
+            `DTEND:${format(endDate)}`,
+            `SUMMARY:${title}`,
+            `DESCRIPTION:Rezervácia v ${shopName}`,
+            `LOCATION:${shopName}`,
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\n');
+
+        const blob = new Blob([icsMsg], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', 'rezervacia.ics');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    window.openGoogleCalendar = function(title, start, duration, shopName) {
+        const startDate = new Date(start);
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        const format = (d) => d.toISOString().replace(/-|:|\.\d+/g, '');
+
+        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${format(startDate)}/${format(endDate)}&details=${encodeURIComponent('Rezervácia v ' + shopName)}&location=${encodeURIComponent(shopName)}`;
+        window.open(url, '_blank');
+    };
+
+    // Lightpick initialization
+    const dateInputs = document.querySelectorAll('input[name="date"]:not([type="hidden"])');
+    dateInputs.forEach(el => {
+        new Lightpick({
+            field: el,
+            format: 'YYYY-MM-DD',
+            lang: 'sk',
+            locale: {
+                buttons: {
+                    prev: '←',
+                    next: '→',
+                    close: '×',
+                    reset: 'Vynulovať',
+                },
+                tooltip: {
+                    one: 'deň',
+                    few: 'dni',
+                    many: 'dní',
+                },
+                pluralize: function(i, locale) {
+                    if (i === 1) return locale.tooltip.one;
+                    if (i >= 2 && i <= 4) return locale.tooltip.few;
+                    return locale.tooltip.many;
+                },
+            },
+            onSelect: function(date) {
+                if (el.dataset.dateInput !== undefined) {
+                    // Ak je to hlavný kalendár na home page
+                    setSelectedDate(date.toDate());
+                }
+            }
+        });
+    });
+}
+
+initSelectedDate();
+renderCalendar();
+bindCalendarNav();
