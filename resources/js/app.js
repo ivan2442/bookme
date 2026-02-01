@@ -537,8 +537,11 @@ function renderSlots(slots) {
 bookingForm?.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!bookingOutput) {
+        console.warn('Booking output element not found');
         return;
     }
+
+    bookingOutput.classList.remove('hidden');
 
     const formData = new FormData(bookingForm);
     const payload = Object.fromEntries(formData.entries());
@@ -612,6 +615,7 @@ bookingForm?.addEventListener('submit', (event) => {
                     if (bookingForm) {
                         bookingForm.reset();
                         bookingOutput.textContent = 'Vyber službu a čas, systém preverí dostupnosť a potvrdí ti termín.';
+                        bookingOutput.classList.add('hidden');
                     }
 
                     // Skryť sekcie kroku 2 a 3
