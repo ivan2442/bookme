@@ -692,14 +692,55 @@ document.querySelectorAll('a[href="#booking"]').forEach(link => {
 const mobileMenuButton = document.getElementById('mobile-menu-button');
 const mobileMenu = document.getElementById('mobile-menu');
 if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
+    const toggleMenu = () => {
+        const isOpen = !mobileMenu.classList.contains('hidden');
+        if (isOpen) {
+            mobileMenu.classList.add('hidden');
+        } else {
+            mobileMenu.classList.remove('hidden');
+        }
+    };
+
+    mobileMenuButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu();
+    }, { passive: false });
 
     // Close mobile menu when clicking on any link inside it
     mobileMenu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
             mobileMenu.classList.add('hidden');
+        }, { passive: true });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!mobileMenu.classList.contains('hidden') &&
+            !mobileMenu.contains(e.target) &&
+            !mobileMenuButton.contains(e.target)) {
+            mobileMenu.classList.add('hidden');
+        }
+    }, { passive: true });
+}
+
+// Scroll to Top Logic
+const scrollToTopBtn = document.getElementById('scroll-to-top');
+if (scrollToTopBtn) {
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            scrollToTopBtn.classList.remove('opacity-0', 'invisible');
+            scrollToTopBtn.classList.add('opacity-100', 'visible');
+        } else {
+            scrollToTopBtn.classList.add('opacity-0', 'invisible');
+            scrollToTopBtn.classList.remove('opacity-100', 'visible');
+        }
+    }, { passive: true });
+
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
         });
     });
 }

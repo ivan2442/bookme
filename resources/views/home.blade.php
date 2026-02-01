@@ -19,8 +19,8 @@
                 Vyhľadaj prevádzku, vyber službu a čas, potvrď jedným klikom.
             </p>
             <div class="flex flex-wrap gap-3">
-                <a href="#booking" class="w-full md:w-auto mt-36 mb-0 md:mt-36 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
-                {{-- <a href="#services" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold hover:border-emerald-200 hover:shadow-md transition">Pozrieť služby</a> --}}
+            {{--    <a href="#booking" class="w-full md:w-auto mt-36 mb-0 md:mt-36 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
+            --}}    {{-- <a href="#services" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold hover:border-emerald-200 hover:shadow-md transition">Pozrieť služby</a> --}}
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
                 <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
@@ -37,7 +37,8 @@
                 </div>
             </div>
         </div>
-        {{--<div class="bg-white/80 backdrop-blur rounded-3xl border border-emerald-100/60 shadow-xl shadow-emerald-100/60 p-6 space-y-4">
+
+        <div class="bg-white/80 backdrop-blur rounded-3xl border border-emerald-100/60 shadow-xl shadow-emerald-100/60 p-6 space-y-4">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase text-slate-500 tracking-widest">Live náhľad</p>
@@ -73,8 +74,16 @@
                 </div>
             </div>
             <p class="text-xs text-slate-500">Ďalšie kroky: potvrdenie e-mailom, 24h pripomienka a ICS export.</p>
-        </div>--}}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-2xl">
+                  <a href="#booking" class="w-full md:w-full mt-6 mb-0 md:mt-6 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
+        </div>
+
     </div>
+
 </section>
 
 <section id="search" class="py-12 space-y-6">

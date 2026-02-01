@@ -54,6 +54,10 @@
                     @else
                         <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
                     @endif
+                    <form method="POST" action="{{ route('auth.logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="hover:text-red-600 transition font-medium text-slate-700">Odhlásiť sa</button>
+                    </form>
                 @else
                     <a class="hover:text-slate-900 transition" href="{{ route('auth.login') }}">Prihlásiť sa</a>
                 @endauth
@@ -73,7 +77,7 @@
         </header>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-2 mt-4">
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-2 mt-4 shadow-xl">
             <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">Vyhľadať prevádzku</a>
             <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#services">Služby</a>
             {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}
@@ -83,6 +87,10 @@
                 @else
                     <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
                 @endif
+                <form method="POST" action="{{ route('auth.logout') }}">
+                    @csrf
+                    <button type="submit" class="block w-full text-left py-2 text-base font-medium text-red-600 hover:text-red-700">Odhlásiť sa</button>
+                </form>
             @else
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('auth.login') }}">Prihlásiť sa</a>
             @endauth
@@ -101,6 +109,13 @@
                 <p class="text-slate-500">&copy 2026 WsTechnology.dev All Rights Reserved</p>
             </div>
         </footer>
+
+        <!-- Scroll to Top Button -->
+        <button id="scroll-to-top" class="fixed bottom-[25px] right-[25px] w-[25px] h-[25px] bg-emerald-500 text-white rounded-[6px] shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-emerald-600 z-50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+            </svg>
+        </button>
     </div>
     <script>
         function confirmDelete(event, message = 'Naozaj chcete odstrániť túto položku?') {
