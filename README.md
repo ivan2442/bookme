@@ -63,6 +63,10 @@ Aplikácia bude dostupná na `http://localhost:8000`.
 Ak chcete spustiť všetko naraz po úprave `.env` súboru:
 
 ```bash
+cd ../
+rm -r bookme
+git clone https://github.com/ivan2442/bookme.git
+cd bookme
 composer install
 php artisan key:generate
 php artisan migrate
