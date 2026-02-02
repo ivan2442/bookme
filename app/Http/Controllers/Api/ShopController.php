@@ -10,7 +10,11 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Profile::query()->where('status', 'published');
+        $query = Profile::query()
+            ->where('status', 'published')
+            ->whereHas('calendarSetting', function ($q) {
+                $q->where('is_public', true);
+            });
 
         if ($request->filled('q')) {
             $search = $request->string('q')->toString();

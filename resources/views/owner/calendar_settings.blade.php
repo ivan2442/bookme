@@ -91,10 +91,22 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <div>
+                                <label class="font-semibold text-slate-900 block">Verejná prevádzka</label>
+                                <p class="text-xs text-slate-500">Ak je zapnuté, prevádzka a služby sú viditeľné na webe.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="hidden" name="is_public" value="0">
+                                <input type="checkbox" name="is_public" value="1" class="sr-only peer" @checked(old('is_public', $settings->is_public ?? true))>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
                                 <label class="font-semibold text-slate-900 block">Vyžadovať potvrdenie</label>
                                 <p class="text-xs text-slate-500">Ak je vypnuté, rezervácie sa potvrdia automaticky.</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="hidden" name="requires_confirmation" value="0">
                                 <input type="checkbox" name="requires_confirmation" value="1" class="sr-only peer" @checked(old('requires_confirmation', $settings->requires_confirmation ?? false))>
                                 <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                             </label>

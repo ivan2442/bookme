@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\ServiceVariant;
 use App\Models\CalendarSetting;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -21,24 +22,67 @@ class OwnerDashboardController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $profiles = Profile::where('owner_id', $user->id)->pluck('id');
+        $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
 
         $now = Carbon::now();
         $monthStart = $now->copy()->startOfMonth();
 
         $appointmentsQuery = Appointment::with(['profile', 'service', 'employee'])
-            ->whereIn('profile_id', $profiles);
+            ->whereIn('profile_id', $profileIds);
 
         $stats = [
             'appointments_today' => (clone $appointmentsQuery)->whereDate('start_at', $now)->count(),
             'appointments_month' => (clone $appointmentsQuery)->whereBetween('start_at', [$monthStart, $now])->count(),
-            'revenue_month' => (clone $appointmentsQuery)->whereBetween('start_at', [$monthStart, $now])->sum('price'),
-            'services' => Service::whereIn('profile_id', $profiles)->count(),
+            'services' => Service::whereIn('profile_id', $profileIds)->count(),
         ];
 
-        $upcoming = (clone $appointmentsQuery)->orderBy('start_at')->limit(5)->get();
+        // Fetch all appointments for these profiles to allow JS filtering or initially for today
+        $upcoming = (clone $appointmentsQuery)
+            ->where('status', '!=', 'completed')
+            ->orderBy('start_at')
+            ->get();
 
-        return view('owner.dashboard', compact('stats', 'upcoming'));
+        $allProfiles = Profile::with('employees')->whereIn('id', $profileIds)->get();
+
+        return view('owner.dashboard', compact('stats', 'upcoming', 'allProfiles'));
+    }
+
+    public function getAppointmentsForDay(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
+        $date = $request->date;
+
+        $appointments = Appointment::with(['profile', 'service', 'employee'])
+            ->whereIn('profile_id', $profileIds)
+            ->whereDate('start_at', $date)
+            ->where('status', '!=', 'completed')
+            ->orderBy('start_at')
+            ->get()
+            ->map(function($a) {
+                $daysNames = [1=>'Pondelok',2=>'Utorok',3=>'Streda',4=>'Štvrtok',5=>'Piatok',6=>'Sobota',0=>'Nedeľa'];
+                return [
+                    'id' => $a->id,
+                    'customer_name' => $a->customer_name,
+                    'customer_phone' => $a->customer_phone,
+                    'service_name' => $a->metadata['service_name_manual'] ?? ($a->service?->name ?? 'Manuálna služba'),
+                    'employee_name' => optional($a->employee)->name ?? 'Bez zamestnanca',
+                    'start_time' => $a->start_at->format('H:i'),
+                    'end_time' => $a->end_at->format('H:i'),
+                    'date_formatted' => $a->start_at->format('d.m.Y'),
+                    'day_name' => $daysNames[$a->start_at->dayOfWeek] ?? '',
+                    'price' => number_format($a->price, 2),
+                    'status' => $a->status,
+                    'duration_minutes' => $a->metadata['duration_minutes'] ?? (int) (($a->end_at->timestamp - $a->start_at->timestamp) / 60),
+                    'employee_id' => $a->employee_id,
+                    'date_raw' => $a->start_at->format('Y-m-d'),
+                    'reschedule_url' => route('owner.appointments.reschedule', $a),
+                    'status_update_url' => route('owner.appointments.status.update', $a),
+                    'delete_url' => route('owner.appointments.delete', $a),
+                ];
+            });
+
+        return response()->json($appointments);
     }
 
     private function getOwnerProfileIds(Request $request)
@@ -258,6 +302,150 @@ class OwnerDashboardController extends Controller
         return back()->with('status', 'Rezervácia bola odstránená.');
     }
 
+    public function updateAppointmentStatus(Request $request, Appointment $appointment): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        if (!in_array($appointment->profile_id, $profileIds)) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'status' => ['required', 'string', 'in:confirmed,completed,no-show,cancelled,pending'],
+        ]);
+
+        $appointment->update(['status' => $data['status']]);
+
+        $message = match($data['status']) {
+            'completed' => 'Rezervácia bola označená ako vybavená.',
+            'no-show' => 'Zákazník bol označený ako neprišiel.',
+            'cancelled' => 'Rezervácia bola zrušená.',
+            default => 'Stav rezervácie bol aktualizovaný.',
+        };
+
+        return back()->with('status', $message);
+    }
+
+    public function storeManualAppointment(Request $request): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        $data = $request->validate([
+            'profile_id' => ['required', 'exists:profiles,id'],
+            'employee_id' => ['nullable', 'exists:employees,id'],
+            'customer_name' => ['required', 'string', 'max:255'],
+            'customer_phone' => ['nullable', 'string', 'max:50'],
+            'service_name' => ['required', 'string', 'max:255'],
+            'date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        if (!in_array($data['profile_id'], $profileIds)) {
+            abort(403);
+        }
+
+        $startAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['start_time']);
+        $endAt = $startAt->copy()->addMinutes((int) $data['duration_minutes']);
+
+        // Pre manuálne rezervácie použijeme prvú nájdenú službu ako placeholder,
+        // alebo ju v budúcne môžeme úplne oddeliť v databáze.
+        $service = Service::where('profile_id', $data['profile_id'])->first();
+
+        Appointment::create([
+            'profile_id' => $data['profile_id'],
+            'service_id' => $service?->id,
+            'employee_id' => $data['employee_id'] ?? null,
+            'customer_name' => $data['customer_name'],
+            'customer_email' => null, // Email nie je vo formulári
+            'customer_phone' => $data['customer_phone'] ?? null,
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+            'status' => 'confirmed',
+            'price' => $data['price'],
+            'currency' => 'EUR', // Predvolená mena
+            'confirmation_code' => (string) Str::uuid(),
+            'metadata' => [
+                'notes' => $data['notes'] ?? null,
+                'manual' => true,
+                'service_name_manual' => $data['service_name'],
+                'duration_minutes' => (int) $data['duration_minutes'],
+            ],
+        ]);
+
+        return back()->with('status', 'Rezervácia bola úspešne pridaná.');
+    }
+
+    public function rescheduleAppointment(Request $request, Appointment $appointment): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        if (!in_array($appointment->profile_id, $profileIds)) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
+            'employee_id' => ['nullable', 'exists:employees,id'],
+        ]);
+
+        $startAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['start_time']);
+        $endAt = $startAt->copy()->addMinutes((int) $data['duration_minutes']);
+
+        $metadata = $appointment->metadata ?? [];
+        $metadata['duration_minutes'] = (int) $data['duration_minutes'];
+
+        $appointment->update([
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+            'employee_id' => $data['employee_id'] ?? $appointment->employee_id,
+            'metadata' => $metadata,
+        ]);
+
+        return back()->with('status', 'Rezervácia bola úspešne presunutá.');
+    }
+
+    public function updateAppointment(Request $request, Appointment $appointment): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        if (!in_array($appointment->profile_id, $profileIds)) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'customer_name' => ['required', 'string', 'max:255'],
+            'customer_phone' => ['nullable', 'string', 'max:50'],
+            'service_name' => ['required', 'string', 'max:255'],
+            'date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'employee_id' => ['nullable', 'exists:employees,id'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        $startAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['start_time']);
+        $endAt = $startAt->copy()->addMinutes((int) $data['duration_minutes']);
+
+        $metadata = $appointment->metadata ?? [];
+        $metadata['service_name_manual'] = $data['service_name'];
+        $metadata['duration_minutes'] = (int) $data['duration_minutes'];
+        $metadata['notes'] = $data['notes'] ?? null;
+
+        $appointment->update([
+            'customer_name' => $data['customer_name'],
+            'customer_phone' => $data['customer_phone'] ?? null,
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+            'price' => $data['price'],
+            'employee_id' => $data['employee_id'] ?? null,
+            'metadata' => $metadata,
+        ]);
+
+        return back()->with('status', 'Rezervácia bola úspešne upravená.');
+    }
+
     public function schedules(Request $request): View
     {
         $profileIds = $this->getOwnerProfileIds($request);
@@ -376,6 +564,7 @@ class OwnerDashboardController extends Controller
             'min_notice_minutes' => ['required', 'integer', 'min:0', 'max:1440'],
             'cancellation_limit_hours' => ['required', 'integer', 'min:0', 'max:720'],
             'requires_confirmation' => ['nullable', 'boolean'],
+            'is_public' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'banner' => ['nullable', 'image', 'max:5120'],
@@ -411,6 +600,7 @@ class OwnerDashboardController extends Controller
                 'min_notice_minutes' => $data['min_notice_minutes'],
                 'cancellation_limit_hours' => $data['cancellation_limit_hours'],
                 'requires_confirmation' => $request->boolean('requires_confirmation'),
+                'is_public' => $request->boolean('is_public'),
             ]
         );
 
@@ -498,6 +688,67 @@ class OwnerDashboardController extends Controller
     public function payments(Request $request): View
     {
         $profileIds = $this->getOwnerProfileIds($request);
-        return view('owner.payments');
+
+        // Získanie vybraného mesiaca a roka, inak aktuálny
+        $selectedMonth = $request->integer('month', Carbon::now()->month);
+        $selectedYear = $request->integer('year', Carbon::now()->year);
+        $selectedDate = Carbon::createFromDate($selectedYear, $selectedMonth, 1);
+
+        $startOfMonth = $selectedDate->copy()->startOfMonth();
+        $endOfMonth = $selectedDate->copy()->endOfMonth();
+
+        $monthsSlovak = [
+            1 => 'Január', 2 => 'Február', 3 => 'Marec', 4 => 'Apríl',
+            5 => 'Máj', 6 => 'Jún', 7 => 'Júl', 8 => 'August',
+            9 => 'September', 10 => 'Október', 11 => 'November', 12 => 'December'
+        ];
+
+        // Vybraný mesiac - vybavené rezervácie
+        $monthlyAppointments = Appointment::whereIn('profile_id', $profileIds)
+            ->where('status', 'completed')
+            ->whereBetween('start_at', [$startOfMonth, $endOfMonth])
+            ->get();
+
+        $stats = [
+            'count' => $monthlyAppointments->count(),
+            'revenue' => $monthlyAppointments->sum('price'),
+            'hours' => $monthlyAppointments->reduce(function ($carry, $appointment) {
+                if ($appointment->start_at && $appointment->end_at) {
+                    return $carry + $appointment->start_at->diffInMinutes($appointment->end_at);
+                }
+                return $carry;
+            }, 0) / 60,
+        ];
+
+        $now = Carbon::now();
+        // Ročný graf - posledných 12 mesiacov
+        $chartData = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $month = $now->copy()->subMonths($i);
+            $start = $month->copy()->startOfMonth();
+            $end = $month->copy()->endOfMonth();
+
+            $revenue = Appointment::whereIn('profile_id', $profileIds)
+                ->where('status', 'completed')
+                ->whereBetween('start_at', [$start, $end])
+                ->sum('price');
+
+            $chartData[] = [
+                'label' => Str::substr($monthsSlovak[$month->month], 0, 3),
+                'full_label' => $monthsSlovak[$month->month] . ' ' . $month->year,
+                'revenue' => (float)$revenue,
+            ];
+        }
+
+        // Zoznam vybavených rezervácií pre vybraný mesiac
+        $latestPayments = Appointment::with(['service', 'employee'])
+            ->whereIn('profile_id', $profileIds)
+            ->where('status', 'completed')
+            ->whereBetween('start_at', [$startOfMonth, $endOfMonth])
+            ->orderBy('start_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('owner.payments', compact('stats', 'chartData', 'latestPayments', 'selectedMonth', 'selectedYear', 'selectedDate', 'monthsSlovak'));
     }
 }

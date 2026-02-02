@@ -8,6 +8,22 @@
     <meta name="description" content="Rýchle online rezervácie pre služby na jednom mieste.">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Nice Select -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+    <style>
+        .nice-select .list {
+            max-height: 200px;
+            overflow-y: auto !important;
+        }
+        .nice-select-time .option {
+            line-height: 15px !important;
+            min-height: 25px !important;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 <body class="bg-sand text-slate-900 selection:bg-emerald-200/80 selection:text-slate-900 overflow-x-hidden">
     <div class="bg-gradient radial-fade"></div>

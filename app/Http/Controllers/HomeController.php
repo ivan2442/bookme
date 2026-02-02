@@ -23,6 +23,9 @@ class HomeController extends Controller
         $profile = Profile::with(['services.variants', 'employees', 'calendarSetting', 'schedules'])
             ->where('slug', $slug)
             ->where('status', 'published')
+            ->whereHas('calendarSetting', function ($q) {
+                $q->where('is_public', true);
+            })
             ->firstOrFail();
 
         return view('profiles.show', compact('profile'));

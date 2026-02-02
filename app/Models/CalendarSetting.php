@@ -19,11 +19,14 @@ class CalendarSetting extends Model
         'min_notice_minutes',
         'cancellation_limit_hours',
         'requires_confirmation',
+        'is_public',
         'timezone',
         'preferences',
     ];
 
     protected $casts = [
+        'requires_confirmation' => 'boolean',
+        'is_public' => 'boolean',
         'preferences' => 'array',
     ];
 

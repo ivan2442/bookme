@@ -173,15 +173,20 @@ function renderShops() {
                         <span class="text-[10px] uppercase font-bold text-slate-500 tracking-tight leading-none mb-1">Najbližší termín</span>
                         <span class="text-sm font-bold text-slate-900 truncate">${nextSlot}</span>
                     </div>
-                    <div class="h-8 w-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-500 transition-colors flex-shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    <div class="flex items-center gap-2">
+                        <a href="/prevadzka/${shop.slug}" class="stop-propagation h-8 px-3 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-colors text-[10px] font-bold uppercase tracking-tight">
+                            Detail
+                        </a>
+                        <div class="h-8 w-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-500 transition-colors flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
 
         card.addEventListener('click', (e) => {
-            if (e.target.classList.contains('stop-propagation')) {
+            if (e.target.closest('.stop-propagation')) {
                 return;
             }
             const shopId = shop.id;
@@ -1073,6 +1078,186 @@ function initSelectedDate() {
     });
 }
 
+// ...existing initializers
 initSelectedDate();
 renderCalendar();
 bindCalendarNav();
+initAdminDashboard();
+
+function initAdminDashboard() {
+    const adminCalGrid = document.querySelector('[data-admin-cal-grid]');
+    const adminCalMonth = document.querySelector('[data-admin-cal-month]');
+    const adminCalPrev = document.querySelector('[data-admin-cal-prev]');
+    const adminCalNext = document.querySelector('[data-admin-cal-next]');
+    const adminDateInput = document.getElementById('admin-selected-date');
+    const appointmentsList = document.getElementById('appointments-list');
+    const upcomingTitle = document.getElementById('upcoming-title');
+
+    if (!adminCalGrid || !adminDateInput) return;
+
+    let adminState = {
+        calendarStart: startOfWeek(new Date()),
+        selectedDate: formatIsoDate(new Date())
+    };
+
+    function renderAdminCalendar() {
+        if (!adminCalGrid || !adminCalMonth) return;
+        const start = adminState.calendarStart;
+        const monthFormatter = new Intl.DateTimeFormat('sk-SK', { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
+        adminCalMonth.textContent = monthFormatter.format(start);
+
+        adminCalGrid.querySelectorAll('.calendar-item').forEach((el) => el.remove());
+
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(start);
+            day.setDate(start.getDate() + i);
+            const dayNum = day.getDate();
+            const iso = formatIsoDate(day);
+
+            const item = document.createElement('a');
+            item.href = '#';
+            item.className = 'calendar-item overflow-hidden';
+            item.textContent = dayNum;
+
+            if (adminState.selectedDate === iso) {
+                item.classList.add('active');
+            }
+
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                adminState.selectedDate = iso;
+                adminDateInput.value = iso;
+                fetchAdminAppointments(iso);
+                renderAdminCalendar();
+            });
+
+            adminCalGrid.appendChild(item);
+        }
+    }
+
+    async function fetchAdminAppointments(date) {
+        if (!appointmentsList) return;
+
+        // Predbežný vizuálny feedback
+        const d = new Date(date);
+        const dayNames = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
+        const formattedTitle = (d.toDateString() === new Date().toDateString()) ? 'Termíny na dnes' : `Termíny na ${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${dayNames[d.getDay()]}`;
+        if (upcomingTitle) upcomingTitle.textContent = formattedTitle;
+
+        try {
+            const response = await axios.get(`/owner/appointments/day?date=${date}`);
+            const appointments = response.data;
+
+            if (appointments.length === 0) {
+                appointmentsList.innerHTML = `
+                    <div class="py-8 text-center" id="no-appointments">
+                        <p class="text-sm text-slate-500 italic">Žiadne nadchádzajúce rezervácie na tento deň.</p>
+                    </div>`;
+                return;
+            }
+
+            appointmentsList.innerHTML = appointments.map(a => `
+                <div class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <p class="font-bold text-slate-900 leading-tight">${a.service_name}</p>
+                            <span class="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-bold uppercase tracking-tight">${a.employee_name}</span>
+                        </div>
+                        <div class="flex flex-col text-sm text-slate-600">
+                            <span class="font-medium text-slate-900">${a.customer_name}</span>
+                            ${a.customer_phone ? `<span class="text-xs text-slate-500">${a.customer_phone}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="md:text-right space-y-2 flex-1">
+                        <div class="flex flex-col md:items-end">
+                            <p class="font-bold text-slate-900 leading-none">${a.date_formatted} ${a.day_name}</p>
+                            <div class="flex items-center gap-3 mt-1 md:justify-end">
+                                <p class="text-sm font-semibold text-emerald-600">${a.start_time} - ${a.end_time}</p>
+                                <span class="h-1 w-1 rounded-full bg-slate-200"></span>
+                                <p class="text-sm font-bold text-slate-900">€${a.price}</p>
+                            </div>
+                            <p class="text-[10px] uppercase font-bold text-slate-400 mt-1">${a.status}</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 md:justify-end">
+                            ${(a.status !== 'completed' && a.status !== 'no-show') ? `
+                                <form method="POST" action="${a.status_update_url}">
+                                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Vybavené">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Vybavené</span>
+                                    </button>
+                                </form>
+                                <form method="POST" action="${a.status_update_url}">
+                                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                                    <input type="hidden" name="status" value="no-show">
+                                    <button type="submit" class="p-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Neprišiel">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <span>Neprišiel</span>
+                                    </button>
+                                </form>
+                                <button type="button"
+                                    onclick="openRescheduleModal(${a.id}, '${a.date_raw}', '${a.start_time}', ${a.duration_minutes}, ${a.employee_id || 'null'})"
+                                    class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Presunúť">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                    <span>Presunúť</span>
+                                </button>
+                                <button type="button"
+                                    onclick="openEditAppointmentModal(${JSON.stringify({
+                                        id: a.id,
+                                        customer_name: a.customer_name,
+                                        customer_phone: a.customer_phone,
+                                        service_name: a.service_name,
+                                        date: a.date_raw,
+                                        start_time: a.start_time,
+                                        duration_minutes: a.duration_minutes,
+                                        price: a.price,
+                                        employee_id: a.employee_id,
+                                        notes: a.notes
+                                    }).replace(/"/g, '&quot;')})"
+                                    class="p-2 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Upraviť">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    <span>Upraviť</span>
+                                </button>
+                            ` : ''}
+                            <form method="POST" action="${a.delete_url}" onsubmit="return confirmDelete(event, 'Naozaj vymazať túto rezerváciu?')">
+                                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Vymazať">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <span>Vymazať</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Chyba pri načítaní rezervácií', error);
+            appointmentsList.innerHTML = '<p class="text-sm text-red-500">Chyba pri načítaní dát.</p>';
+        }
+    }
+
+    if (adminCalPrev) {
+        adminCalPrev.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newDate = new Date(adminState.calendarStart);
+            newDate.setDate(newDate.getDate() - 7);
+            adminState.calendarStart = newDate;
+            renderAdminCalendar();
+        });
+    }
+
+    if (adminCalNext) {
+        adminCalNext.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newDate = new Date(adminState.calendarStart);
+            newDate.setDate(newDate.getDate() + 7);
+            adminState.calendarStart = newDate;
+            renderAdminCalendar();
+        });
+    }
+
+    renderAdminCalendar();
+}
