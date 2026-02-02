@@ -76,6 +76,7 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     // Rozvrhy
     Route::get('/schedules', [OwnerDashboardController::class, 'schedules'])->name('schedules');
     Route::post('/schedules', [OwnerDashboardController::class, 'storeSchedule'])->name('schedules.store');
+    Route::post('/schedules/{schedule}', [OwnerDashboardController::class, 'updateSchedule'])->name('schedules.update');
     Route::delete('/schedules/{schedule}', [OwnerDashboardController::class, 'deleteSchedule'])->name('schedules.delete');
 
     // Nastavenia kalendára

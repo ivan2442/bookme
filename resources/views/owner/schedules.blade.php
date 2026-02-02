@@ -98,12 +98,19 @@
                                 <p class="text-[10px] uppercase font-bold text-slate-400 mt-1">Celá prevádzka</p>
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('owner.schedules.delete', $schedule) }}" onsubmit="return confirmDelete(event, 'Naozaj odstrániť tento čas?')">
-                            @csrf @method('DELETE')
-                            <button class="p-2 text-slate-300 hover:text-red-500 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <div class="flex items-center gap-1">
+                            <button type="button"
+                                onclick="openEditModal({{ $schedule->id }}, {{ $schedule->profile_id }}, {{ $schedule->employee_id ?? 'null' }}, {{ $schedule->day_of_week }}, '{{ substr($schedule->start_time, 0, 5) }}', '{{ substr($schedule->end_time, 0, 5) }}')"
+                                class="p-2 text-slate-300 hover:text-blue-500 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
-                        </form>
+                            <form method="POST" action="{{ route('owner.schedules.delete', $schedule) }}" onsubmit="return confirmDelete(event, 'Naozaj odstrániť tento čas?')">
+                                @csrf @method('DELETE')
+                                <button class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @empty
                     <p class="text-sm text-slate-500 italic text-center py-4">Zatiaľ nie sú nastavené žiadne pracovné časy.</p>
@@ -112,6 +119,77 @@
         </div>
     </div>
 </section>
+
+<!-- Edit Schedule Modal -->
+<div id="editScheduleModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeEditModal()"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 overflow-hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-display font-semibold text-slate-900">Upraviť pracovný čas</h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form id="editScheduleForm" method="POST" action="" class="space-y-4">
+                @csrf
+                <input type="hidden" id="edit_schedule_id">
+
+                <div>
+                    <label class="label">Prevádzka</label>
+                    <select name="profile_id" id="edit_profile_id" class="input-control" required>
+                        @foreach($profiles as $profile)
+                            <option value="{{ $profile->id }}">{{ $profile->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label">Zamestnanec (voliteľné)</label>
+                    <select name="employee_id" id="edit_employee_id" class="input-control">
+                        <option value="">Bez väzby na zamestnanca (všeobecný čas)</option>
+                        @foreach($profiles as $profile)
+                            @foreach($profile->employees as $employee)
+                                <option value="{{ $employee->id }}">{{ $employee->name }} — {{ $profile->name }}</option>
+                            @endforeach
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label">Deň v týždni</label>
+                    <select name="day_of_week" id="edit_day_of_week" class="input-control" required>
+                        @foreach([1=>'Pondelok',2=>'Utorok',3=>'Streda',4=>'Štvrtok',5=>'Piatok',6=>'Sobota',0=>'Nedeľa'] as $val => $label)
+                            <option value="{{ $val }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">Otvárame o</label>
+                        <input type="time" name="start_time" id="edit_start_time" class="input-control" required>
+                    </div>
+                    <div>
+                        <label class="label">Zatvárame o</label>
+                        <input type="time" name="end_time" id="edit_end_time" class="input-control" required>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">
+                        Zrušiť
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition">
+                        Uložiť zmeny
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     function selectAllDays() {
@@ -130,6 +208,28 @@
 
     function clearDays() {
         document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
+    }
+
+    function openEditModal(id, profileId, employeeId, dayOfWeek, startTime, endTime) {
+        const modal = document.getElementById('editScheduleModal');
+        const form = document.getElementById('editScheduleForm');
+
+        form.action = `/owner/schedules/${id}`;
+        document.getElementById('edit_schedule_id').value = id;
+        document.getElementById('edit_profile_id').value = profileId;
+        document.getElementById('edit_employee_id').value = employeeId || '';
+        document.getElementById('edit_day_of_week').value = dayOfWeek;
+        document.getElementById('edit_start_time').value = startTime;
+        document.getElementById('edit_end_time').value = endTime;
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editScheduleModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 </script>
 @endsection

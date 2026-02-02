@@ -41,6 +41,7 @@
                         <div class="space-y-1">
                             <label class="label">Min. čas pred (min)</label>
                             <input type="number" name="min_notice_minutes" class="input-control" min="0" value="{{ old('min_notice_minutes', $settings->min_notice_minutes ?? 60) }}" required>
+                            <p class="text-[10px] text-slate-500 italic">Ako dlho vopred sa možno objednať (napr. 60 min).</p>
                         </div>
                     </div>
 

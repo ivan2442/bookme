@@ -326,6 +326,36 @@ class OwnerDashboardController extends Controller
         return back()->with('status', 'Pracovný čas bol odstránený.');
     }
 
+    public function updateSchedule(Request $request, Schedule $schedule): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        if (!in_array($schedule->profile_id, $profileIds)) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'profile_id' => ['required', 'exists:profiles,id'],
+            'employee_id' => ['nullable', 'exists:employees,id'],
+            'day_of_week' => ['required', 'integer', 'between:0,6'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+        ]);
+
+        if (!in_array($data['profile_id'], $profileIds)) {
+            abort(403);
+        }
+
+        $schedule->update([
+            'profile_id' => $data['profile_id'],
+            'employee_id' => $data['employee_id'] ?? null,
+            'day_of_week' => $data['day_of_week'],
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+        ]);
+
+        return back()->with('status', 'Pracovný čas bol úspešne upravený.');
+    }
+
     public function calendarSettings(Request $request): View
     {
         $profileIds = $this->getOwnerProfileIds($request);
