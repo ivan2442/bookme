@@ -462,77 +462,178 @@ function resetSlots(message) {
     timeInput && (timeInput.value = '');
 }
 
-function renderSlots(slots) {
-    if (!timeGrid) return;
-    if (!slots.length) {
-        resetSlots('Žiadne voľné termíny pre vybraný deň.');
-        return;
-    }
-    timeGrid.innerHTML = '';
+let lockTimeout = null;
+    let refreshTimeout = null;
 
-    const morning = [];
-    const afternoon = [];
+    const startLockTimer = () => {
+        if (lockTimeout) clearTimeout(lockTimeout);
+        if (refreshTimeout) clearTimeout(refreshTimeout);
 
-    slots.forEach((slot) => {
-        const startDate = new Date(slot.start_at);
-        const hour = parseInt(
-            new Intl.DateTimeFormat('en-GB', { hour: '2-digit', hour12: false, timeZone: TIME_ZONE }).format(startDate),
-            10
-        );
-        if (hour < 12) {
-            morning.push(slot);
-        } else {
-            afternoon.push(slot);
-        }
-    });
+        // 4 minutes and 50 seconds = 290000 ms (10 seconds before 5 minutes)
+        lockTimeout = setTimeout(() => {
+            Swal.fire({
+                title: 'Pokračovať v rezervácii?',
+                text: 'Z dôvodu neaktivity bude vaša rozpracovaná rezervácia čoskoro zrušená.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#f43f5e',
+                confirmButtonText: 'Pokračovať',
+                cancelButtonText: 'Zrušiť',
+                timer: 10000,
+                timerProgressBar: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Extend the lock (client-side simple version, just restart timer)
+                    startLockTimer();
+                } else {
+                    window.location.reload();
+                }
+            });
+        }, 290000);
 
-    const renderGroup = (label, group) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'slot-group';
-        const heading = document.createElement('p');
-        heading.className = 'slot-group-heading';
-        heading.textContent = label;
-        wrapper.appendChild(heading);
-
-        const row = document.createElement('div');
-        row.className = 'flex flex-wrap gap-2';
-
-        group.forEach((slot) => {
-            const button = document.createElement('button');
-            const start = new Date(slot.start_at);
-            const time = timeFormatter.format(start);
-            const isAvailable = slot.status === 'available' || slot.available === true;
-            button.type = 'button';
-            button.className = 'time-chip';
-            button.dataset.time = slot.start_at;
-            button.textContent = time;
-            if (!isAvailable) {
-                button.disabled = true;
-                button.classList.add('is-disabled');
-                button.title = 'Obsadené';
-            } else {
-                button.addEventListener('click', () => {
-                    timeGrid.querySelectorAll('.time-chip').forEach((b) => b.classList.remove('is-active'));
-                    button.classList.add('is-active');
-                    if (timeInput) {
-                        timeInput.value = slot.start_at;
-                    }
-                });
+        // 5 minutes = 300000 ms
+        refreshTimeout = setTimeout(() => {
+            if (!Swal.isVisible()) {
+                window.location.reload();
             }
-            row.appendChild(button);
-        });
-
-        wrapper.appendChild(row);
-        timeGrid.appendChild(wrapper);
+        }, 300000);
     };
 
-    if (morning.length) {
-        renderGroup('Dopoludnie', morning);
+    function renderSlots(slots) {
+        if (!timeGrid) return;
+        if (!slots.length) {
+            resetSlots('Žiadne voľné termíny pre vybraný deň.');
+            return;
+        }
+        timeGrid.innerHTML = '';
+
+        const morning = [];
+        const afternoon = [];
+
+        slots.forEach((slot) => {
+            const startDate = new Date(slot.start_at);
+            const hour = parseInt(
+                new Intl.DateTimeFormat('en-GB', { hour: '2-digit', hour12: false, timeZone: TIME_ZONE }).format(startDate),
+                10
+            );
+            if (hour < 12) {
+                morning.push(slot);
+            } else {
+                afternoon.push(slot);
+            }
+        });
+
+        const renderGroup = (label, group) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'slot-group';
+            const heading = document.createElement('p');
+            heading.className = 'slot-group-heading mb-3';
+            heading.textContent = label;
+            wrapper.appendChild(heading);
+
+            const row = document.createElement('div');
+            row.className = 'flex flex-row gap-3 overflow-x-auto pb-2 scrollbar-hide';
+
+            group.forEach((slot) => {
+                const button = document.createElement('button');
+                const start = new Date(slot.start_at);
+                const time = timeFormatter.format(start);
+                const isAvailable = slot.status === 'available';
+                const isLocking = slot.status === 'locking';
+
+                button.type = 'button';
+                button.className = 'slot-card min-w-[100px] flex-shrink-0 text-center transition-all hover:border-emerald-200 p-3';
+                button.dataset.time = slot.start_at;
+
+                const timeP = document.createElement('p');
+                timeP.className = 'font-semibold text-slate-900';
+                timeP.textContent = time;
+
+                const statusP = document.createElement('p');
+                statusP.className = 'text-[10px] text-emerald-600';
+
+                if (isLocking) {
+                    button.disabled = true;
+                    button.dataset.status = 'busy';
+                    button.classList.add('opacity-70', 'cursor-not-allowed');
+                    statusP.classList.replace('text-emerald-600', 'text-orange-500');
+                    statusP.textContent = 'obsadzuje sa';
+                    button.title = 'Niekto iný práve vypĺňa rezerváciu';
+                } else if (!isAvailable) {
+                    button.disabled = true;
+                    button.dataset.status = 'busy';
+                    button.classList.add('opacity-60', 'cursor-not-allowed');
+                    statusP.classList.replace('text-emerald-600', 'text-slate-500');
+                    statusP.textContent = 'obsadené';
+                    button.title = 'Obsadené';
+                } else {
+                    statusP.textContent = 'voľný';
+                    button.addEventListener('click', () => {
+                        timeGrid.querySelectorAll('.slot-card').forEach((b) => {
+                            b.classList.remove('is-active', 'ring-2', 'ring-emerald-500', 'border-emerald-500', 'bg-emerald-50');
+                            // Reset internal text colors
+                            const tp = b.querySelector('p.font-semibold');
+                            if (tp) {
+                                tp.classList.remove('text-white');
+                                tp.classList.add('text-slate-900');
+                            }
+                            const sp = b.querySelector('p.text-\\[10px\\]');
+                            if (sp) {
+                                sp.classList.remove('text-emerald-100');
+                                sp.classList.add('text-emerald-600');
+                            }
+                        });
+
+                        button.classList.add('is-active', 'ring-2', 'ring-emerald-500', 'border-emerald-500', 'bg-emerald-500');
+                        // Light up text
+                        if (timeP) {
+                            timeP.classList.remove('text-slate-900');
+                            timeP.classList.add('text-white');
+                        }
+                        if (statusP) {
+                            statusP.classList.remove('text-emerald-600');
+                            statusP.classList.add('text-emerald-100');
+                        }
+
+                        if (timeInput) {
+                            timeInput.value = slot.start_at;
+                        }
+
+                        // Create temporary lock
+                        const payload = {
+                            profile_id: state.currentProfileId,
+                            service_id: state.selectedServiceId,
+                            service_variant_id: state.selectedVariantId,
+                            employee_id: state.selectedEmployeeId,
+                            start_at: slot.start_at,
+                            date: dateInput?.value
+                        };
+
+                        axios.post('/api/locks', payload)
+                            .then(() => {
+                                startLockTimer();
+                            })
+                            .catch(err => console.error('Nepodarilo sa vytvoriť zámok', err));
+                    });
+                }
+
+                button.appendChild(timeP);
+                button.appendChild(statusP);
+                row.appendChild(button);
+            });
+
+            wrapper.appendChild(row);
+            timeGrid.appendChild(wrapper);
+        };
+
+        if (morning.length) {
+            renderGroup('Dopoludnie', morning);
+        }
+        if (afternoon.length) {
+            renderGroup('Popoludnie', afternoon);
+        }
     }
-    if (afternoon.length) {
-        renderGroup('Popoludnie', afternoon);
-    }
-}
 
 bookingForm?.addEventListener('submit', (event) => {
     event.preventDefault();

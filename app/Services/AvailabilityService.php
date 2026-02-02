@@ -125,7 +125,7 @@ class AvailabilityService
                             continue;
                         }
 
-                        $isBusy = $this->hasConflict($slotStart, $slotEnd, $appointments, $locks, $employeeId);
+                        $status = $this->getStatus($slotStart, $slotEnd, $appointments, $locks, $employeeId);
 
                         $slots[] = [
                             'profile_id' => $profile->id,
@@ -133,7 +133,7 @@ class AvailabilityService
                             'employee_id' => $employeeId,
                             'start_at' => $slotStart->toIso8601String(),
                             'end_at' => $slotEnd->toIso8601String(),
-                            'status' => $isBusy ? 'busy' : 'available',
+                            'status' => $status,
                         ];
                     }
                 }
@@ -227,18 +227,16 @@ class AvailabilityService
         return $windows;
     }
 
-    protected function hasConflict(CarbonInterface $start, CarbonInterface $end, Collection $appointments, Collection $locks, ?int $employeeId): bool
+    protected function getStatus(CarbonInterface $start, CarbonInterface $end, Collection $appointments, Collection $locks, ?int $employeeId): string
     {
         $overlap = fn ($itemStart, $itemEnd) => $itemStart->lt($end) && $itemEnd->gt($start);
 
-        $appointmentConflict = $appointments->first(function (Appointment $appointment) use ($overlap, $start, $end, $employeeId) {
+        $appointmentConflict = $appointments->first(function (Appointment $appointment) use ($overlap, $employeeId) {
             if ($employeeId) {
-                // Conflict if appointment is unassigned or matches the selected employee
                 if ($appointment->employee_id && (int) $appointment->employee_id !== (int) $employeeId) {
                     return false;
                 }
             } else {
-                // When no employee chosen, only block generic (unassigned) appointments
                 if ($appointment->employee_id) {
                     return false;
                 }
@@ -248,10 +246,10 @@ class AvailabilityService
         });
 
         if ($appointmentConflict) {
-            return true;
+            return 'busy';
         }
 
-        $lockConflict = $locks->first(function (AppointmentLock $lock) use ($overlap, $start, $end, $employeeId) {
+        $lockConflict = $locks->first(function (AppointmentLock $lock) use ($overlap, $employeeId) {
             if ($employeeId) {
                 if ($lock->employee_id && (int) $lock->employee_id !== (int) $employeeId) {
                     return false;
@@ -265,6 +263,10 @@ class AvailabilityService
             return $overlap($lock->start_at, $lock->end_at);
         });
 
-        return (bool) $lockConflict;
+        if ($lockConflict) {
+            return 'locking';
+        }
+
+        return 'available';
     }
 }

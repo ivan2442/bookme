@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AppointmentController;
+use App\Http\Controllers\Api\AppointmentLockController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\Owner\DashboardController;
 use App\Http\Controllers\Api\ServiceController;
@@ -13,6 +14,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/shops/{profile}/services', [ServiceController::class, 'index']);
 
     Route::post('/availability', [AvailabilityController::class, 'check']);
+    Route::post('/locks', [AppointmentLockController::class, 'store']);
 
     Route::post('/appointments', [AppointmentController::class, 'store']);
     Route::get('/appointments/{appointment}', [AppointmentController::class, 'show']);

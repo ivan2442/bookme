@@ -49,7 +49,7 @@
             <div class="grid grid-cols-2 gap-3" data-demo-slots>
                 <div class="slot-card">
                     <p class="font-semibold text-slate-900">10:00</p>
-                    <p class="text-xs text-slate-600">voľný slot</p>
+                    <p class="text-xs text-emerald-600">voľný slot</p>
                 </div>
                 <div class="slot-card" data-status="busy">
                     <p class="font-semibold text-slate-900">10:30</p>
@@ -207,7 +207,7 @@
             </div>
             <div>
                 <label class="label">Čas</label>
-                <div class="flex flex-wrap gap-2" data-time-grid>
+                <div class="space-y-6" data-time-grid>
                     <span class="text-sm text-slate-500" data-time-placeholder>Vyber dátum a variant.</span>
                 </div>
                 <input type="hidden" name="start_at" data-time-input />
