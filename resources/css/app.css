@@ -49,6 +49,7 @@ body {
 
 .input-control {
     width: 100%;
+    max-width: 100%;
     border-radius: 16px;
     border: 1px solid #f1f5f9;
     background: #fff;
@@ -88,6 +89,8 @@ body {
     box-shadow: var(--card-shadow);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .service-card {
@@ -99,6 +102,8 @@ body {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     padding: 12px;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .shop-card:hover,
@@ -226,6 +231,8 @@ body {
     padding: 10px;
     background: #fff;
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .cal-nav {
@@ -246,29 +253,53 @@ body {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 6px;
+    gap: 4px;
     margin-top: 10px;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .calendar-grid {
+        gap: 6px;
+    }
 }
 
 .calendar-heading {
     text-align: center;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
     color: #64748b;
+    text-transform: lowercase;
+}
+
+@media (min-width: 640px) {
+    .calendar-heading {
+        font-size: 0.75rem;
+    }
 }
 
 .calendar-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 0;
-    border-radius: 12px;
+    padding: 8px 0;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
     background: #fff;
     font-weight: 700;
     color: #0f172a;
     text-decoration: none;
     transition: all 120ms ease;
+    font-size: 0.85rem;
+    min-width: 0;
+}
+
+@media (min-width: 640px) {
+    .calendar-item {
+        padding: 10px 0;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
 }
 
 .calendar-item:hover {

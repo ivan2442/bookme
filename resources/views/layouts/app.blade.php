@@ -9,9 +9,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-sand text-slate-900 selection:bg-emerald-200/80 selection:text-slate-900">
+<body class="bg-sand text-slate-900 selection:bg-emerald-200/80 selection:text-slate-900 overflow-x-hidden">
     <div class="bg-gradient radial-fade"></div>
-    <div class="min-h-screen relative overflow-hidden">
+    <div class="min-h-screen relative overflow-x-hidden">
         @if(session('status'))
             <script>
                 window.onload = function() {

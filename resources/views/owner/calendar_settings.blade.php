@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="overflow-x-hidden">
 <section class="pt-12 pb-6 space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
@@ -108,4 +109,5 @@
         @endforeach
     </div>
 </section>
+</div>
 @endsection

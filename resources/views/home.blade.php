@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="overflow-x-hidden">
 <section class="pt-4 lg:pt-16 pb-10 relative">
     <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -left-24 top-10 h-48 w-48 rounded-full bg-emerald-300/40 blur-3xl"></div>
@@ -129,12 +130,12 @@
         </div>
     </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" data-shop-list>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-full overflow-x-hidden" data-shop-list>
         <p class="text-sm text-slate-500">Načítavam prevádzky...</p>
     </div>
 </section>
 
-<section id="services" class="py-12 space-y-6 hidden">
+<section id="services" class="py-12 space-y-6 hidden max-w-full overflow-x-hidden">
     <div class="flex items-center gap-3">
         <span class="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-700 font-semibold">2</span>
         <div>
@@ -142,12 +143,12 @@
             <h2 class="font-display text-2xl text-slate-900">Služby podľa dĺžky a ceny</h2>
         </div>
     </div>
-    <div class="grid md:grid-cols-3 gap-4" data-services-list>
+    <div class="grid md:grid-cols-3 gap-4 max-w-full" data-services-list>
         <p class="text-sm text-slate-500">Načítavam služby...</p>
     </div>
 </section>
 
-<section id="booking" class="py-12 space-y-6 hidden">
+<section id="booking" class="py-12 space-y-6 hidden max-w-full overflow-x-hidden">
     <div class="flex items-center gap-3">
         <span class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-semibold">3</span>
         <div>
@@ -156,8 +157,8 @@
         </div>
     </div>
     <div class="grid lg:grid-cols-[2fr,1.2fr] gap-6">
-        <form class="p-6 bg-white/90 border border-slate-100 rounded-2xl shadow-sm space-y-4" data-booking-form>
-            <div class="grid sm:grid-cols-2 gap-3">
+        <form class="p-4 sm:p-6 bg-white/90 border border-slate-100 rounded-2xl shadow-sm space-y-4 max-w-full overflow-hidden" data-booking-form>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="label">Prevádzka</label>
                     <select name="shop_id" class="input-control" required data-shop-select>
@@ -171,7 +172,7 @@
                     </select>
                 </div>
             </div>
-            <div class="grid sm:grid-cols-2 gap-3" data-variant-wrapper>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-variant-wrapper>
                 <div>
                     <label class="label">Variant</label>
                     <select name="service_variant_id" class="input-control" data-variant-select>
@@ -179,7 +180,7 @@
                     </select>
                 </div>
             </div>
-            <div class="grid sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="label">Meno</label>
                     <input name="customer_name" type="text" class="input-control" value="{{ old('customer_name') }}" placeholder="Zadaj meno" required />
@@ -189,10 +190,16 @@
                     <input name="customer_email" type="email" class="input-control" value="{{ old('customer_email') }}" placeholder="na@priklad.sk" required />
                 </div>
             </div>
-            <div class="grid sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="label">Telefón</label>
-                    <input name="customer_phone" type="text" class="input-control" value="{{ old('customer_phone') }}" placeholder="+421..." />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="label">Telefón</label>
+                        <input name="customer_phone" type="text" class="input-control" value="{{ old('customer_phone') }}" placeholder="+421..." />
+                    </div>
+                    <div>
+                        <label class="label">Poznámka</label>
+                        <textarea name="notes" rows="4" class="input-control" placeholder="Upresnenie pre prevádzku"></textarea>
+                    </div>
                 </div>
                 <div>
                     <label class="label">Dátum</label>
@@ -228,10 +235,6 @@
                 </div>
                 <input type="hidden" name="start_at" data-time-input />
                 <input type="hidden" name="employee_id" data-employee-input />
-            </div>
-            <div>
-                <label class="label">Poznámka</label>
-                <textarea name="notes" rows="2" class="input-control" placeholder="Upresnenie pre prevádzku"></textarea>
             </div>
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center gap-2 text-sm text-slate-600">
@@ -327,5 +330,5 @@
     </div>
 </section>
 @endif --}}
-
+</div>
 @endsection

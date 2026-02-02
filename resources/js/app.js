@@ -154,26 +154,26 @@ function renderShops() {
 
         card.innerHTML = `
             ${bannerHtml}
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">${shop.category ?? ''}</span>
-                    <div class="flex items-center gap-1 text-xs font-bold text-slate-900">
+            <div class="p-5 min-w-0">
+                <div class="flex items-center justify-between mb-2 gap-2">
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md truncate">${shop.category ?? ''}</span>
+                    <div class="flex items-center gap-1 text-xs font-bold text-slate-900 flex-shrink-0">
                         <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                         ${rating}
                     </div>
                 </div>
-                <h3 class="font-display text-lg text-slate-900 group-hover:text-emerald-600 transition-colors mb-1 font-bold">${shop.name}</h3>
-                <div class="flex items-center gap-1.5 text-slate-400 text-xs mb-4">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    ${shop.city ?? ''}
+                <h3 class="font-display text-lg text-slate-900 group-hover:text-emerald-600 transition-colors mb-1 font-bold truncate">${shop.name}</h3>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs mb-4 truncate">
+                    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span class="truncate">${shop.city ?? ''}</span>
                 </div>
 
-                <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <div class="flex flex-col">
+                <div class="flex items-center justify-between pt-4 border-t border-slate-50 gap-2">
+                    <div class="flex flex-col min-w-0">
                         <span class="text-[10px] uppercase font-bold text-slate-500 tracking-tight leading-none mb-1">Najbližší termín</span>
-                        <span class="text-sm font-bold text-slate-900">${nextSlot}</span>
+                        <span class="text-sm font-bold text-slate-900 truncate">${nextSlot}</span>
                     </div>
-                    <div class="h-8 w-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <div class="h-8 w-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-500 transition-colors flex-shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </div>
                 </div>
@@ -243,24 +243,24 @@ function renderServices(shopId = null) {
         card.dataset.shopId = service.profile_id;
         card.dataset.serviceId = service.id;
         card.innerHTML = `
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="font-semibold text-lg text-slate-900">${service.name}</p>
+            <div class="flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="font-semibold text-lg text-slate-900 truncate">${service.name}</p>
                 </div>
-                <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">${service.category ?? ''}</span>
+                <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider flex-shrink-0">${service.category ?? ''}</span>
             </div>
-            <div class="flex items-center justify-between mt-2 text-xs text-slate-500">
-                <div class="flex items-center gap-1.5">
+            <div class="flex items-center justify-between mt-2 text-xs text-slate-500 gap-2">
+                <div class="flex items-center gap-1.5 flex-shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span>${duration} min</span>
                 </div>
-                <span class="font-bold text-emerald-600 text-sm">€${Number(price).toFixed(2)}</span>
+                <span class="font-bold text-emerald-600 text-sm flex-shrink-0">€${Number(price).toFixed(2)}</span>
             </div>
             ${
                 employeeNames
-                    ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100 w-fit">
-                         <div class="h-1.5 w-1.5 rounded-full bg-slate-400"></div>
-                         <p class="text-[10px] font-bold text-slate-600 uppercase tracking-tight">Zamestnanec: ${employeeNames}</p>
+                    ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100 w-full overflow-hidden">
+                         <div class="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0"></div>
+                         <p class="text-[10px] font-bold text-slate-600 uppercase tracking-tight truncate">Zamestnanec: ${employeeNames}</p>
                        </div>`
                     : ''
             }
@@ -580,14 +580,14 @@ let lockTimeout = null;
 
         const renderGroup = (label, group) => {
             const wrapper = document.createElement('div');
-            wrapper.className = 'slot-group';
+            wrapper.className = 'slot-group max-w-full overflow-hidden';
             const heading = document.createElement('p');
-            heading.className = 'slot-group-heading mb-3';
+            heading.className = 'slot-group-heading mb-3 truncate';
             heading.textContent = label;
             wrapper.appendChild(heading);
 
             const row = document.createElement('div');
-            row.className = 'flex flex-row gap-3 overflow-x-auto pb-2 scrollbar-hide';
+            row.className = 'flex flex-row gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide max-w-full w-full';
 
             group.forEach((slot) => {
                 const button = document.createElement('button');
@@ -597,15 +597,15 @@ let lockTimeout = null;
                 const isLocking = slot.status === 'locking';
 
                 button.type = 'button';
-                button.className = 'slot-card min-w-[100px] flex-shrink-0 text-center transition-all hover:border-emerald-200 p-3';
+                button.className = 'slot-card min-w-[85px] sm:min-w-[100px] flex-shrink-0 text-center transition-all hover:border-emerald-200 p-2.5 sm:p-3 overflow-hidden';
                 button.dataset.time = slot.start_at;
 
                 const timeP = document.createElement('p');
-                timeP.className = 'font-semibold text-slate-900';
+                timeP.className = 'font-semibold text-slate-900 truncate';
                 timeP.textContent = time;
 
                 const statusP = document.createElement('p');
-                statusP.className = 'text-[10px] text-emerald-600';
+                statusP.className = 'text-[10px] text-emerald-600 truncate';
 
                 if (isLocking) {
                     button.disabled = true;
@@ -945,7 +945,7 @@ function renderCalendar() {
 
         const item = document.createElement('a');
         item.href = '#';
-        item.className = 'calendar-item';
+        item.className = 'calendar-item overflow-hidden';
         item.textContent = dayNum;
         if (isPast) {
             item.classList.add('disabled');
