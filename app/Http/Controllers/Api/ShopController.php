@@ -42,8 +42,26 @@ class ShopController extends Controller
                 },
                 'services.variants.employees:id,name',
                 'employees:id,profile_id,name',
+                'calendarSetting',
+                'schedules.breaks',
+                'holidays',
             ])
             ->paginate($request->integer('per_page', 15));
+
+        $availabilityService = app(\App\Services\AvailabilityService::class);
+        $profiles->getCollection()->transform(function ($profile) use ($availabilityService) {
+            $duration = $profile->services->min('base_duration_minutes') ?? 30;
+            $res = $availabilityService->slots($profile, $duration, now(), 14);
+            $nextSlot = null;
+            if (!empty($res['slots'])) {
+                $available = collect($res['slots'])->firstWhere('status', 'available');
+                if ($available) {
+                    $nextSlot = $available['start_at'];
+                }
+            }
+            $profile->next_slot = $nextSlot;
+            return $profile;
+        });
 
         return response()->json($profiles);
     }

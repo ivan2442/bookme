@@ -15,106 +15,122 @@
             <h1 class="font-display text-4xl md:text-5xl leading-tight text-slate-900">
                 BookMe spája prevádzky a ich klientov.
             </h1>
-            <p class="text-lg text-slate-600 max-w-2xl">
-                Vyhľadaj prevádzku, vyber službu a čas, potvrď jedným klikom.
+            <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">
+                Moderný rezervačný systém pre vaše podnikanie. Objavte služby vo vašom okolí a rezervujte si termín behom pár sekúnd.
             </p>
-            <div class="flex flex-wrap gap-3">
-            {{--    <a href="#booking" class="w-full md:w-auto mt-36 mb-0 md:mt-36 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
-            --}}    {{-- <a href="#services" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold hover:border-emerald-200 hover:shadow-md transition">Pozrieť služby</a> --}}
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="#search" class="px-8 py-4 rounded-2xl bg-slate-900 text-white font-semibold shadow-xl shadow-slate-200 hover:bg-slate-800 hover:-translate-y-0.5 transition-all">
+                    Nájsť prevádzku
+                </a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-                <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
-                    <p class="text-2xl font-semibold text-slate-900">24/7</p>
-                    <p class="text-sm text-slate-600">Rezervácie nonstop</p>
+            <div class="flex items-center gap-6 pt-4">
+                <div class="flex -space-x-3">
+                    <div class="h-10 w-10 rounded-full bg-emerald-100 border-2 border-white flex items-center justify-center text-emerald-600 font-bold text-xs shadow-sm">L</div>
+                    <div class="h-10 w-10 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-orange-600 font-bold text-xs shadow-sm">M</div>
+                    <div class="h-10 w-10 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-blue-600 font-bold text-xs shadow-sm">K</div>
                 </div>
-             {{--   <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
-                    <p class="text-2xl font-semibold text-slate-900">Bez double-book</p>
-                    <p class="text-sm text-slate-600">Sloty sú zamknuté</p>
-                </div>--}}
-                <div class="p-4 rounded-2xl bg-white/80 border border-slate-100 shadow-sm">
-                    <p class="text-2xl font-semibold text-slate-900">Notifikácie</p>
-                    <p class="text-sm text-slate-600">E-mail + SMS pripomienky</p>
-                </div>
+                <p class="text-sm text-slate-500 font-medium">Už stovky spokojných klientov</p>
             </div>
         </div>
 
-        <div class="bg-white/80 backdrop-blur rounded-3xl border border-emerald-100/60 shadow-xl shadow-emerald-100/60 p-6 space-y-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs uppercase text-slate-500 tracking-widest">Live náhľad</p>
-                    <p class="font-semibold text-lg text-slate-900">Kalendár BookMe</p>
-                </div>
-                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Demo</span>
-            </div>
-            <div class="grid grid-cols-2 gap-3" data-demo-slots>
-                <div class="slot-card">
-                    <p class="font-semibold text-slate-900">10:00</p>
-                    <p class="text-xs text-emerald-600">voľný slot</p>
-                </div>
-                <div class="slot-card" data-status="busy">
-                    <p class="font-semibold text-slate-900">10:30</p>
-                    <p class="text-xs text-slate-600">obsadené čoskoro</p>
-                </div>
-            </div>
-            <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p class="text-sm text-slate-700 mb-2">Klient</p>
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-600">Meno</span>
-                        <span class="font-semibold text-slate-900">Lucia</span>
+        <div class="relative">
+            <div class="absolute -inset-4 bg-emerald-500/5 rounded-[40px] blur-2xl"></div>
+            <div class="relative bg-white/90 backdrop-blur-xl rounded-3xl border border-white/60 shadow-2xl shadow-emerald-200/40 p-8 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-emerald-600 tracking-widest mb-1">Rýchly náhľad</p>
+                        <h3 class="font-display text-xl text-slate-900">Vyberte si svoj čas</h3>
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-600">Služba</span>
-                        <span class="font-semibold text-slate-900">Balayage + styling</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-600">Prevádzka</span>
-                        <span class="font-semibold text-slate-900">Halo Studio</span>
+                    <div class="flex gap-1">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-200"></span>
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-100"></span>
                     </div>
                 </div>
-            </div>
-            <p class="text-xs text-slate-500">Ďalšie kroky: potvrdenie e-mailom, 24h pripomienka a ICS export.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-2xl">
-                  <a href="#booking" class="w-full md:w-full mt-6 mb-0 md:mt-6 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-lg shadow-slate-300/50 hover:translate-y-[-1px] transition">Začať rezerváciu</a>
-        </div>
+                <div class="grid grid-cols-2 gap-3" data-demo-slots>
+                    <div class="p-4 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 flex flex-col items-center justify-center gap-1 border border-emerald-400 transform scale-105">
+                        <p class="font-bold text-lg">10:00</p>
+                        <p class="text-[10px] text-emerald-100 font-medium">Váš výber</p>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50 flex flex-col items-center justify-center gap-1 opacity-60">
+                        <p class="font-bold text-slate-400 text-lg">10:30</p>
+                        <p class="text-[10px] text-slate-400 font-medium">obsadené</p>
+                    </div>
+                </div>
 
+                <div class="space-y-4 pt-2">
+                    <div class="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-50 shadow-sm">
+                        <div class="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-tight">Klient</p>
+                            <p class="text-sm font-semibold text-slate-900 leading-none">Lucia Kováčová</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-50 shadow-sm">
+                        <div class="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-emerald-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-tight">Služba</p>
+                            <p class="text-sm font-semibold text-slate-900 leading-none">Dámsky strih & styling</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-[11px] text-slate-400 pt-2 italic">Rezervácia prebehne automaticky po potvrdení</p>
+            </div>
+        </div>
     </div>
-
 </section>
 
-<section id="search" class="py-12 space-y-6">
+<section id="search" class="py-12 space-y-8">
     <div class="flex items-center gap-3">
         <span class="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold">1</span>
         <div>
             <p class="text-xs uppercase tracking-widest text-slate-500">Vyhľadať prevádzku</p>
-            <h2 class="font-display text-2xl text-slate-900">Filtrovanie podľa mesta a kategórie</h2>
+            <h2 class="font-display text-2xl text-slate-900">Filtrovanie prevádzok</h2>
         </div>
     </div>
-    <div class="grid md:grid-cols-[2fr,3fr] gap-6">
-        <div class="p-5 bg-white/90 border border-slate-100 rounded-2xl shadow-sm space-y-4">
-            <div class="space-y-2">
-                <label class="text-sm text-slate-600 font-medium">Mesto</label>
-                <input id="filter-city" type="text" placeholder="Bratislava" class="input-control" />
+
+    <div class="max-w-3xl mx-auto space-y-6">
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg class="h-6 w-6 text-slate-300 group-focus-within:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
+            <input id="filter-city" type="text" placeholder="V ktorom meste hľadáte službu?"
+                class="w-full pl-14 pr-6 py-5 bg-white border border-slate-100 rounded-[24px] shadow-xl shadow-slate-200/40 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-lg placeholder:text-slate-300 font-medium" />
+        </div>
+
+        <div class="flex justify-center">
+            <button type="button" id="toggle-advanced" class="group px-6 py-2 rounded-full hover:bg-white hover:shadow-sm transition-all flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400 group-hover:text-emerald-600">Rozšírené filtre</span>
+                <svg id="advanced-icon" class="w-4 h-4 text-slate-300 group-hover:text-emerald-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="advanced-filters" class="grid md:grid-cols-2 gap-4 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
             <div class="space-y-2">
-                <label class="text-sm text-slate-600 font-medium">Kategória</label>
-                <select id="filter-category" class="input-control">
-                    <option value="">Všetky</option>
+                <label class="text-[11px] uppercase tracking-wider text-slate-400 font-bold ml-4">Kategória</label>
+                <select id="filter-category" class="w-full px-5 py-4 bg-white border border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all font-medium appearance-none">
+                    <option value="">Všetky kategórie</option>
                 </select>
             </div>
             <div class="space-y-2">
-                <label class="text-sm text-slate-600 font-medium">Kľúčové slovo</label>
-                <input id="filter-query" type="text" placeholder="strih, masáž, barber..." class="input-control" />
+                <label class="text-[11px] uppercase tracking-wider text-slate-400 font-bold ml-4">Kľúčové slovo</label>
+                <input id="filter-query" type="text" placeholder="strih, masáž, barber..." class="w-full px-5 py-4 bg-white border border-slate-100 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all font-medium placeholder:text-slate-300" />
             </div>
-            <p class="text-xs text-slate-500">Filtrování prebieha priamo na stránke, live pri písaní.</p>
         </div>
-            <div class="grid sm:grid-cols-2 gap-4" data-shop-list>
-                <p class="text-sm text-slate-500">Načítavam prevádzky...</p>
-            </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" data-shop-list>
+        <p class="text-sm text-slate-500">Načítavam prevádzky...</p>
     </div>
 </section>
 
