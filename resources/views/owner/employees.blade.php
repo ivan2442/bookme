@@ -87,11 +87,13 @@
                 @csrf
                 <div>
                     <label class="label">Prevádzka</label>
-                    <select name="profile_id" class="input-control" required>
-                        @foreach($profiles as $profile)
-                            <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="nice-select-wrapper">
+                        <select name="profile_id" class="nice-select" required>
+                            @foreach($profiles as $profile)
+                                <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label class="label">Meno a priezvisko</label>
@@ -118,9 +120,14 @@
 </div>
 
 <script>
+    $(document).ready(function() {
+        $('.nice-select').niceSelect();
+    });
+
     function openAddEmployeeModal() {
         document.getElementById('addEmployeeModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        $('#addEmployeeModal .nice-select').niceSelect('update');
     }
 
     function closeAddEmployeeModal() {

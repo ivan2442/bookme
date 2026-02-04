@@ -134,11 +134,13 @@
                 @csrf
                 <div>
                     <label class="label">Prevádzka</label>
-                    <select name="profile_id" class="input-control" required>
-                        @foreach($profiles as $profile)
-                            <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="nice-select-wrapper">
+                        <select name="profile_id" class="nice-select" required>
+                            @foreach($profiles as $profile)
+                                <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-4">
@@ -185,9 +187,14 @@
 </div>
 
 <script>
+    $(document).ready(function() {
+        $('.nice-select').niceSelect();
+    });
+
     function openAddServiceModal() {
         document.getElementById('addServiceModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        $('#addServiceModal .nice-select').niceSelect('update');
     }
 
     function closeAddServiceModal() {

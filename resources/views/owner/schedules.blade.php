@@ -336,6 +336,10 @@
 </div>
 
 <script>
+    $(document).ready(function() {
+        $('.nice-select').niceSelect();
+    });
+
     function openAddScheduleModal() {
         document.getElementById('addScheduleModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
