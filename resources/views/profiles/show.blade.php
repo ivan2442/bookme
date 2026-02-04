@@ -4,8 +4,8 @@
 <div class="space-y-12 pb-20 overflow-x-hidden">
     <!-- Hero Banner & Logo -->
     <div class="relative h-72 md:h-96 w-full rounded-[40px] overflow-hidden shadow-2xl mt-8">
-        @if($profile->banner_path)
-            <img src="{{ asset('storage/' . $profile->banner_path) }}" alt="{{ $profile->name }} banner" class="w-full h-full object-cover">
+        @if($profile->banner_url)
+            <img src="{{ $profile->banner_url }}" alt="{{ $profile->name }} banner" class="w-full h-full object-cover">
         @else
             <div class="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
                 <span class="text-white/10 text-9xl font-bold select-none">{{ $profile->name }}</span>
@@ -17,8 +17,8 @@
         <div class="absolute bottom-8 left-8 right-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
             <div class="flex items-center gap-6 max-w-full">
                 <div class="h-24 w-24 md:h-32 md:w-32 flex-shrink-0 rounded-3xl bg-white p-2 shadow-2xl border border-white/20 overflow-hidden transform hover:scale-105 transition-transform duration-500">
-                    @if($profile->logo_path)
-                        <img src="{{ asset('storage/' . $profile->logo_path) }}" alt="{{ $profile->name }} logo" class="w-full h-full object-contain rounded-2xl">
+                    @if($profile->logo_url)
+                        <img src="{{ $profile->logo_url }}" alt="{{ $profile->name }} logo" class="w-full h-full object-contain rounded-2xl">
                     @else
                         <div class="w-full h-full bg-slate-50 flex items-center justify-center rounded-2xl">
                             <span class="text-emerald-500 font-bold text-3xl">{{ substr($profile->name, 0, 1) }}</span>

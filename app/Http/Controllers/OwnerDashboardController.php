@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\ServiceVariant;
 use App\Models\CalendarSetting;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -634,10 +635,16 @@ class OwnerDashboardController extends Controller
         ];
 
         if ($request->hasFile('logo')) {
+            if ($profile->logo_path) {
+                Storage::disk('public')->delete($profile->logo_path);
+            }
             $updateData['logo_path'] = $request->file('logo')->store('profiles/logos', 'public');
         }
 
         if ($request->hasFile('banner')) {
+            if ($profile->banner_path) {
+                Storage::disk('public')->delete($profile->banner_path);
+            }
             $updateData['banner_path'] = $request->file('banner')->store('profiles/banners', 'public');
         }
 

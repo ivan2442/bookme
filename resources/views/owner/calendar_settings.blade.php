@@ -13,6 +13,16 @@
 
     @include('owner.partials.nav')
 
+    @if($errors->any())
+        <div class="card border-rose-200 bg-rose-50 text-rose-800">
+            <ul class="list-disc list-inside text-sm font-medium">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if(session('status'))
         <div class="card border-emerald-200 bg-emerald-50 text-emerald-800">{{ session('status') }}</div>
     @endif
@@ -73,15 +83,21 @@
                             <div class="space-y-1">
                                 <label class="label">Logo prevádzky</label>
                                 <input type="file" name="logo" class="input-control !p-2 text-xs">
-                                @if($profile->logo_path)
-                                    <p class="text-[10px] text-emerald-600">Logo je nahrané</p>
+                                @if($profile->logo_url)
+                                    <div class="mt-2 relative group">
+                                        <img src="{{ $profile->logo_url }}" class="h-12 w-12 object-contain rounded-lg border border-slate-200 bg-white" alt="Logo preview">
+                                        <p class="text-[10px] text-emerald-600 mt-1 font-bold uppercase tracking-tight">Logo je nahrané</p>
+                                    </div>
                                 @endif
                             </div>
                             <div class="space-y-1">
                                 <label class="label">Banner prevádzky</label>
                                 <input type="file" name="banner" class="input-control !p-2 text-xs">
-                                @if($profile->banner_path)
-                                    <p class="text-[10px] text-emerald-600">Banner je nahraný</p>
+                                @if($profile->banner_url)
+                                    <div class="mt-2 relative group">
+                                        <img src="{{ $profile->banner_url }}" class="h-12 w-24 object-cover rounded-lg border border-slate-200 bg-white" alt="Banner preview">
+                                        <p class="text-[10px] text-emerald-600 mt-1 font-bold uppercase tracking-tight">Banner je nahraný</p>
+                                    </div>
                                 @endif
                             </div>
                         </div>

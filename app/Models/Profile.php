@@ -38,10 +38,27 @@ class Profile extends Model
         'settings',
     ];
 
+    protected $appends = [
+        'logo_url',
+        'banner_url',
+        'trial_days_left',
+        'trial_time_left',
+    ];
+
     protected $casts = [
         'settings' => 'array',
         'subscription_starts_at' => 'datetime',
     ];
+
+    public function getLogoUrlAttribute()
+    {
+        return $this->logo_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->logo_path) : null;
+    }
+
+    public function getBannerUrlAttribute()
+    {
+        return $this->banner_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->banner_path) : null;
+    }
 
     public function owner(): BelongsTo
     {

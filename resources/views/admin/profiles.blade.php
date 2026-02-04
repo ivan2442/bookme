@@ -264,12 +264,18 @@
                         <div>
                             <label class="label">Logo prevádzky</label>
                             <input type="file" name="logo" class="input-control !p-2 text-xs">
-                            <p id="edit-logo-status" class="text-[10px] text-emerald-600 hidden">Logo je nahrané</p>
+                            <div id="edit-logo-preview" class="mt-2 hidden">
+                                <img src="" id="edit-logo-img" class="h-12 w-12 object-contain rounded-lg border border-slate-200" alt="Logo preview">
+                                <p class="text-[10px] text-emerald-600 mt-1 font-bold">Logo je nahrané</p>
+                            </div>
                         </div>
                         <div>
                             <label class="label">Banner prevádzky</label>
                             <input type="file" name="banner" class="input-control !p-2 text-xs">
-                            <p id="edit-banner-status" class="text-[10px] text-emerald-600 hidden">Banner je nahraný</p>
+                            <div id="edit-banner-preview" class="mt-2 hidden">
+                                <img src="" id="edit-banner-img" class="h-12 w-24 object-cover rounded-lg border border-slate-200" alt="Banner preview">
+                                <p class="text-[10px] text-emerald-600 mt-1 font-bold">Banner je nahraný</p>
+                            </div>
                         </div>
                     </div>
                     <div class="grid sm:grid-cols-1 gap-3">
@@ -320,16 +326,18 @@
         }
 
         // Status nahraných obrázkov
-        if (profile.logo_path) {
-            document.getElementById('edit-logo-status').classList.remove('hidden');
+        if (profile.logo_url) {
+            document.getElementById('edit-logo-preview').classList.remove('hidden');
+            document.getElementById('edit-logo-img').src = profile.logo_url;
         } else {
-            document.getElementById('edit-logo-status').classList.add('hidden');
+            document.getElementById('edit-logo-preview').classList.add('hidden');
         }
 
-        if (profile.banner_path) {
-            document.getElementById('edit-banner-status').classList.remove('hidden');
+        if (profile.banner_url) {
+            document.getElementById('edit-banner-preview').classList.remove('hidden');
+            document.getElementById('edit-banner-img').src = profile.banner_url;
         } else {
-            document.getElementById('edit-banner-status').classList.add('hidden');
+            document.getElementById('edit-banner-preview').classList.add('hidden');
         }
 
 
