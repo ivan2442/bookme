@@ -48,7 +48,7 @@
                 </div>
             </div>
             <p class="text-3xl font-bold text-slate-900">{{ number_format($stats['count']) }}</p>
-            <p class="text-xs text-slate-400 mt-1">Počet ukončených termínov ({{ $selectedDate->translatedFormat('F') }})</p>
+            <p class="text-xs text-slate-400 mt-1">Počet ukončených termínov ({{ $monthsSlovak[$selectedMonth] }})</p>
         </div>
 
         <div class="card p-6 border-l-4 border-blue-500">
@@ -59,7 +59,7 @@
                 </div>
             </div>
             <p class="text-3xl font-bold text-slate-900">€{{ number_format($stats['revenue'], 2) }}</p>
-            <p class="text-xs text-slate-400 mt-1">Celkový obrat za {{ $selectedDate->translatedFormat('F') }}</p>
+            <p class="text-xs text-slate-400 mt-1">Celkový obrat za {{ $monthsSlovak[$selectedMonth] }}</p>
         </div>
 
         <div class="card p-6 border-l-4 border-purple-500">
@@ -70,7 +70,7 @@
                 </div>
             </div>
             <p class="text-3xl font-bold text-slate-900">{{ number_format($stats['hours'], 1) }}h</p>
-            <p class="text-xs text-slate-400 mt-1">Služby v {{ $selectedDate->translatedFormat('F') }}</p>
+            <p class="text-xs text-slate-400 mt-1">Služby v {{ $monthsSlovak[$selectedMonth] }}</p>
         </div>
     </div>
 

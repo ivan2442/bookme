@@ -2,12 +2,17 @@
 
 @section('content')
 <section class="pt-12 pb-6 space-y-6">
-    <div class="flex items-center justify-between gap-3">
+    <div class="flex items-center justify-between gap-3 mb-6">
         <div>
             <p class="text-xs uppercase tracking-widest text-slate-500">Prevádzka</p>
             <h1 class="font-display text-3xl text-slate-900">Moje služby</h1>
         </div>
-        <span class="badge">Správa služieb</span>
+        <div class="flex gap-2">
+            <button onclick="openAddServiceModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Pridať novú službu</span>
+            </button>
+        </div>
     </div>
 
     @include('owner.partials.nav')
@@ -18,56 +23,7 @@
         </div>
     @endif
 
-    <div class="grid lg:grid-cols-[1.3fr,1fr] gap-4">
-        <div class="card space-y-4">
-            <h2 class="font-semibold text-lg text-slate-900">Pridať novú službu</h2>
-            <form method="POST" action="{{ route('owner.services.store') }}" class="space-y-3">
-                @csrf
-                <div>
-                    <label class="label">Prevádzka</label>
-                    <select name="profile_id" class="input-control" required>
-                        @foreach($profiles as $profile)
-                            <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">Názov služby</label>
-                        <input type="text" name="name" class="input-control" value="{{ old('name') }}" placeholder="napr. Pánsky strih" required>
-                    </div>
-                    <div>
-                        <label class="label">Kategória</label>
-                        <input type="text" name="category" class="input-control" value="{{ old('category') }}" placeholder="napr. Kaderníctvo">
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">Základná dĺžka (min)</label>
-                        <input type="number" name="base_duration_minutes" class="input-control" value="{{ old('base_duration_minutes', 30) }}" min="5" required>
-                    </div>
-                    <div>
-                        <label class="label">Základná cena (€)</label>
-                        <input type="number" name="base_price" class="input-control" value="{{ old('base_price', 0) }}" step="0.01" min="0" required>
-                    </div>
-                </div>
-                <div>
-                    <label class="label">Priradiť zamestnancov</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        @foreach($employees as $employee)
-                            <label class="flex items-center gap-2 p-2 border border-slate-100 rounded-lg hover:bg-slate-50 cursor-pointer">
-                                <input type="checkbox" name="employee_ids[]" value="{{ $employee->id }}" class="h-4 w-4" @checked(is_array(old('employee_ids')) && in_array($employee->id, old('employee_ids')))>
-                                <span class="text-sm">{{ $employee->name }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
-                <button type="submit" class="w-full px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition">
-                    Vytvoriť službu
-                </button>
-            </form>
-        </div>
-
+    <div class="max-w-4xl mx-auto">
         <div class="card space-y-3">
             <h2 class="font-semibold text-lg text-slate-900">Zoznam služieb</h2>
             <div class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
@@ -86,12 +42,24 @@
                             <form method="POST" action="{{ route('owner.services.update', $service) }}" class="space-y-3 mt-2 pt-2 border-t border-slate-100">
                                 @csrf
                                 <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" name="name" class="input-control !py-1.5 !text-sm" value="{{ $service->name }}" required>
-                                    <input type="text" name="category" class="input-control !py-1.5 !text-sm" value="{{ $service->category }}" placeholder="Kategória">
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-slate-500">Názov služby</label>
+                                        <input type="text" name="name" class="input-control !py-1.5 !text-sm" value="{{ $service->name }}" required>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-slate-500">Kategória</label>
+                                        <input type="text" name="category" class="input-control !py-1.5 !text-sm" value="{{ $service->category }}" placeholder="Kategória">
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <input type="number" name="base_duration_minutes" class="input-control !py-1.5 !text-sm" value="{{ $service->base_duration_minutes }}" required>
-                                    <input type="number" name="base_price" class="input-control !py-1.5 !text-sm" value="{{ $service->base_price }}" step="0.01" required>
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-slate-500">Dĺžka (min)</label>
+                                        <input type="number" name="base_duration_minutes" class="input-control !py-1.5 !text-sm" value="{{ $service->base_duration_minutes }}" required>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-slate-500">Cena (€)</label>
+                                        <input type="number" name="base_price" class="input-control !py-1.5 !text-sm" value="{{ $service->base_price }}" step="0.01" required>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Zamestnanci</label>
@@ -108,6 +76,7 @@
                             </form>
                         </details>
 
+{{--
                         <div class="mt-4 space-y-2">
                             <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Varianty služby</p>
                             @foreach($service->variants as $variant)
@@ -138,6 +107,7 @@
                                 </form>
                             </details>
                         </div>
+--}}
                     </div>
                 @empty
                     <p class="text-sm text-slate-500">Zatiaľ nemáte žiadne služby.</p>
@@ -146,4 +116,83 @@
         </div>
     </div>
 </section>
+
+<!-- Add Service Modal -->
+<div id="addServiceModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeAddServiceModal()"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 overflow-hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-display font-semibold text-slate-900">Pridať novú službu</h3>
+                <button onclick="closeAddServiceModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('owner.services.store') }}" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="label">Prevádzka</label>
+                    <select name="profile_id" class="input-control" required>
+                        @foreach($profiles as $profile)
+                            <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">Názov služby</label>
+                        <input type="text" name="name" class="input-control" placeholder="napr. Pánsky strih" required>
+                    </div>
+                    <div>
+                        <label class="label">Kategória</label>
+                        <input type="text" name="category" class="input-control" placeholder="napr. Kaderníctvo">
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">Základná dĺžka (min)</label>
+                        <input type="number" name="base_duration_minutes" class="input-control" value="30" min="5" required>
+                    </div>
+                    <div>
+                        <label class="label">Základná cena (€)</label>
+                        <input type="number" name="base_price" class="input-control" value="0" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="label">Priradiť zamestnancov</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        @foreach($employees as $employee)
+                            <label class="flex items-center gap-2 p-2 border border-slate-100 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="checkbox" name="employee_ids[]" value="{{ $employee->id }}" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 rounded border-slate-300">
+                                <span class="text-sm font-medium text-slate-700">{{ $employee->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
+                    <button type="button" onclick="closeAddServiceModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200/50">Vytvoriť službu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openAddServiceModal() {
+        document.getElementById('addServiceModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddServiceModal() {
+        document.getElementById('addServiceModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+</script>
 @endsection

@@ -50,6 +50,7 @@ const TIME_ZONE = 'Europe/Bratislava';
 const timeFormatter = new Intl.DateTimeFormat('sk-SK', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
     timeZone: TIME_ZONE,
 });
 
@@ -59,6 +60,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat('sk-SK', {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
     timeZone: TIME_ZONE,
 });
 

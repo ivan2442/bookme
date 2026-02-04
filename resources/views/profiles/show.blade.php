@@ -40,9 +40,9 @@
                     </p>
                 </div>
             </div>
-            <a href="{{ route('home') }}#booking" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
+            <button onclick="openBookingModal({{ $profile->id }}, null, 'Všeobecná rezervácia')" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
                 Rezervovať teraz
-            </a>
+            </button>
         </div>
     </div>
 
@@ -90,9 +90,9 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-4">
-                                <a href="{{ route('home') }}#booking" class="p-4 rounded-[20px] bg-slate-50 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-emerald-200 group-hover:-translate-y-0.5">
+                                <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}')" class="p-4 rounded-[20px] bg-slate-50 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-emerald-200 group-hover:-translate-y-0.5">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                </a>
+                                </button>
                             </div>
                         </div>
                     @endforeach
@@ -164,4 +164,262 @@
         </div>
     </div>
 </div>
+
+<!-- Booking Modal -->
+<div id="bookingModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeBookingModal()"></div>
+
+        <div class="relative bg-white rounded-[32px] shadow-2xl w-full max-w-2xl p-6 md:p-8 overflow-hidden">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-emerald-600 tracking-widest mb-1">Rezervácia termínu</p>
+                    <h3 class="text-2xl font-display font-semibold text-slate-900" id="modal_service_name">Služba</h3>
+                </div>
+                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form class="space-y-4" id="modal-booking-form">
+                @csrf
+                <input type="hidden" name="shop_id" id="modal_shop_id">
+                <input type="hidden" name="service_id" id="modal_service_id">
+                <input type="hidden" name="start_at" id="modal_start_at">
+                <input type="hidden" name="date" id="modal_date" value="{{ date('Y-m-d') }}">
+                <input type="hidden" name="employee_id" id="modal_employee_id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="label !ml-1">Vaše meno</label>
+                        <input name="customer_name" type="text" class="input-control" placeholder="Meno a priezvisko" required />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="label !ml-1">E-mail</label>
+                        <input name="customer_email" type="email" class="input-control" placeholder="vas@email.sk" required />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="label !ml-1">Telefón</label>
+                        <input name="customer_phone" type="text" class="input-control" placeholder="+421..." />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="label !ml-1">Poznámka</label>
+                        <input name="notes" type="text" class="input-control" placeholder="Voliteľná poznámka" />
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 pt-2">
+                    <div class="space-y-3">
+                        <label class="label !ml-1">Vyberte dátum</label>
+                        <div class="date-calendar !shadow-none !border-slate-100" id="modal-calendar">
+                            <div class="flex items-center justify-between mb-2">
+                                <button type="button" class="cal-nav" id="modal-cal-prev">‹</button>
+                                <div class="text-center cal-month text-sm" id="modal-cal-month">—</div>
+                                <button type="button" class="cal-nav" id="modal-cal-next">›</button>
+                            </div>
+                            <div class="calendar-grid !gap-1" id="modal-cal-grid">
+                                <div class="calendar-heading">po</div>
+                                <div class="calendar-heading">ut</div>
+                                <div class="calendar-heading">st</div>
+                                <div class="calendar-heading">št</div>
+                                <div class="calendar-heading">pi</div>
+                                <div class="calendar-heading">so</div>
+                                <div class="calendar-heading">ne</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="label !ml-1">Dostupné časy</label>
+                        <div class="max-h-[280px] overflow-y-auto pr-2 space-y-4" id="modal-time-grid">
+                            <p class="text-sm text-slate-400 italic">Načítavam voľné termíny...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t border-slate-50">
+                    <div class="flex items-center gap-2 text-[11px] text-slate-400 uppercase font-bold tracking-tight">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Slot sa zamkne na 5 minút
+                    </div>
+                    <button type="submit" class="px-8 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition shadow-lg shadow-emerald-200/50">
+                        Potvrdiť rezerváciu
+                    </button>
+                </div>
+            </form>
+            <div id="modal-booking-output" class="mt-4 text-sm text-center font-medium hidden"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let modalState = {
+        calendarStart: null,
+        closedDays: [],
+        selectedDate: '{{ date('Y-m-d') }}',
+        shopId: null,
+        serviceId: null
+    };
+
+    function openBookingModal(shopId, serviceId, serviceName) {
+        modalState.shopId = shopId;
+        modalState.serviceId = serviceId;
+        modalState.calendarStart = new Date();
+        modalState.calendarStart.setDate(modalState.calendarStart.getDate() - (modalState.calendarStart.getDay() === 0 ? 6 : modalState.calendarStart.getDay() - 1));
+
+        document.getElementById('modal_service_name').textContent = serviceName;
+        document.getElementById('modal_shop_id').value = shopId;
+        document.getElementById('modal_service_id').value = serviceId;
+        document.getElementById('bookingModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        updateModalCalendar();
+        fetchModalAvailability();
+    }
+
+    function closeBookingModal() {
+        document.getElementById('bookingModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('modal-booking-output').classList.add('hidden');
+        document.getElementById('modal-booking-form').reset();
+    }
+
+    function updateModalCalendar() {
+        const grid = document.getElementById('modal-cal-grid');
+        const monthLabel = document.getElementById('modal-cal-month');
+
+        // Clear previous days
+        grid.querySelectorAll('.calendar-day').forEach(d => d.remove());
+
+        const start = new Date(modalState.calendarStart);
+        const monthName = start.toLocaleString('sk-SK', { month: 'long', year: 'numeric' });
+        monthLabel.textContent = monthName;
+
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(start);
+            day.setDate(start.getDate() + i);
+
+            const dayEl = document.createElement('button');
+            dayEl.type = 'button';
+            const iso = day.toISOString().split('T')[0];
+            const isToday = iso === new Date().toISOString().split('T')[0];
+            const isSelected = iso === modalState.selectedDate;
+
+            dayEl.className = `calendar-day h-10 w-10 flex items-center justify-center rounded-xl text-xs font-bold transition-all
+                ${isSelected ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'hover:bg-emerald-50 text-slate-700'}`;
+
+            if (isToday && !isSelected) dayEl.classList.add('border', 'border-emerald-200', 'text-emerald-600');
+
+            dayEl.textContent = day.getDate();
+            dayEl.onclick = () => {
+                modalState.selectedDate = iso;
+                document.getElementById('modal_date').value = iso;
+                updateModalCalendar();
+                fetchModalAvailability();
+            };
+
+            grid.appendChild(dayEl);
+        }
+    }
+
+    async function fetchModalAvailability() {
+        const grid = document.getElementById('modal-time-grid');
+        grid.innerHTML = '<p class="text-sm text-slate-400 italic">Načítavam...</p>';
+
+        try {
+            const response = await axios.post('/api/availability', {
+                profile_id: modalState.shopId,
+                service_id: modalState.serviceId,
+                date: modalState.selectedDate,
+                days: 1
+            });
+
+            const slots = response.data.slots || [];
+            if (slots.length === 0) {
+                grid.innerHTML = '<p class="text-sm text-slate-500 italic">Žiadne voľné termíny na tento deň.</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            slots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const time = new Date(slot.start_at).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+                btn.className = 'w-full p-3 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all flex items-center justify-between group';
+                btn.innerHTML = `
+                    <span class="font-bold text-slate-900">${time}</span>
+                    <span class="text-[10px] font-bold uppercase text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">Vybrať</span>
+                `;
+
+                btn.onclick = () => {
+                    grid.querySelectorAll('button').forEach(b => b.classList.remove('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20'));
+                    btn.classList.add('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20');
+                    document.getElementById('modal_start_at').value = slot.start_at;
+
+                    // Create lock
+                    axios.post('/api/locks', {
+                        profile_id: modalState.shopId,
+                        service_id: modalState.serviceId,
+                        start_at: slot.start_at,
+                        date: modalState.selectedDate
+                    }).catch(err => console.error('Lock error', err));
+                };
+
+                grid.appendChild(btn);
+            });
+        } catch (error) {
+            grid.innerHTML = '<p class="text-sm text-red-500">Chyba pri načítaní dát.</p>';
+        }
+    }
+
+    document.getElementById('modal-cal-prev').onclick = () => {
+        modalState.calendarStart.setDate(modalState.calendarStart.getDate() - 7);
+        updateModalCalendar();
+    };
+    document.getElementById('modal-cal-next').onclick = () => {
+        modalState.calendarStart.setDate(modalState.calendarStart.getDate() + 7);
+        updateModalCalendar();
+    };
+
+    document.getElementById('modal-booking-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const out = document.getElementById('modal-booking-output');
+        const form = e.target;
+        const startAt = document.getElementById('modal_start_at').value;
+
+        if (!startAt) {
+            Swal.fire('Chyba', 'Vyberte si prosím čas termínu.', 'error');
+            return;
+        }
+
+        out.classList.remove('hidden', 'text-red-500', 'text-emerald-600');
+        out.textContent = 'Odosielam rezerváciu...';
+
+        try {
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+
+            const response = await axios.post('/api/appointments', payload);
+            out.classList.add('text-emerald-600');
+            out.textContent = 'Rezervácia bola úspešná!';
+
+            Swal.fire({
+                title: 'Rezervácia úspešná!',
+                text: 'Váš termín bol potvrdený. Informácie sme vám zaslali e-mailom.',
+                icon: 'success',
+                confirmButtonColor: '#10b981'
+            }).then(() => {
+                closeBookingModal();
+                location.reload();
+            });
+
+        } catch (error) {
+            out.classList.add('text-red-500');
+            out.textContent = error.response?.data?.message || 'Chyba pri rezervácii.';
+        }
+    };
+</script>
 @endsection

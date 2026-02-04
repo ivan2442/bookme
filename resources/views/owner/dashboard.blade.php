@@ -181,17 +181,19 @@
             <form method="POST" action="{{ route('owner.appointments.manual.store') }}" class="space-y-4">
                 @csrf
                 {{-- Skrytý výber prevádzky - defaultne prvá, ak ich má majiteľ viac, v dashboarde pracujeme s konkrétnou (predpokladáme kontext jednej prevádzky pre zjednodušenie podľa zadania) --}}
-                <input type="hidden" name="profile_id" value="{{ $allProfiles->first()->id }}">
+                <input type="hidden" name="profile_id" id="manual_profile_id" value="{{ $allProfiles->first()->id }}">
 
                 @if($allProfiles->first()->employees->count() > 1)
                     <div>
                         <label class="label">Zamestnanec</label>
-                        <select name="employee_id" class="input-control nice-select" id="manual_employee_select">
-                            <option value="">Bez zamestnanca</option>
-                            @foreach($allProfiles->first()->employees as $employee)
-                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                            @endforeach
-                        </select>
+                        <div class="nice-select-wrapper">
+                            <select name="employee_id" class="nice-select" id="manual_employee_select">
+                                <option value="">Bez zamestnanca</option>
+                                @foreach($allProfiles->first()->employees as $employee)
+                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 @elseif($allProfiles->first()->employees->count() === 1)
                     <input type="hidden" name="employee_id" value="{{ $allProfiles->first()->employees->first()->id }}">
@@ -215,21 +217,23 @@
                     </div>
                     <div>
                         <label class="label">Dátum</label>
-                        <input type="date" name="date" class="input-control" value="{{ date('Y-m-d') }}" required>
+                        <input type="date" name="date" id="manual_date" class="input-control" value="{{ date('Y-m-d') }}" required>
                     </div>
                 </div>
 
                 <div class="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">Čas začiatku</label>
-                        <select name="start_time" class="input-control nice-select nice-select-time" required>
-                            @for($h = 7; $h <= 21; $h++)
-                                @foreach(['00', '30'] as $m)
-                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                    <option value="{{ $time }}" {{ $time == '09:00' ? 'selected' : '' }}>{{ $time }}</option>
-                                @endforeach
-                            @endfor
-                        </select>
+                        <div class="nice-select-wrapper">
+                            <select name="start_time" id="manual_start_time" class="nice-select nice-select-time" required>
+                                @for($h = 7; $h <= 21; $h++)
+                                    @foreach(['00', '30'] as $m)
+                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                        <option value="{{ $time }}" {{ $time == '09:00' ? 'selected' : '' }}>{{ $time }}</option>
+                                    @endforeach
+                                @endfor
+                            </select>
+                        </div>
                     </div>
                     <div>
                         <label class="label">Dĺžka (min)</label>
@@ -260,11 +264,45 @@
         document.getElementById('manualAppointmentModal').classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
         $('#manualAppointmentModal .nice-select').niceSelect('update');
+        checkBusySlots();
     }
 
     function closeManualAppointmentModal() {
         document.getElementById('manualAppointmentModal').classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
+    }
+
+    function checkBusySlots() {
+        const date = document.getElementById('manual_date').value;
+        const employeeId = document.getElementById('manual_employee_select')?.value || '';
+        const profileId = document.getElementById('manual_profile_id').value;
+        const timeSelect = document.getElementById('manual_start_time');
+
+        if (!date) return;
+
+        axios.get('/owner/appointments/day-full', { params: { date, employee_id: employeeId, profile_id: profileId } })
+            .then(response => {
+                const appointments = response.data;
+
+                Array.from(timeSelect.options).forEach(option => {
+                    const time = option.value;
+                    const isBusy = appointments.some(app => {
+                        return time >= app.start && time < app.end;
+                    });
+
+                    if (isBusy) {
+                        if (!option.text.includes('(obsadené)')) {
+                            option.text = `${time} (obsadené)`;
+                        }
+                        option.classList.add('busy-option');
+                    } else {
+                        option.text = time;
+                        option.classList.remove('busy-option');
+                    }
+                });
+                $(timeSelect).niceSelect('update');
+            })
+            .catch(err => console.error('Chyba pri kontrole obsadenosti', err));
     }
 
     function openRescheduleModal(id, date, startTime, duration, employeeId) {
@@ -326,6 +364,10 @@
 
     $(document).ready(function() {
         $('.nice-select').niceSelect();
+
+        $('#manual_date, #manual_employee_select').on('change', function() {
+            checkBusySlots();
+        });
     });
 </script>
 
@@ -369,14 +411,16 @@
                 <div class="grid sm:grid-cols-3 gap-4">
                     <div>
                         <label class="label">Čas začiatku</label>
-                        <select name="start_time" id="edit_start_time" class="input-control nice-select nice-select-time" required>
-                            @for($h = 7; $h <= 21; $h++)
-                                @foreach(['00', '30'] as $m)
-                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                    <option value="{{ $time }}">{{ $time }}</option>
-                                @endforeach
-                            @endfor
-                        </select>
+                        <div class="nice-select-wrapper">
+                            <select name="start_time" id="edit_start_time" class="nice-select nice-select-time" required>
+                                @for($h = 7; $h <= 21; $h++)
+                                    @foreach(['00', '30'] as $m)
+                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                        <option value="{{ $time }}">{{ $time }}</option>
+                                    @endforeach
+                                @endfor
+                            </select>
+                        </div>
                     </div>
                     <div>
                         <label class="label">Dĺžka (min)</label>
@@ -391,12 +435,14 @@
                 @if($allProfiles->first()->employees->count() > 1)
                 <div>
                     <label class="label">Zamestnanec</label>
-                    <select name="employee_id" id="edit_employee_select" class="input-control nice-select">
-                        <option value="">Bez zamestnanca</option>
-                        @foreach($allProfiles->first()->employees as $employee)
-                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="nice-select-wrapper">
+                        <select name="employee_id" id="edit_employee_select" class="nice-select">
+                            <option value="">Bez zamestnanca</option>
+                            @foreach($allProfiles->first()->employees as $employee)
+                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 @elseif($allProfiles->first()->employees->count() === 1)
                     <input type="hidden" name="employee_id" id="edit_employee_select" value="{{ $allProfiles->first()->employees->first()->id }}">
@@ -438,14 +484,16 @@
                     </div>
                     <div>
                         <label class="label">Nový čas začiatku</label>
-                        <select name="start_time" id="reschedule_start_time" class="input-control nice-select nice-select-time" required>
-                            @for($h = 7; $h <= 21; $h++)
-                                @foreach(['00', '30'] as $m)
-                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                    <option value="{{ $time }}">{{ $time }}</option>
-                                @endforeach
-                            @endfor
-                        </select>
+                        <div class="nice-select-wrapper">
+                            <select name="start_time" id="reschedule_start_time" class="nice-select nice-select-time" required>
+                                @for($h = 7; $h <= 21; $h++)
+                                    @foreach(['00', '30'] as $m)
+                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                        <option value="{{ $time }}">{{ $time }}</option>
+                                    @endforeach
+                                @endfor
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -457,12 +505,14 @@
                     @if($allProfiles->first()->employees->count() > 1)
                     <div>
                         <label class="label">Zamestnanec</label>
-                        <select name="employee_id" id="reschedule_employee_select" class="input-control nice-select">
-                            <option value="">Bez zamestnanca</option>
-                            @foreach($allProfiles->first()->employees as $employee)
-                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                            @endforeach
-                        </select>
+                        <div class="nice-select-wrapper">
+                            <select name="employee_id" id="reschedule_employee_select" class="nice-select">
+                                <option value="">Bez zamestnanca</option>
+                                @foreach($allProfiles->first()->employees as $employee)
+                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     @endif
                 </div>

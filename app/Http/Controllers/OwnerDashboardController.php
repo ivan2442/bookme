@@ -85,6 +85,33 @@ class OwnerDashboardController extends Controller
         return response()->json($appointments);
     }
 
+    public function getAppointmentsForDayFull(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
+        $date = $request->date;
+        $employeeId = $request->employee_id;
+
+        $query = Appointment::whereIn('profile_id', $profileIds)
+            ->whereDate('start_at', $date)
+            ->where('status', '!=', 'cancelled');
+
+        if ($employeeId) {
+            $query->where('employee_id', $employeeId);
+        }
+
+        $timezone = Profile::whereIn('id', $profileIds)->first()->timezone ?? config('app.timezone');
+
+        $appointments = $query->get(['start_at', 'end_at'])->map(function($a) use ($timezone) {
+            return [
+                'start' => $a->start_at->timezone($timezone)->format('H:i'),
+                'end' => $a->end_at->timezone($timezone)->format('H:i'),
+            ];
+        });
+
+        return response()->json($appointments);
+    }
+
     private function getOwnerProfileIds(Request $request)
     {
         return Profile::where('owner_id', $request->user()->id)->pluck('id')->toArray();
@@ -450,7 +477,7 @@ class OwnerDashboardController extends Controller
     {
         $profileIds = $this->getOwnerProfileIds($request);
         $profiles = Profile::with('employees')->whereIn('id', $profileIds)->get();
-        $schedules = Schedule::with(['profile', 'employee'])
+        $schedules = Schedule::with(['profile', 'employee', 'breaks'])
             ->whereIn('profile_id', $profileIds)
             ->orderBy('day_of_week')
             ->orderBy('start_time')
@@ -470,6 +497,9 @@ class OwnerDashboardController extends Controller
             'days.*' => ['integer', 'between:0,6'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'has_break' => ['nullable', 'string'],
+            'break_start_time' => ['nullable', 'required_if:has_break,on', 'date_format:H:i'],
+            'break_end_time' => ['nullable', 'required_if:has_break,on', 'date_format:H:i', 'after:break_start_time'],
         ]);
 
         if (!in_array($data['profile_id'], $profileIds)) {
@@ -488,7 +518,7 @@ class OwnerDashboardController extends Controller
         }
 
         foreach ($days as $dow) {
-            Schedule::updateOrCreate([
+            $schedule = Schedule::updateOrCreate([
                 'profile_id' => $data['profile_id'],
                 'employee_id' => isset($data['employee_id']) ? $data['employee_id'] : null,
                 'day_of_week' => $dow,
@@ -497,6 +527,16 @@ class OwnerDashboardController extends Controller
                 'end_time' => $data['end_time'],
                 'is_recurring' => true,
             ]);
+
+            // Handle breaks
+            $schedule->breaks()->delete();
+            if ($request->boolean('has_break')) {
+                $schedule->breaks()->create([
+                    'start_time' => $data['break_start_time'],
+                    'end_time' => $data['break_end_time'],
+                    'label' => 'Prestávka',
+                ]);
+            }
         }
 
         return back()->with('status', count($days) > 1 ? 'Pracovné časy boli uložené.' : 'Pracovný čas bol uložený.');
@@ -527,6 +567,9 @@ class OwnerDashboardController extends Controller
             'day_of_week' => ['required', 'integer', 'between:0,6'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'has_break' => ['nullable', 'string'],
+            'break_start_time' => ['nullable', 'required_if:has_break,on', 'date_format:H:i'],
+            'break_end_time' => ['nullable', 'required_if:has_break,on', 'date_format:H:i', 'after:break_start_time'],
         ]);
 
         if (!in_array($data['profile_id'], $profileIds)) {
@@ -540,6 +583,16 @@ class OwnerDashboardController extends Controller
             'start_time' => $data['start_time'],
             'end_time' => $data['end_time'],
         ]);
+
+        // Handle breaks
+        $schedule->breaks()->delete();
+        if ($request->boolean('has_break')) {
+            $schedule->breaks()->create([
+                'start_time' => $data['break_start_time'],
+                'end_time' => $data['break_end_time'],
+                'label' => 'Prestávka',
+            ]);
+        }
 
         return back()->with('status', 'Pracovný čas bol úspešne upravený.');
     }

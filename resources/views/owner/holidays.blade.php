@@ -2,12 +2,17 @@
 
 @section('content')
 <section class="pt-12 pb-6 space-y-6">
-    <div class="flex items-center justify-between gap-3">
+    <div class="flex items-center justify-between gap-3 mb-6">
         <div>
             <p class="text-xs uppercase tracking-widest text-slate-500">Prevádzka</p>
             <h1 class="font-display text-3xl text-slate-900">Sviatky a uzávierky</h1>
         </div>
-        <span class="badge">Blokácie</span>
+        <div class="flex gap-2">
+            <button onclick="openAddHolidayModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Pridať sviatok / blokáciu</span>
+            </button>
+        </div>
     </div>
 
     @include('owner.partials.nav')
@@ -16,55 +21,7 @@
         <div class="card border-emerald-200 bg-emerald-50 text-emerald-800">{{ session('status') }}</div>
     @endif
 
-    <div class="grid lg:grid-cols-[1.1fr,1fr] gap-4">
-        <div class="card space-y-4">
-            <h2 class="font-semibold text-lg text-slate-900">Pridať sviatok / blokáciu</h2>
-            <form method="POST" action="{{ route('owner.holidays.store') }}" class="space-y-3">
-                @csrf
-                <div>
-                    <label class="label">Prevádzka</label>
-                    <select name="profile_id" class="input-control" required>
-                        @foreach($profiles as $profile)
-                            <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="label">Zamestnanec (voliteľné)</label>
-                    <select name="employee_id" class="input-control">
-                        <option value="">Celá prevádzka</option>
-                        @foreach($profiles as $profile)
-                            @foreach($profile->employees as $employee)
-                                <option value="{{ $employee->id }}" @selected(old('employee_id') == $employee->id)>{{ $employee->name }} — {{ $profile->name }}</option>
-                            @endforeach
-                        @endforeach
-                    </select>
-                </div>
-                <div class="grid sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="label">Dátum</label>
-                        <input type="text" name="date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD">
-                    </div>
-                    <div>
-                        <label class="label">Od</label>
-                        <input type="time" name="start_time" class="input-control" value="{{ old('start_time') }}">
-                    </div>
-                    <div>
-                        <label class="label">Do</label>
-                        <input type="time" name="end_time" class="input-control" value="{{ old('end_time') }}">
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <input type="text" name="reason" class="input-control" value="{{ old('reason') }}" placeholder="Dôvod (sviatok, dovolenka)">
-                    <label class="flex items-center gap-2 text-sm text-slate-600">
-                        <input type="checkbox" name="is_closed" value="1" class="h-4 w-4" @checked(old('is_closed', '1') == '1')>
-                        Celý deň zatvorené
-                    </label>
-                </div>
-                <button class="w-full px-4 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition">Pridať</button>
-            </form>
-        </div>
-
+    <div class="max-w-4xl mx-auto">
         <div class="card space-y-3">
             <h2 class="font-semibold text-lg text-slate-900">Zoznam blokácií</h2>
             <div class="space-y-2 max-h-[75vh] overflow-y-auto pr-1">
@@ -106,14 +63,16 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Zamestnanec</label>
-                                    <select name="employee_id" class="input-control !py-1.5 !text-sm">
-                                        <option value="">Celá prevádzka</option>
-                                        @foreach($profiles->where('id', $holiday->profile_id) as $p)
-                                            @foreach($p->employees as $e)
-                                                <option value="{{ $e->id }}" @selected($holiday->employee_id == $e->id)>{{ $e->name }}</option>
+                                    <div class="nice-select-wrapper">
+                                        <select name="employee_id" class="nice-select">
+                                            <option value="">Celá prevádzka</option>
+                                            @foreach($profiles->where('id', $holiday->profile_id) as $p)
+                                                @foreach($p->employees as $e)
+                                                    <option value="{{ $e->id }}" @selected($holiday->employee_id == $e->id)>{{ $e->name }}</option>
+                                                @endforeach
                                             @endforeach
-                                        @endforeach
-                                    </select>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Dátum</label>
@@ -123,11 +82,31 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Od</label>
-                                    <input type="time" name="start_time" value="{{ $holiday->start_time ? substr($holiday->start_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm">
+                                    <div class="nice-select-wrapper">
+                                        <select name="start_time" class="nice-select nice-select-time">
+                                            <option value="">Celý deň</option>
+                                            @for($h = 0; $h <= 23; $h++)
+                                                @foreach(['00', '30'] as $m)
+                                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                                    <option value="{{ $time }}" @selected($holiday->start_time && substr($holiday->start_time, 0, 5) == $time)>{{ $time }}</option>
+                                                @endforeach
+                                            @endfor
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Do</label>
-                                    <input type="time" name="end_time" value="{{ $holiday->end_time ? substr($holiday->end_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm">
+                                    <div class="nice-select-wrapper">
+                                        <select name="end_time" class="nice-select nice-select-time">
+                                            <option value="">Celý deň</option>
+                                            @for($h = 0; $h <= 23; $h++)
+                                                @foreach(['00', '30'] as $m)
+                                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                                    <option value="{{ $time }}" @selected($holiday->end_time && substr($holiday->end_time, 0, 5) == $time)>{{ $time }}</option>
+                                                @endforeach
+                                            @endfor
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -156,12 +135,136 @@
         </div>
     </div>
 </section>
+
+<!-- Add Holiday Modal -->
+<div id="addHolidayModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeAddHolidayModal()"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 overflow-hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-display font-semibold text-slate-900">Pridať sviatok / blokáciu</h3>
+                <button onclick="closeAddHolidayModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('owner.holidays.store') }}" class="space-y-4">
+                @csrf
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">Prevádzka</label>
+                        <select name="profile_id" class="nice-select" required>
+                            @foreach($profiles as $profile)
+                                <option value="{{ $profile->id }}" @selected(old('profile_id') == $profile->id)>{{ $profile->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label">Zamestnanec (voliteľné)</label>
+                        <select name="employee_id" class="nice-select">
+                            <option value="">Celá prevádzka</option>
+                            @foreach($profiles as $profile)
+                                @foreach($profile->employees as $employee)
+                                    <option value="{{ $employee->id }}" @selected(old('employee_id') == $employee->id)>{{ $employee->name }} — {{ $profile->name }}</option>
+                                @endforeach
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
+                    <div>
+                        <label class="label">Dátum</label>
+                        <input type="text" name="date" id="add_holiday_date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD">
+                    </div>
+                    <div>
+                        <label class="label">Od</label>
+                        <div class="nice-select-wrapper">
+                            <select name="start_time" class="nice-select nice-select-time">
+                                <option value="">Celý deň</option>
+                                @for($h = 0; $h <= 23; $h++)
+                                    @foreach(['00', '30'] as $m)
+                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                        <option value="{{ $time }}" @selected(old('start_time') == $time)>{{ $time }}</option>
+                                    @endforeach
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="label">Do</label>
+                        <div class="nice-select-wrapper">
+                            <select name="end_time" class="nice-select nice-select-time">
+                                <option value="">Celý deň</option>
+                                @for($h = 0; $h <= 23; $h++)
+                                    @foreach(['00', '30'] as $m)
+                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                        <option value="{{ $time }}" @selected(old('end_time') == $time)>{{ $time }}</option>
+                                    @endforeach
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-[1fr,200px] gap-4">
+                    <div>
+                        <label class="label">Dôvod</label>
+                        <input type="text" name="reason" class="input-control" value="{{ old('reason') }}" placeholder="Dôvod (sviatok, dovolenka)">
+                    </div>
+                    <div class="flex items-end pb-3">
+                        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                            <input type="checkbox" name="is_closed" value="1" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 rounded border-slate-300" @checked(old('is_closed', '1') == '1')>
+                            Celý deň zatvorené
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
+                    <button type="button" onclick="closeAddHolidayModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-200/50">Pridať blokáciu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr("#add_holiday_date", {
+            dateFormat: "Y-m-d",
+            locale: "sk",
+            minDate: "today"
+        });
+    });
+
+    $(document).ready(function() {
+        $('.nice-select').niceSelect();
+    });
+
+    function openAddHolidayModal() {
+        document.getElementById('addHolidayModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        $('#addHolidayModal .nice-select').niceSelect('update');
+    }
+
+    function closeAddHolidayModal() {
+        document.getElementById('addHolidayModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
     function toggleEdit(id) {
         const view = document.getElementById(`holiday-view-${id}`);
         const edit = document.getElementById(`holiday-edit-${id}`);
         view.classList.toggle('hidden');
         edit.classList.toggle('hidden');
+        if (!edit.classList.contains('hidden')) {
+            $(`#holiday-edit-${id} .nice-select`).niceSelect('update');
+        }
     }
 </script>
 @endsection

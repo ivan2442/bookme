@@ -6,6 +6,8 @@
     <title>{{ $title ?? 'BookMe' }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Rýchle online rezervácie pre služby na jednom mieste.">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Nice Select -->
@@ -13,15 +15,80 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
     <style>
+        select.nice-select {
+            display: none !important;
+        }
+        .nice-select {
+            border-radius: 12px !important;
+            border: 1px solid #f1f5f9 !important;
+            height: 46px !important;
+            line-height: 44px !important;
+            padding-left: 16px !important;
+            padding-right: 30px !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+            background-color: #ffffff !important;
+            width: 100% !important;
+            float: none !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .nice-select:after {
+            right: 16px !important;
+        }
+        .nice-select .current {
+            display: block !important;
+            width: 100% !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            line-height: 44px !important;
+        }
         .nice-select .list {
-            max-height: 200px;
+            width: 100% !important;
+            border-radius: 12px !important;
+            max-height: 200px !important;
             overflow-y: auto !important;
+            z-index: 9999 !important;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;
+        }
+        .nice-select-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+        .nice-select-wrapper:has(.nice-select.open) {
+            z-index: 50;
+        }
+        .nice-select-time {
+            text-align: center !important;
+            justify-content: center !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .nice-select-time .current {
+            padding-right: 0 !important;
+            text-align: center !important;
+        }
+        .nice-select-time:after {
+            display: none !important;
         }
         .nice-select-time .option {
-            line-height: 15px !important;
-            min-height: 25px !important;
-            padding-top: 5px;
-            padding-bottom: 5px;
+            line-height: 24px !important;
+            min-height: 24px !important;
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+            text-align: center !important;
+        }
+        .nice-select .option.busy-option {
+            color: #94a3b8 !important;
+            background-color: #f8fafc !important;
+            font-style: italic;
+        }
+        .nice-select .option.busy-option:hover {
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
         }
     </style>
 </head>
