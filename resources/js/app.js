@@ -886,19 +886,51 @@ if (mobileMenuButton && mobileMenu) {
     }, { passive: true });
 }
 
-// Scroll to Top Logic
+// Header & Scroll Logic
 const scrollToTopBtn = document.getElementById('scroll-to-top');
-if (scrollToTopBtn) {
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
+const headerWrapper = document.getElementById('header-wrapper');
+const mainHeader = document.getElementById('main-header');
+let lastScrollY = window.scrollY;
+
+window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    // Scroll to Top visibility
+    if (scrollToTopBtn) {
+        if (currentScrollY > 300) {
             scrollToTopBtn.classList.remove('opacity-0', 'invisible');
             scrollToTopBtn.classList.add('opacity-100', 'visible');
         } else {
             scrollToTopBtn.classList.add('opacity-0', 'invisible');
             scrollToTopBtn.classList.remove('opacity-100', 'visible');
         }
-    }, { passive: true });
+    }
 
+    // Sticky Header Logic
+    if (headerWrapper && mainHeader) {
+        // Hide on scroll down, show on scroll up
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            // Scrolling down
+            headerWrapper.classList.replace('translate-y-0', '-translate-y-full');
+        } else {
+            // Scrolling up
+            headerWrapper.classList.replace('-translate-y-full', 'translate-y-0');
+        }
+
+        // Visual feedback for sticky state
+        if (currentScrollY > 20) {
+            mainHeader.classList.add('shadow-xl', 'shadow-slate-200/50', '!py-3');
+            mainHeader.classList.remove('md:py-6');
+        } else {
+            mainHeader.classList.remove('shadow-xl', 'shadow-slate-200/50', '!py-3');
+            mainHeader.classList.add('md:py-6');
+        }
+    }
+
+    lastScrollY = currentScrollY;
+}, { passive: true });
+
+if (scrollToTopBtn) {
     scrollToTopBtn.addEventListener('click', () => {
         window.scrollTo({
             top: 0,
