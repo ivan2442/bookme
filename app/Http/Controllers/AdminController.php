@@ -427,6 +427,13 @@ class AdminController extends Controller
         return back()->with('status', 'Prevádzka bola upravená.');
     }
 
+    public function publishProfile(Profile $profile): RedirectResponse
+    {
+        $profile->update(['status' => 'published']);
+
+        return back()->with('status', 'Prevádzka bola úspešne zverejnená.');
+    }
+
     public function schedules(): View
     {
         $profiles = Profile::with('employees')->orderBy('name')->get();

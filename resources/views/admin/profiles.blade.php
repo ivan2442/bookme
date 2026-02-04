@@ -121,7 +121,9 @@
                         <p class="font-semibold text-slate-900">{{ $profile->name }}</p>
                         <p class="text-xs text-slate-500">{{ $profile->category }} • {{ $profile->city }}</p>
                         <div class="flex items-center gap-2 mt-1">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $profile->status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase
+                                {{ $profile->status === 'published' ? 'bg-emerald-100 text-emerald-700' :
+                                   ($profile->status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600') }}">
                                 {{ $profile->status }}
                             </span>
                             <span class="text-[10px] text-slate-400">{{ $profile->owner ? $profile->owner->email : '' }}</span>
@@ -138,10 +140,18 @@
                         @endif
                     </div>
                     <div class="flex gap-1">
+                        @if($profile->status === 'pending')
+                            <form action="{{ route('admin.profiles.publish', $profile) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm shadow-emerald-200">
+                                    Zverejniť
+                                </button>
+                            </form>
+                        @endif
                         <button type="button"
                                 onclick="openEditModal({{ json_encode($profile) }})"
                                 class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition">
-                            Upraviť
+                                Upraviť
                         </button>
                         <form action="{{ route('admin.profiles.update', $profile) }}" method="POST" onsubmit="return confirmDelete(event, 'Naozaj chcete odstrániť túto prevádzku? (Zmeňte stav na neaktívny alebo ju vymažte z DB ak je to implementované)')">
                             @csrf
@@ -196,6 +206,7 @@
                             <label class="label">Stav</label>
                             <select name="status" id="edit-status" class="input-control" required>
                                 <option value="draft">Draft</option>
+                                <option value="pending">Čakajúca (Pending)</option>
                                 <option value="published">Publikovaná</option>
                                 <option value="inactive">Neaktívna</option>
                             </select>
