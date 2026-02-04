@@ -661,10 +661,10 @@ let lockTimeout = null;
 
                         // Create temporary lock
                         const payload = {
-                            profile_id: state.currentProfileId,
-                            service_id: state.selectedServiceId,
-                            service_variant_id: state.selectedVariantId,
-                            employee_id: state.selectedEmployeeId,
+                            profile_id: shopSelect.value,
+                            service_id: serviceSelect.value,
+                            service_variant_id: variantSelect?.value || null,
+                            employee_id: employeeInput?.value || null,
                             start_at: slot.start_at,
                             date: dateInput?.value
                         };
