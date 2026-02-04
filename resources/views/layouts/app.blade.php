@@ -6,6 +6,22 @@
     <title>{{ $title ?? 'BookMe' }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Rýchle online rezervácie pre služby na jednom mieste.">
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $title ?? 'BookMe - Moderný rezervačný systém' }}">
+    <meta property="og:description" content="Rýchle online rezervácie pre služby na jednom mieste. Zarezervujte si svoj termín bez telefonátov.">
+    <meta property="og:image" content="{{ asset('og-image.png') }}">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="{{ request()->getHost() }}">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="{{ $title ?? 'BookMe - Moderný rezervačný systém' }}">
+    <meta name="twitter:description" content="Rýchle online rezervácie pre služby na jednom mieste. Zarezervujte si svoj termín bez telefonátov.">
+    <meta name="twitter:image" content="{{ asset('og-image.png') }}">
+
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
