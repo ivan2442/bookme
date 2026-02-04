@@ -64,7 +64,7 @@ Ak chcete spustiť všetko naraz po úprave `.env` súboru:
 
 ```bash
 cd ../
-rm -r bookme
+rm -r web
 git clone https://github.com/ivan2442/bookme.git
 cd bookme
 composer install
