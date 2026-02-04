@@ -85,8 +85,12 @@
                                 <input type="file" name="logo" class="input-control !p-2 text-xs">
                                 @if($profile->logo_url)
                                     <div class="mt-2 relative group">
-                                        <img src="{{ $profile->logo_url }}" class="h-12 w-12 object-contain rounded-lg border border-slate-200 bg-white" alt="Logo preview">
-                                        <p class="text-[10px] text-emerald-600 mt-1 font-bold uppercase tracking-tight">Logo je nahrané</p>
+                                        <img src="{{ $profile->logo_url }}" class="h-16 w-16 object-contain rounded-lg border border-slate-200 bg-white" alt="Logo preview">
+                                        <p class="text-[10px] text-emerald-600 mt-1 font-bold uppercase tracking-tight">Logo je aktívne</p>
+                                    </div>
+                                @else
+                                    <div class="mt-2 p-3 rounded-lg border border-dashed border-slate-200 bg-slate-50 text-center">
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Logo nie je nastavené</p>
                                     </div>
                                 @endif
                             </div>
@@ -95,8 +99,12 @@
                                 <input type="file" name="banner" class="input-control !p-2 text-xs">
                                 @if($profile->banner_url)
                                     <div class="mt-2 relative group">
-                                        <img src="{{ $profile->banner_url }}" class="h-12 w-24 object-cover rounded-lg border border-slate-200 bg-white" alt="Banner preview">
-                                        <p class="text-[10px] text-emerald-600 mt-1 font-bold uppercase tracking-tight">Banner je nahraný</p>
+                                        <img src="{{ $profile->banner_url }}" class="h-16 w-32 object-cover rounded-lg border border-slate-200 bg-white" alt="Banner preview">
+                                        <p class="text-[10px] text-emerald-600 mt-1 font-bold uppercase tracking-tight">Banner je aktívny</p>
+                                    </div>
+                                @else
+                                    <div class="mt-2 p-3 rounded-lg border border-dashed border-slate-200 bg-slate-50 text-center">
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Banner nie je nastavený</p>
                                     </div>
                                 @endif
                             </div>

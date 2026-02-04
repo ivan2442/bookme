@@ -415,18 +415,23 @@ class AdminController extends Controller
             'subscription_plan' => $data['subscription_plan'] ?? 'free',
         ];
 
-        if ($request->hasFile('logo')) {
-            if ($profile->logo_path) {
-                Storage::disk('public')->delete($profile->logo_path);
+        try {
+            if ($request->hasFile('logo')) {
+                if ($profile->logo_path) {
+                    Storage::disk('public')->delete($profile->logo_path);
+                }
+                $updateData['logo_path'] = $request->file('logo')->store('profiles/logos', 'public');
             }
-            $updateData['logo_path'] = $request->file('logo')->store('profiles/logos', 'public');
-        }
 
-        if ($request->hasFile('banner')) {
-            if ($profile->banner_path) {
-                Storage::disk('public')->delete($profile->banner_path);
+            if ($request->hasFile('banner')) {
+                if ($profile->banner_path) {
+                    Storage::disk('public')->delete($profile->banner_path);
+                }
+                $updateData['banner_path'] = $request->file('banner')->store('profiles/banners', 'public');
             }
-            $updateData['banner_path'] = $request->file('banner')->store('profiles/banners', 'public');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Chyba pri nahrávaní súborov v adminovi: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Nepodarilo sa nahrať súbory: ' . $e->getMessage()]);
         }
 
         $profile->update($updateData);
