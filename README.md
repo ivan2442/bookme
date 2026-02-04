@@ -74,4 +74,6 @@ npm install
 npm run build
 rm public/storage
 php artisan storage:link
+cd ../
+mv bookme web
 ```
