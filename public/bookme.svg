@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 151 148">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+        stroke: #fff;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        font-size: 76px;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        font-family: MyriadPro-Bold, 'Myriad Pro';
+        font-weight: 700;
+      }
+
+      .cls-3 {
+        font-size: 48px;
+      }
+
+      .cls-5 {
+        letter-spacing: -.1em;
+      }
+
+      .cls-6 {
+        letter-spacing: -.08em;
+      }
+
+      .cls-7 {
+        letter-spacing: -.08em;
+      }
+
+      .cls-8 {
+        letter-spacing: -.11em;
+      }
+
+      .cls-4 {
+        font-size: 63px;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="20.66" y1="16.99" x2="134.61" y2="130.94" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#41e59a"/>
+      <stop offset="1" stop-color="#38c685"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-1" x="17.44" y="13.77" width="120.39" height="120.39" rx="11" ry="11"/>
+  <text class="cls-2" transform="translate(21.51 77.22)"><tspan x="0" y="0">B</tspan></text>
+  <text class="cls-3" transform="translate(56.31 77.22)"><tspan class="cls-7" x="0" y="0">o</tspan><tspan class="cls-6" x="23.9" y="0">ok</tspan></text>
+  <text class="cls-4" transform="translate(52.17 126.71)"><tspan class="cls-5" x="0" y="0">M</tspan><tspan class="cls-8" x="46.87" y="0">e</tspan></text>
+</svg>

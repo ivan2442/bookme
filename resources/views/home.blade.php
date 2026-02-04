@@ -158,7 +158,7 @@
     </div>
     <div class="grid lg:grid-cols-[2fr,1.2fr] gap-6">
         <form class="p-4 sm:p-6 bg-white/90 border border-slate-100 rounded-2xl shadow-sm space-y-4 max-w-full overflow-hidden" data-booking-form>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden">
                 <div>
                     <label class="label">Prevádzka</label>
                     <select name="shop_id" class="input-control" required data-shop-select>
