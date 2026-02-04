@@ -72,5 +72,6 @@ php artisan key:generate
 php artisan migrate
 npm install
 npm run build
+rm public/storage
 php artisan storage:link
 ```
