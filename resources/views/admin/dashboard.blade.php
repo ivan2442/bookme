@@ -73,13 +73,40 @@
                 </div>
             </div>
         </div>
-        <div class="card">
-            <h2 class="font-semibold text-lg text-slate-900 mb-3">Rýchle akcie</h2>
-            <div class="space-y-2">
-                <a class="admin-tab block text-center" href="{{ route('admin.profiles') }}">+ Pridať prevádzku</a>
-                <a class="admin-tab block text-center" href="{{ route('admin.appointments') }}">Zoznam rezervácií</a>
-                <a class="admin-tab block text-center" href="{{ route('admin.payments') }}">Finančný prehľad</a>
+        <div class="space-y-4">
+            <div class="card">
+                <h2 class="font-semibold text-lg text-slate-900 mb-3">Rýchle akcie</h2>
+                <div class="space-y-2">
+                    <a class="admin-tab block text-center" href="{{ route('admin.profiles') }}">+ Pridať prevádzku</a>
+                    <a class="admin-tab block text-center" href="{{ route('admin.appointments') }}">Zoznam rezervácií</a>
+                    <a class="admin-tab block text-center" href="{{ route('admin.payments') }}">Finančný prehľad</a>
+                    <a class="admin-tab block text-center" href="{{ route('admin.invoices') }}">Správa faktúr</a>
+                </div>
             </div>
+
+            @if($expiring_trials->isNotEmpty())
+                <div class="card border-orange-100 bg-orange-50/30">
+                    <h2 class="font-semibold text-lg text-slate-900 mb-3 flex items-center gap-2 text-orange-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Končiace predplatné
+                    </h2>
+                    <div class="space-y-3">
+                        @foreach($expiring_trials as $profile)
+                            <div class="p-3 bg-white rounded-xl border border-orange-100 shadow-sm">
+                                <p class="font-bold text-slate-900 text-sm leading-tight">{{ $profile->name }}</p>
+                                <div class="flex items-center justify-between mt-1">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400">{{ $profile->city }}</span>
+                                    @if($profile->trial_days_left > 0)
+                                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Zostáva {{ $profile->trial_time_left }}</span>
+                                    @else
+                                        <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Expirovalo</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </section>

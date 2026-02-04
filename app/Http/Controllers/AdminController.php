@@ -30,7 +30,16 @@ class AdminController extends Controller
         $latest_profiles = Profile::with('owner')->latest()->limit(5)->get();
         $upcoming = Appointment::with(['profile', 'service', 'employee'])->where('start_at', '>=', now())->orderBy('start_at')->limit(5)->get();
 
-        return view('admin.dashboard', compact('stats', 'latest_profiles', 'upcoming'));
+        // Prevádzky s končiacim predplatným (v najbližších 14 dňoch alebo po expirácii)
+        $expiring_trials = Profile::whereNotNull('subscription_starts_at')
+            ->where('subscription_plan', 'free')
+            ->get()
+            ->filter(function($p) {
+                return $p->trial_days_left <= 14;
+            })
+            ->sortBy('trial_days_left');
+
+        return view('admin.dashboard', compact('stats', 'latest_profiles', 'upcoming', 'expiring_trials'));
     }
 
     public function services(): View
@@ -333,6 +342,8 @@ class AdminController extends Controller
                 'description' => $data['description'] ?? null,
                 'timezone' => $data['timezone'] ?? 'Europe/Bratislava',
                 'status' => 'published',
+                'subscription_starts_at' => now(),
+                'subscription_plan' => 'free',
                 'logo_path' => $request->hasFile('logo') ? $request->file('logo')->store('profiles/logos', 'public') : null,
                 'banner_path' => $request->hasFile('banner') ? $request->file('banner')->store('profiles/banners', 'public') : null,
             ]);
@@ -380,7 +391,9 @@ class AdminController extends Controller
             'address_line1' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'timezone' => ['nullable', 'string', 'max:64'],
-            'status' => ['required', 'string', 'in:draft,published,inactive'],
+            'status' => ['required', 'string', 'in:draft,published,inactive,pending'],
+            'subscription_starts_at' => ['nullable', 'date'],
+            'subscription_plan' => ['required', 'string', 'in:free,basic,premium'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'banner' => ['nullable', 'image', 'max:5120'],
         ]);
@@ -397,6 +410,8 @@ class AdminController extends Controller
             'description' => $data['description'] ?? null,
             'timezone' => $data['timezone'] ?? 'Europe/Bratislava',
             'status' => $data['status'],
+            'subscription_starts_at' => $data['subscription_starts_at'] ?? null,
+            'subscription_plan' => $data['subscription_plan'] ?? 'free',
         ];
 
         if ($request->hasFile('logo')) {
@@ -533,8 +548,50 @@ class AdminController extends Controller
 
     public function payments(): View
     {
-        $payments = Payment::with('appointment.profile')->orderBy('created_at', 'desc')->paginate(30);
+        $payments = \App\Models\Payment::with('appointment.profile')->orderBy('created_at', 'desc')->paginate(30);
 
         return view('admin.payments', compact('payments'));
+    }
+
+    public function invoices(): View
+    {
+        $invoices = \App\Models\Invoice::with('profile')->orderBy('created_at', 'desc')->paginate(30);
+        $profiles = Profile::orderBy('name')->get();
+
+        return view('admin.invoices', compact('invoices', 'profiles'));
+    }
+
+    public function storeInvoice(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'profile_id' => ['required', 'exists:profiles,id'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'due_at' => ['required', 'date'],
+            'invoice_number' => ['nullable', 'string', 'unique:invoices,invoice_number'],
+        ]);
+
+        if (empty($data['invoice_number'])) {
+            $data['invoice_number'] = 'INV-' . strtoupper(Str::random(8));
+        }
+
+        \App\Models\Invoice::create($data);
+
+        return back()->with('status', 'Faktúra bola vytvorená.');
+    }
+
+    public function updateInvoiceStatus(Request $request, \App\Models\Invoice $invoice): RedirectResponse
+    {
+        $data = $request->validate([
+            'status' => ['required', 'string', 'in:unpaid,paid,cancelled'],
+        ]);
+
+        $updateData = ['status' => $data['status']];
+        if ($data['status'] === 'paid') {
+            $updateData['paid_at'] = now();
+        }
+
+        $invoice->update($updateData);
+
+        return back()->with('status', 'Stav faktúry bol aktualizovaný.');
     }
 }

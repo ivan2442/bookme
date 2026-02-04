@@ -126,6 +126,16 @@
                             </span>
                             <span class="text-[10px] text-slate-400">{{ $profile->owner ? $profile->owner->email : '' }}</span>
                         </div>
+                        @if($profile->subscription_starts_at)
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="text-[10px] font-bold uppercase tracking-tight text-slate-400">Bezplatná verzia:</span>
+                                @if($profile->trial_days_left > 0)
+                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Zostáva {{ $profile->trial_time_left }}</span>
+                                @else
+                                    <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Skončila ({{ $profile->trial_ends_at->format('d.m.Y') }})</span>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                     <div class="flex gap-1">
                         <button type="button"
@@ -227,6 +237,20 @@
                     </div>
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
+                            <label class="label">Dátum spustenia predplatného</label>
+                            <input type="date" name="subscription_starts_at" id="edit-subscription_starts_at" class="input-control">
+                        </div>
+                        <div>
+                            <label class="label">Plán predplatného</label>
+                            <select name="subscription_plan" id="edit-subscription_plan" class="input-control" required>
+                                <option value="free">Bezplatná verzia (Trial)</option>
+                                <option value="basic">Základný (20 €/mesiac)</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
                             <label class="label">Logo prevádzky</label>
                             <input type="file" name="logo" class="input-control !p-2 text-xs">
                             <p id="edit-logo-status" class="text-[10px] text-emerald-600 hidden">Logo je nahrané</p>
@@ -276,6 +300,13 @@
         document.getElementById('edit-timezone').value = profile.timezone || 'Europe/Bratislava';
         document.getElementById('edit-owner_id').value = profile.owner_id || '';
         document.getElementById('edit-description').value = profile.description || '';
+        document.getElementById('edit-subscription_plan').value = profile.subscription_plan || 'free';
+
+        if (profile.subscription_starts_at) {
+            document.getElementById('edit-subscription_starts_at').value = profile.subscription_starts_at.substring(0, 10);
+        } else {
+            document.getElementById('edit-subscription_starts_at').value = '';
+        }
 
         // Status nahraných obrázkov
         if (profile.logo_path) {

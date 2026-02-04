@@ -17,6 +17,39 @@
 
     @include('owner.partials.nav')
 
+    @if($allProfiles->first() && $allProfiles->first()->subscription_starts_at)
+        @php $profile = $allProfiles->first(); @endphp
+        @if($profile->trial_days_left > 0)
+            <div class="card bg-slate-900 border-0 text-white p-6 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"></div>
+                <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="space-y-1">
+                        <p class="text-xs uppercase font-bold tracking-widest text-emerald-400">Bezplatná verzia systému</p>
+                        <h2 class="text-2xl font-display font-bold">Využívate BookMe zadarmo</h2>
+                        <p class="text-sm text-slate-300">Skúšobná doba vám končí <span class="font-bold text-white">{{ $profile->trial_ends_at->format('d.m.Y') }}</span>. Potom bude systém spoplatnený sumou 20 € mesačne.</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <div class="h-24 px-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center justify-center shadow-inner">
+                            <p class="text-[10px] uppercase font-bold text-emerald-400 mb-1 tracking-widest">Zostáva ešte</p>
+                            <span class="text-2xl font-bold text-emerald-400 text-center leading-tight">{{ $profile->trial_time_left }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="card bg-gradient-to-r from-rose-500 to-rose-600 border-0 text-white p-6 shadow-lg shadow-rose-200/50">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <p class="text-xs uppercase font-bold tracking-widest text-rose-100">Predplatné skončilo</p>
+                        <h2 class="text-xl font-display font-semibold">Vaša bezplatná verzia systému vypršala</h2>
+                        <p class="text-sm text-rose-50/80">Pre pokračovanie v používaní systému je potrebné aktivovať platenú verziu.</p>
+                    </div>
+                    <button class="px-6 py-2 rounded-xl bg-white text-rose-600 font-bold hover:bg-rose-50 transition shadow-xl">Aktivovať za 20 €</button>
+                </div>
+            </div>
+        @endif
+    @endif
+
     <div class="grid md:grid-cols-3 gap-4">
         <div class="card">
             <p class="text-sm text-slate-500 mb-1">Rezervácie dnes</p>

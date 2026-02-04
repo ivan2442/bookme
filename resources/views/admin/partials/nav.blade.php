@@ -3,4 +3,5 @@
     <a href="{{ route('admin.profiles') }}" class="admin-tab {{ request()->routeIs('admin.profiles') ? 'is-active' : '' }}">Prevádzky</a>
     <a href="{{ route('admin.appointments') }}" class="admin-tab {{ request()->routeIs('admin.appointments') ? 'is-active' : '' }}">Rezervácie</a>
     <a href="{{ route('admin.payments') }}" class="admin-tab {{ request()->routeIs('admin.payments') ? 'is-active' : '' }}">Platby</a>
+    <a href="{{ route('admin.invoices') }}" class="admin-tab {{ request()->routeIs('admin.invoices') ? 'is-active' : '' }}">Faktúry</a>
 </div>

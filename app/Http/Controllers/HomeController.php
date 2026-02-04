@@ -18,11 +18,16 @@ class HomeController extends Controller
         return view('home', compact('latestArticles'));
     }
 
+    public function forBusinesses()
+    {
+        return view('for-businesses');
+    }
+
     public function showProfile($slug)
     {
         $profile = Profile::with(['services.variants', 'employees', 'calendarSetting', 'schedules'])
             ->where('slug', $slug)
-            ->where('status', 'published')
+            ->whereIn('status', ['published', 'pending'])
             ->whereHas('calendarSetting', function ($q) {
                 $q->where('is_public', true);
             })

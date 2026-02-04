@@ -2,6 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Profile;
+use App\Models\CalendarSetting;
+use App\Mail\BusinessRegistrationConfirmation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -33,6 +41,73 @@ class AuthController extends Controller
             : route('owner.dashboard');
 
         return redirect()->intended($redirect);
+    }
+
+    public function registerBusiness(Request $request)
+    {
+        $data = $request->validate([
+            'business_name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'role' => 'owner',
+                'password' => Hash::make($data['password']),
+            ]);
+
+            $slug = Str::slug($data['business_name']);
+            $originalSlug = $slug;
+            $count = 1;
+            while (Profile::where('slug', $slug)->exists()) {
+                $slug = $originalSlug . '-' . $count++;
+            }
+
+            $profile = Profile::create([
+                'owner_id' => $user->id,
+                'name' => $data['business_name'],
+                'slug' => $slug,
+                'category' => $data['category'],
+                'city' => $data['city'],
+                'status' => 'pending',
+                'subscription_starts_at' => now(),
+                'subscription_plan' => 'free',
+                'timezone' => 'Europe/Bratislava',
+            ]);
+
+            CalendarSetting::create([
+                'profile_id' => $profile->id,
+                'slot_interval_minutes' => 30,
+                'max_advance_days' => 30,
+                'is_public' => true,
+            ]);
+
+            DB::commit();
+
+            try {
+                Mail::to($user->email)->send(new BusinessRegistrationConfirmation($profile));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('E-mail send failed: ' . $e->getMessage());
+            }
+
+            Auth::login($user);
+
+            return redirect()->route('owner.dashboard')->with('status', 'Registrácia prebehla úspešne. Vaša prevádzka bude po odobrení adminom verejná. Momentálne je však plne funkčná cez váš unikátny odkaz.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Registrácia zlyhala: ' . $e->getMessage());
+        }
     }
 
     public function logout(Request $request)

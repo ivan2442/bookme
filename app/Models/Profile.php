@@ -31,6 +31,8 @@ class Profile extends Model
         'longitude',
         'timezone',
         'status',
+        'subscription_starts_at',
+        'subscription_plan',
         'logo_path',
         'banner_path',
         'settings',
@@ -38,6 +40,7 @@ class Profile extends Model
 
     protected $casts = [
         'settings' => 'array',
+        'subscription_starts_at' => 'datetime',
     ];
 
     public function owner(): BelongsTo
@@ -73,5 +76,66 @@ class Profile extends Model
     public function calendarSetting(): HasOne
     {
         return $this->hasOne(CalendarSetting::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function getTrialEndsAtAttribute()
+    {
+        if (!$this->subscription_starts_at) {
+            return null;
+        }
+        return $this->subscription_starts_at->copy()->addMonths(3);
+    }
+
+    public function getIsTrialActiveAttribute()
+    {
+        $trialEndsAt = $this->trial_ends_at;
+        if (!$trialEndsAt) {
+            return false;
+        }
+        return now()->lessThan($trialEndsAt);
+    }
+
+    public function getTrialDaysLeftAttribute()
+    {
+        $trialEndsAt = $this->trial_ends_at;
+        if (!$trialEndsAt) {
+            return 0;
+        }
+        if (now()->greaterThanOrEqualTo($trialEndsAt)) {
+            return 0;
+        }
+        return (int) ceil(now()->diffInMinutes($trialEndsAt) / (24 * 60));
+    }
+
+    public function getTrialTimeLeftAttribute()
+    {
+        $trialEndsAt = $this->trial_ends_at;
+        if (!$trialEndsAt || now()->greaterThanOrEqualTo($trialEndsAt)) {
+            return '0 dní';
+        }
+
+        $diff = now()->diff($trialEndsAt);
+        $parts = [];
+
+        if ($diff->m > 0) {
+            $monthWord = $diff->m == 1 ? 'Mesiac' : ($diff->m < 5 ? 'Mesiace' : 'Mesiacov');
+            $parts[] = $diff->m . ' ' . $monthWord;
+        }
+
+        if ($diff->d > 0) {
+            $dayWord = $diff->d == 1 ? 'Deň' : ($diff->d < 5 ? 'Dni' : 'Dní');
+            $parts[] = $diff->d . ' ' . $dayWord;
+        }
+
+        if (empty($parts)) {
+            return 'Menej ako deň';
+        }
+
+        return implode(' ', $parts);
     }
 }

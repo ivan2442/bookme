@@ -8,12 +8,14 @@ use App\Http\Controllers\ArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/pre-prevadzky', [HomeController::class, 'forBusinesses'])->name('for-businesses');
 Route::get('/clanky', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('/clanky/{slug}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/prevadzka/{slug}', [HomeController::class, 'showProfile'])->name('profiles.show');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login.submit');
+Route::post('/register-business', [AuthController::class, 'registerBusiness'])->name('auth.register.business');
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
@@ -50,6 +52,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::delete('/holidays/{holiday}', [AdminController::class, 'deleteHoliday'])->name('holidays.delete');
 
     Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
+    Route::get('/invoices', [AdminController::class, 'invoices'])->name('invoices');
+    Route::post('/invoices', [AdminController::class, 'storeInvoice'])->name('invoices.store');
+    Route::post('/invoices/{invoice}/status', [AdminController::class, 'updateInvoiceStatus'])->name('invoices.status.update');
 });
 
 Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
