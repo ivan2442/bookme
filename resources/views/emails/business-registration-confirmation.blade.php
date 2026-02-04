@@ -1,4 +1,9 @@
 <x-mail::message>
+
+<div style="text-align: center; padding: 20px 0;">
+<img src="{{ asset('favicon.png') }}" width="80" height="80" alt="BookMe Logo">
+</div>
+
 # Potvrdenie registrácie prevádzky
 
 Dobrý deň,

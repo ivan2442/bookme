@@ -21,8 +21,13 @@
             <p class="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
                 BookMe je komplexný rezervačný systém, ktorý za vás vybaví termíny, pripomenie sa klientom a poskytne vám dokonalý prehľad o vašej prevádzke.
             </p>
-            <div class="p-4 bg-white/50 backdrop-blur-sm border border-emerald-100 rounded-2xl inline-block">
-                <p class="text-slate-900 font-bold">Prvé 3 mesiace úplne zadarmo <span class="text-emerald-500 mx-2">•</span> potom iba 20 € mesačne</p>
+            <div class="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-4 px-6 py-3 rounded-2xl bg-white/80 backdrop-blur-sm border border-emerald-100 shadow-sm mx-auto">
+                <div class="flex items-center gap-2">
+                    <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <p class="text-slate-900 font-bold">Prvé 3 mesiace <span class="text-emerald-500">úplne zadarmo</span></p>
+                </div>
+                <span class="hidden sm:block text-emerald-200">|</span>
+                <p class="text-slate-500 text-sm font-semibold">potom iba 20 € mesačne</p>
             </div>
             <div class="flex justify-center">
                 <a href="#register" class="px-10 py-5 rounded-2xl bg-slate-900 text-white font-bold text-lg shadow-2xl shadow-slate-200 hover:bg-slate-800 hover:-translate-y-1 transition-all">
