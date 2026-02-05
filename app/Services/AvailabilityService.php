@@ -33,27 +33,6 @@ class AvailabilityService
         $bufferAfter = ($settings?->buffer_after_minutes ?? 0) + $bufferAfter;
         $serviceDuration = ($durationMinutes ?: 30) + $bufferBefore + $bufferAfter;
 
-        $schedules = Schedule::query()
-            ->with('breaks')
-            ->where('profile_id', $profile->id)
-            ->when($employeeId, function ($query) use ($employeeId) {
-                $query->where(function ($q) use ($employeeId) {
-                    $q->whereNull('employee_id')
-                        ->orWhere('employee_id', $employeeId);
-                });
-            })
-            ->get();
-
-        $holidays = Holiday::query()
-            ->where('profile_id', $profile->id)
-            ->when($employeeId, function ($query) use ($employeeId) {
-                $query->where(function ($q) use ($employeeId) {
-                    $q->whereNull('employee_id')->orWhere('employee_id', $employeeId);
-                });
-            })
-            ->whereBetween('date', [$start->toDateString(), $endRange->toDateString()])
-            ->get();
-
         $appointments = Appointment::query()
             ->where('profile_id', $profile->id)
             ->whereNotIn('status', ['cancelled'])
@@ -76,6 +55,7 @@ class AvailabilityService
             })
             ->get();
 
+        $dailyWindows = $this->getWorkingWindows($profile, $startDate, $days, $employeeId);
         $slots = [];
         $closedDays = [];
         $now = Carbon::now($timezone);
@@ -84,19 +64,96 @@ class AvailabilityService
         for ($day = 0; $day < $days; $day++) {
             $date = $start->copy()->addDays($day);
             $dateString = $date->toDateString();
+
             if ($date->greaterThan($maxAdvanceBoundary)) {
                 $closedDays[] = $dateString;
                 continue;
             }
 
-            if ($this->isClosedByHoliday($holidays, $date)) {
+            $windows = $dailyWindows[$dateString] ?? [];
+            if (empty($windows)) {
                 $closedDays[] = $dateString;
+                continue;
+            }
+
+            foreach ($windows as [$windowStart, $windowEnd]) {
+                for ($slotStart = $windowStart->copy(); $slotStart->lt($windowEnd); $slotStart->addMinutes($slotInterval)) {
+                    $slotEnd = $slotStart->copy()->addMinutes($serviceDuration);
+
+                    if ($slotEnd->greaterThan($windowEnd)) {
+                        break;
+                    }
+
+                    if ($slotStart->lessThan($now->copy()->addMinutes($minNotice))) {
+                        continue;
+                    }
+
+                    $status = $this->getStatus($slotStart, $slotEnd, $appointments, $locks, $employeeId);
+
+                    $slots[] = [
+                        'profile_id' => $profile->id,
+                        'service_variant_id' => $variantId,
+                        'employee_id' => $employeeId,
+                        'start_at' => $slotStart->toIso8601String(),
+                        'end_at' => $slotEnd->toIso8601String(),
+                        'status' => $status,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'slots' => $slots,
+            'closed_days' => array_unique($closedDays),
+        ];
+    }
+
+    /**
+     * Get working windows for a profile in a date range.
+     * These are time intervals when the business is open, excluding breaks and holidays.
+     *
+     * @return array<string, array<int, array{0: CarbonInterface, 1: CarbonInterface}>>
+     */
+    public function getWorkingWindows(Profile $profile, CarbonInterface $startDate, int $days = 1, ?int $employeeId = null): array
+    {
+        $timezone = $profile->timezone ?? config('app.timezone');
+        $start = $startDate->copy()->startOfDay()->setTimezone($timezone);
+        $endRange = $start->copy()->addDays($days)->endOfDay();
+
+        $schedules = Schedule::query()
+            ->with('breaks')
+            ->where('profile_id', $profile->id)
+            ->when($employeeId, function ($query) use ($employeeId) {
+                $query->where(function ($q) use ($employeeId) {
+                    $q->whereNull('employee_id')
+                        ->orWhere('employee_id', $employeeId);
+                });
+            })
+            ->get();
+
+        $holidays = Holiday::query()
+            ->where('profile_id', $profile->id)
+            ->when($employeeId, function ($query) use ($employeeId) {
+                $query->where(function ($q) use ($employeeId) {
+                    $q->whereNull('employee_id')->orWhere('employee_id', $employeeId);
+                });
+            })
+            ->whereBetween('date', [$start->toDateString(), $endRange->toDateString()])
+            ->get();
+
+        $dailyWindows = [];
+
+        for ($day = 0; $day < $days; $day++) {
+            $date = $start->copy()->addDays($day);
+            $dateString = $date->toDateString();
+            $dailyWindows[$dateString] = [];
+
+            if ($this->isClosedByHoliday($holidays, $date)) {
                 continue;
             }
 
             $daySchedules = $this->schedulesForDay($schedules, $date);
             if ($daySchedules->isEmpty()) {
-                $closedDays[] = $dateString;
                 continue;
             }
 
@@ -113,37 +170,13 @@ class AvailabilityService
                 $windows = $this->subtractIntervals([[$scheduleStart, $scheduleEnd]], $this->breakIntervals($schedule, $date, $timezone));
                 $windows = $this->subtractIntervals($windows, $blockedIntervals);
 
-                foreach ($windows as [$windowStart, $windowEnd]) {
-                    for ($slotStart = $windowStart->copy(); $slotStart->lt($windowEnd); $slotStart->addMinutes($slotInterval)) {
-                        $slotEnd = $slotStart->copy()->addMinutes($serviceDuration);
-
-                        if ($slotEnd->greaterThan($windowEnd)) {
-                            break;
-                        }
-
-                        if ($slotStart->lessThan($now->copy()->addMinutes($minNotice))) {
-                            continue;
-                        }
-
-                        $status = $this->getStatus($slotStart, $slotEnd, $appointments, $locks, $employeeId);
-
-                        $slots[] = [
-                            'profile_id' => $profile->id,
-                            'service_variant_id' => $variantId,
-                            'employee_id' => $employeeId,
-                            'start_at' => $slotStart->toIso8601String(),
-                            'end_at' => $slotEnd->toIso8601String(),
-                            'status' => $status,
-                        ];
-                    }
+                foreach ($windows as $window) {
+                    $dailyWindows[$dateString][] = $window;
                 }
             }
         }
 
-        return [
-            'slots' => $slots,
-            'closed_days' => array_unique($closedDays),
-        ];
+        return $dailyWindows;
     }
 
     protected function schedulesForDay(Collection $schedules, CarbonInterface $date): Collection

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Profile;
+use App\Models\Schedule;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +24,17 @@ class PakavozIntegrationTest extends TestCase
             'email' => 'test@example.com',
             'timezone' => 'UTC',
         ]);
+
+        // Pridanie rozvrhu pre všetky dni (08:00 - 20:00)
+        for ($i = 0; $i < 7; $i++) {
+            Schedule::create([
+                'profile_id' => $profile->id,
+                'day_of_week' => $i,
+                'start_time' => '08:00',
+                'end_time' => '20:00',
+            ]);
+        }
+
         $service = Service::create([
             'profile_id' => $profile->id,
             'name' => 'STK Kontrola',
@@ -43,7 +55,7 @@ class PakavozIntegrationTest extends TestCase
                 'date' => $targetDate,
                 'availability' => [
                     [
-                        'time' => '08:00',
+                        'time' => '10:00',
                         'available_slots' => 2,
                         'total_slots' => 3,
                         'is_full' => false
@@ -63,7 +75,52 @@ class PakavozIntegrationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'slots');
-        $this->assertStringContainsString($targetDate.'T08:00:00', $response->json('slots.0.start_at'));
+        $this->assertStringContainsString($targetDate.'T10:00:00', $response->json('slots.0.start_at'));
+    }
+
+    public function test_availability_filters_pakavoz_slots_by_opening_hours()
+    {
+        $targetDate = now()->next(now()::MONDAY)->format('Y-m-d'); // Použijeme pondelok pre istotu
+
+        Http::fake([
+            'pakavoz.sk/api/v1/availability*' => Http::response([
+                'date' => $targetDate,
+                'availability' => [
+                    [
+                        'time' => '07:00', // Mimo otváracích hodín (otvárame o 08:00)
+                        'available_slots' => 1,
+                        'total_slots' => 3,
+                        'is_full' => false
+                    ],
+                    [
+                        'time' => '10:00', // V rámci otváracích hodín
+                        'available_slots' => 1,
+                        'total_slots' => 3,
+                        'is_full' => false
+                    ],
+                    [
+                        'time' => '21:00', // Mimo otváracích hodín (zatvárame o 20:00)
+                        'available_slots' => 1,
+                        'total_slots' => 3,
+                        'is_full' => false
+                    ],
+                ]
+            ], 200),
+        ]);
+
+        [$profile, $service] = $this->createPakavozService();
+
+        $response = $this->postJson('/api/availability', [
+            'service_id' => $service->id,
+            'profile_id' => $profile->id,
+            'date' => $targetDate,
+            'days' => 1
+        ]);
+
+        $response->assertStatus(200);
+        // Očakávame len 1 slot (ten o 10:00)
+        $response->assertJsonCount(1, 'slots');
+        $this->assertStringContainsString($targetDate.'T10:00:00', $response->json('slots.0.start_at'));
     }
 
     public function test_reservation_is_sent_to_pakavoz_when_enabled()

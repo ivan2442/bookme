@@ -60,14 +60,36 @@ class AvailabilityController extends Controller
 
         if ($service->is_pakavoz_enabled && $service->pakavoz_api_key) {
             $slots = [];
+            $dailyWindows = $this->availability->getWorkingWindows($profile, $startDate, $days, $validated['employee_id'] ?? null);
+
             for ($i = 0; $i < $days; $i++) {
                 $currentDate = $startDate->copy()->addDays($i);
-                $response = $this->pakavoz->getAvailability($service->pakavoz_api_key, $currentDate->toDateString());
+                $dateString = $currentDate->toDateString();
+                $windows = $dailyWindows[$dateString] ?? [];
+
+                if (empty($windows)) {
+                    continue;
+                }
+
+                $response = $this->pakavoz->getAvailability($service->pakavoz_api_key, $dateString);
 
                 foreach ($response['availability'] ?? [] as $slot) {
                     if (! ($slot['is_full'] ?? false) && ($slot['available_slots'] ?? 0) > 0) {
-                        $slotStart = Carbon::parse($currentDate->toDateString().' '.$slot['time'], $timezone);
+                        $slotStart = Carbon::parse($dateString.' '.$slot['time'], $timezone);
                         $slotEnd = $slotStart->copy()->addMinutes($duration);
+
+                        // Overenie, či slot spadá do otváracích hodín prevádzky
+                        $isInWindow = false;
+                        foreach ($windows as [$winStart, $winEnd]) {
+                            if ($slotStart->greaterThanOrEqualTo($winStart) && $slotEnd->lessThanOrEqualTo($winEnd)) {
+                                $isInWindow = true;
+                                break;
+                            }
+                        }
+
+                        if (! $isInWindow) {
+                            continue;
+                        }
 
                         $slots[] = [
                             'profile_id' => $profile->id,
