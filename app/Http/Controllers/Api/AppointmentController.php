@@ -26,6 +26,8 @@ class AppointmentController extends Controller
             'customer_email' => ['nullable', 'email'],
             'customer_phone' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
+            'evc' => ['nullable', 'string', 'max:20'],
+            'vehicle_model' => ['nullable', 'string', 'max:255'],
         ]);
 
         $appointment = $this->appointments->book([

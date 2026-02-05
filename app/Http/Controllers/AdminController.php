@@ -66,6 +66,8 @@ class AdminController extends Controller
             'variant_price' => ['nullable', 'numeric', 'min:0'],
             'employee_ids' => ['array'],
             'employee_ids.*' => ['exists:employees,id'],
+            'is_pakavoz_enabled' => ['nullable', 'boolean'],
+            'pakavoz_api_key' => ['nullable', 'string', 'max:255'],
         ]);
 
         $service = Service::create([
@@ -77,6 +79,8 @@ class AdminController extends Controller
             'base_price' => $data['base_price'],
             'currency' => strtoupper($data['currency']),
             'is_active' => true,
+            'is_pakavoz_enabled' => $request->boolean('is_pakavoz_enabled'),
+            'pakavoz_api_key' => $data['pakavoz_api_key'] ?? null,
         ]);
 
         if (! empty($data['variant_name'])) {
@@ -151,6 +155,8 @@ class AdminController extends Controller
             'is_active' => ['nullable', 'boolean'],
             'employee_ids' => ['array'],
             'employee_ids.*' => ['exists:employees,id'],
+            'is_pakavoz_enabled' => ['nullable', 'boolean'],
+            'pakavoz_api_key' => ['nullable', 'string', 'max:255'],
         ]);
 
         $service->update([
@@ -161,6 +167,8 @@ class AdminController extends Controller
             'base_price' => $data['base_price'],
             'currency' => strtoupper($data['currency']),
             'is_active' => $request->boolean('is_active'),
+            'is_pakavoz_enabled' => $request->boolean('is_pakavoz_enabled'),
+            'pakavoz_api_key' => $data['pakavoz_api_key'] ?? null,
         ]);
 
         if (isset($data['employee_ids'])) {

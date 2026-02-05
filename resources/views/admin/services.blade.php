@@ -73,6 +73,18 @@
                     </div>
                 </div>
 
+                <div class="border-t border-slate-200 pt-3 space-y-2">
+                    <h3 class="font-semibold text-slate-900">Pakavoz Integrácia</h3>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="is_pakavoz_enabled" value="1" id="admin_add_pakavoz_enabled" onchange="togglePakavozKeyAdmin('add')">
+                        <label for="admin_add_pakavoz_enabled" class="label !mb-0">Aktivovať Pakavoz API</label>
+                    </div>
+                    <div id="admin_pakavoz_key_container_add" style="display: none">
+                        <label class="label">Pakavoz API Kľúč</label>
+                        <input type="text" name="pakavoz_api_key" class="input-control" placeholder="pakavoz_secure_token_...">
+                    </div>
+                </div>
+
                 <button type="submit" class="px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition shadow-md shadow-emerald-200/70">
                     Uložiť službu
                 </button>
@@ -100,6 +112,15 @@
                                     <input type="checkbox" name="is_active" value="1" @checked($service->is_active) class="h-4 w-4">
                                     Aktívna
                                 </label>
+                                <div class="border-t border-slate-100 pt-2 mt-1 space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" name="is_pakavoz_enabled" value="1" @checked($service->is_pakavoz_enabled) id="admin_pakavoz_enabled_{{ $service->id }}" onchange="togglePakavozKeyAdmin('{{ $service->id }}')">
+                                        <label for="admin_pakavoz_enabled_{{ $service->id }}" class="text-xs font-semibold text-slate-600">Aktivovať Pakavoz API</label>
+                                    </div>
+                                    <div id="admin_pakavoz_key_container_{{ $service->id }}" @style(['display: none' => !$service->is_pakavoz_enabled])>
+                                        <input type="text" name="pakavoz_api_key" class="input-control !py-1 !text-xs" value="{{ $service->pakavoz_api_key }}" placeholder="Pakavoz API Kľúč">
+                                    </div>
+                                </div>
                                 <div class="flex flex-col gap-2">
                                     <div>
                                         <label class="label">Zamestnanci tejto služby</label>
@@ -185,4 +206,16 @@
         </div>
     </div>
 </section>
+
+<script>
+    function togglePakavozKeyAdmin(id) {
+        const checkbox = id === 'add' ? document.getElementById('admin_add_pakavoz_enabled') : document.getElementById('admin_pakavoz_enabled_' + id);
+        const container = document.getElementById('admin_pakavoz_key_container_' + id);
+        if (checkbox.checked) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+</script>
 @endsection

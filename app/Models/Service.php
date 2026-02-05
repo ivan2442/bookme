@@ -21,10 +21,13 @@ class Service extends Model
         'base_price',
         'currency',
         'is_active',
+        'is_pakavoz_enabled',
+        'pakavoz_api_key',
     ];
 
     protected $casts = [
         'is_active' => 'bool',
+        'is_pakavoz_enabled' => 'bool',
     ];
 
     public function profile(): BelongsTo

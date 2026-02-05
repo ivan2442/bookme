@@ -72,6 +72,16 @@
                                         @endforeach
                                     </div>
                                 </div>
+                                <div class="grid grid-cols-2 gap-2 border-t border-slate-50 pt-2 mt-2">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" name="is_pakavoz_enabled" value="1" @checked($service->is_pakavoz_enabled) id="pakavoz_enabled_{{ $service->id }}" onchange="togglePakavozKey('{{ $service->id }}')">
+                                        <label for="pakavoz_enabled_{{ $service->id }}" class="text-[10px] uppercase font-bold text-slate-500">Pakavoz API</label>
+                                    </div>
+                                    <div id="pakavoz_key_container_{{ $service->id }}" @style(['display: none' => !$service->is_pakavoz_enabled])>
+                                        <label class="text-[10px] uppercase font-bold text-slate-500">Pakavoz API Kľúč</label>
+                                        <input type="text" name="pakavoz_api_key" class="input-control !py-1.5 !text-sm" value="{{ $service->pakavoz_api_key }}" placeholder="pakavoz_secure_token_...">
+                                    </div>
+                                </div>
                                 <button class="w-full px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">Uložiť zmeny</button>
                             </form>
                         </details>
@@ -177,6 +187,17 @@
                     </div>
                 </div>
 
+                <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-50 pt-4">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="is_pakavoz_enabled" value="1" id="add_pakavoz_enabled" onchange="togglePakavozKey('add')">
+                        <label for="add_pakavoz_enabled" class="label !mb-0">Aktivovať Pakavoz API</label>
+                    </div>
+                    <div id="pakavoz_key_container_add" style="display: none">
+                        <label class="label">Pakavoz API Kľúč</label>
+                        <input type="text" name="pakavoz_api_key" class="input-control" placeholder="pakavoz_secure_token_...">
+                    </div>
+                </div>
+
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
                     <button type="button" onclick="closeAddServiceModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
                     <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200/50">Vytvoriť službu</button>
@@ -200,6 +221,16 @@
     function closeAddServiceModal() {
         document.getElementById('addServiceModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
+    }
+
+    function togglePakavozKey(id) {
+        const checkbox = id === 'add' ? document.getElementById('add_pakavoz_enabled') : document.getElementById('pakavoz_enabled_' + id);
+        const container = document.getElementById('pakavoz_key_container_' + id);
+        if (checkbox.checked) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
     }
 </script>
 @endsection

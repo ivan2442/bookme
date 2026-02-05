@@ -14,6 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 class AppointmentService
 {
+    public function __construct(private PakavozService $pakavoz)
+    {
+    }
+
     public function book(array $data): Appointment
     {
         $variant = null;
@@ -63,6 +67,23 @@ class AppointmentService
 
         $employeeId = $data['employee_id'] ?? null;
         $requiresConfirmation = (bool) ($settings?->requires_confirmation ?? false);
+
+        if ($service->is_pakavoz_enabled) {
+            $errors = [];
+            if (empty($data['evc'])) {
+                $errors['evc'] = 'Evidenčné číslo vozidla (EČV) je povinné pre túto službu.';
+            }
+            if (empty($data['customer_name'])) {
+                $errors['customer_name'] = 'Meno je povinné pre túto službu.';
+            }
+            if (empty($data['customer_phone'])) {
+                $errors['customer_phone'] = 'Telefónne číslo je povinné pre túto službu.';
+            }
+
+            if (! empty($errors)) {
+                throw ValidationException::withMessages($errors);
+            }
+        }
 
         return DB::transaction(function () use ($data, $variant, $service, $profile, $startAt, $endAt, $duration, $employeeId, $timezone, $requiresConfirmation) {
             $hasAppointments = Appointment::query()
@@ -131,8 +152,33 @@ class AppointmentService
                 'metadata' => [
                     'notes' => $data['notes'] ?? null,
                     'duration_with_buffers' => $duration,
+                    'evc' => $data['evc'] ?? null,
+                    'vehicle_model' => $data['vehicle_model'] ?? null,
                 ],
             ]);
+
+            if ($service->is_pakavoz_enabled && $service->pakavoz_api_key) {
+                $pakavozResult = $this->pakavoz->createReservation($service->pakavoz_api_key, [
+                    'name' => $data['customer_name'],
+                    'phone' => $data['customer_phone'],
+                    'email' => $data['customer_email'] ?? null,
+                    'evc' => $data['evc'],
+                    'date' => $startAt->toDateString(),
+                    'time' => $startAt->format('H:i'),
+                    'model' => $data['vehicle_model'] ?? null,
+                    'note' => $data['notes'] ?? null,
+                ]);
+
+                if (! $pakavozResult['success']) {
+                    throw ValidationException::withMessages([
+                        'start_at' => $pakavozResult['message'],
+                    ]);
+                }
+
+                $metadata = $appointment->metadata;
+                $metadata['pakavoz_reservation_id'] = $pakavozResult['data']['reservation_id'] ?? null;
+                $appointment->update(['metadata' => $metadata]);
+            }
 
             // Lock slot for a few minutes to prevent race during post-processing (notifications, payment intent, etc.)
             AppointmentLock::create([

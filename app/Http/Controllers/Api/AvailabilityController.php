@@ -7,13 +7,16 @@ use App\Models\Profile;
 use App\Models\Service;
 use App\Models\ServiceVariant;
 use App\Services\AvailabilityService;
+use App\Services\PakavozService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class AvailabilityController extends Controller
 {
-    public function __construct(private AvailabilityService $availability)
-    {
+    public function __construct(
+        private AvailabilityService $availability,
+        private PakavozService $pakavoz
+    ) {
     }
 
     public function check(Request $request)
@@ -54,6 +57,39 @@ class AvailabilityController extends Controller
         $timezone = $profile?->timezone ?? config('app.timezone');
         $startDate = Carbon::parse($validated['date'], $timezone)->startOfDay();
         $days = $validated['days'] ?? 3;
+
+        if ($service->is_pakavoz_enabled && $service->pakavoz_api_key) {
+            $slots = [];
+            for ($i = 0; $i < $days; $i++) {
+                $currentDate = $startDate->copy()->addDays($i);
+                $response = $this->pakavoz->getAvailability($service->pakavoz_api_key, $currentDate->toDateString());
+
+                foreach ($response['availability'] ?? [] as $slot) {
+                    if (! ($slot['is_full'] ?? false) && ($slot['available_slots'] ?? 0) > 0) {
+                        $slotStart = Carbon::parse($currentDate->toDateString().' '.$slot['time'], $timezone);
+                        $slotEnd = $slotStart->copy()->addMinutes($duration);
+
+                        $slots[] = [
+                            'profile_id' => $profile->id,
+                            'service_variant_id' => $variant?->id,
+                            'employee_id' => $validated['employee_id'] ?? null,
+                            'start_at' => $slotStart->toIso8601String(),
+                            'end_at' => $slotEnd->toIso8601String(),
+                            'status' => 'available',
+                        ];
+                    }
+                }
+            }
+
+            return response()->json([
+                'profile_id' => $profile->id,
+                'service_id' => $serviceId,
+                'service_variant_id' => $variant?->id,
+                'currency' => $currency,
+                'slots' => $slots,
+                'closed_days' => [],
+            ]);
+        }
 
         $result = $this->availability->slots(
             $profile,

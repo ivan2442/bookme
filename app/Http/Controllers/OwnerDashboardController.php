@@ -141,6 +141,8 @@ class OwnerDashboardController extends Controller
             'base_duration_minutes' => ['required', 'integer', 'min:1'],
             'employee_ids' => ['nullable', 'array'],
             'employee_ids.*' => ['exists:employees,id'],
+            'is_pakavoz_enabled' => ['nullable', 'boolean'],
+            'pakavoz_api_key' => ['nullable', 'string', 'max:255'],
         ]);
 
         if (!in_array($data['profile_id'], $profileIds)) {
@@ -156,6 +158,8 @@ class OwnerDashboardController extends Controller
             'base_duration_minutes' => $data['base_duration_minutes'],
             'currency' => 'EUR',
             'status' => 'published',
+            'is_pakavoz_enabled' => $request->boolean('is_pakavoz_enabled'),
+            'pakavoz_api_key' => $data['pakavoz_api_key'] ?? null,
         ]);
 
         if (!empty($data['employee_ids'])) {
@@ -180,6 +184,8 @@ class OwnerDashboardController extends Controller
             'base_duration_minutes' => ['required', 'integer', 'min:1'],
             'employee_ids' => ['nullable', 'array'],
             'employee_ids.*' => ['exists:employees,id'],
+            'is_pakavoz_enabled' => ['nullable', 'boolean'],
+            'pakavoz_api_key' => ['nullable', 'string', 'max:255'],
         ]);
 
         $service->update([
@@ -187,6 +193,8 @@ class OwnerDashboardController extends Controller
             'category' => $data['category'],
             'base_price' => $data['base_price'],
             'base_duration_minutes' => $data['base_duration_minutes'],
+            'is_pakavoz_enabled' => $request->boolean('is_pakavoz_enabled'),
+            'pakavoz_api_key' => $data['pakavoz_api_key'] ?? null,
         ]);
 
         if (isset($data['employee_ids'])) {
