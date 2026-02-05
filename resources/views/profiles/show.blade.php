@@ -16,7 +16,7 @@
 
         <div class="absolute bottom-8 left-8 right-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
             <div class="flex items-center gap-6 max-w-full">
-                <div class="h-24 w-24 md:h-32 md:w-32 flex-shrink-0 rounded-3xl bg-white p-2 shadow-2xl border border-white/20 overflow-hidden transform hover:scale-105 transition-transform duration-500">
+                <div class="h-24 w-24 md:h-32 md:w-32 flex-shrink-0 rounded-3xl bg-transparent p-2 shadow-2xl border border-white/20 overflow-hidden transform hover:scale-105 transition-transform duration-500">
                     @if($profile->logo_url)
                         <img src="{{ $profile->logo_url }}" alt="{{ $profile->name }} logo" class="w-full h-full object-contain rounded-2xl">
                     @else
