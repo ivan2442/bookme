@@ -7,7 +7,12 @@
             <p class="text-xs uppercase tracking-widest text-slate-500">Admin</p>
             <h1 class="font-display text-3xl text-slate-900">Prevádzky</h1>
         </div>
-        <span class="badge">Správa</span>
+        <div class="flex items-center gap-3">
+            <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200">
+                Pridať prevádzku
+            </button>
+            <span class="badge">Správa</span>
+        </div>
     </div>
 
     @include('admin.partials.nav')
@@ -27,86 +32,6 @@
     @if(session('status'))
         <div class="card border-emerald-200 bg-emerald-50 text-emerald-800">{{ session('status') }}</div>
     @endif
-
-    <div class="space-y-4">
-        <div class="card space-y-4">
-            <h2 class="font-semibold text-lg text-slate-900">Pridať prevádzku</h2>
-            <form method="POST" action="{{ route('admin.profiles.store') }}" class="space-y-3" enctype="multipart/form-data">
-                @csrf
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">Názov prevádzky</label>
-                        <input type="text" name="name" class="input-control" value="{{ old('name') }}" required>
-                    </div>
-                    <div>
-                        <label class="label">Slug</label>
-                        <input type="text" name="slug" class="input-control" value="{{ old('slug') }}" placeholder="automaticky podľa názvu">
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">E-mail (login majiteľa)</label>
-                        <input type="email" name="email" class="input-control" value="{{ old('email') }}" placeholder="info@prevadzka.sk" required>
-                    </div>
-                    <div>
-                        <label class="label">Heslo majiteľa</label>
-                        <input type="password" name="password" class="input-control" placeholder="Min. 8 znakov" required>
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">Kategória</label>
-                        <input type="text" name="category" class="input-control" value="{{ old('category') }}" placeholder="Kaderníctvo">
-                    </div>
-                    <div>
-                        <label class="label">Mesto</label>
-                        <input type="text" name="city" class="input-control" value="{{ old('city') }}" placeholder="Bratislava">
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">Adresa</label>
-                        <input type="text" name="address_line1" class="input-control" value="{{ old('address_line1') }}" placeholder="Ulica 123">
-                    </div>
-                    <div>
-                        <label class="label">Timezone</label>
-                        <input type="text" name="timezone" class="input-control" value="{{ old('timezone', 'Europe/Bratislava') }}">
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-1 gap-3">
-                    <div>
-                        <label class="label">Popis prevádzky</label>
-                        <textarea name="description" class="input-control" rows="3" placeholder="Krátky popis prevádzky, ktorý uvidia klienti...">{{ old('description') }}</textarea>
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">Logo prevádzky</label>
-                        <input type="file" name="logo" class="input-control !p-2 text-xs" onchange="previewImage(this, 'add-logo-preview')">
-                        <div id="add-logo-preview" class="mt-2 hidden">
-                            <img src="" class="h-12 w-12 object-contain rounded-lg border border-slate-200" alt="Logo preview">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="label">Banner prevádzky</label>
-                        <input type="file" name="banner" class="input-control !p-2 text-xs" onchange="previewImage(this, 'add-banner-preview')">
-                        <div id="add-banner-preview" class="mt-2 hidden">
-                            <img src="" class="h-12 w-24 object-cover rounded-lg border border-slate-200" alt="Banner preview">
-                        </div>
-                    </div>
-                </div>
-                <div class="grid sm:grid-cols-1 gap-3">
-                    <div>
-                        <label class="label">Telefón (voliteľné)</label>
-                        <input type="text" name="phone" class="input-control" value="{{ old('phone') }}" placeholder="+421...">
-                    </div>
-                </div>
-                <button type="submit" class="px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition shadow-md shadow-emerald-200/70">
-                    Uložiť prevádzku
-                </button>
-            </form>
-        </div>
-    </div>
 
     <div class="card space-y-3">
         <div class="flex items-center justify-between gap-3">
@@ -180,6 +105,104 @@
             @empty
                 <p class="text-sm text-slate-500">Žiadne prevádzky.</p>
             @endforelse
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div id="add-modal" class="fixed inset-0 z-[9999] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeAddModal()"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="relative inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-slate-100">
+            <div class="bg-white p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-slate-900" id="modal-title">Pridať prevádzku</h3>
+                    <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18"/></svg>
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('admin.profiles.store') }}" class="space-y-3" enctype="multipart/form-data">
+                    @csrf
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Názov prevádzky</label>
+                            <input type="text" name="name" class="input-control" value="{{ old('name') }}" required>
+                        </div>
+                        <div>
+                            <label class="label">Slug</label>
+                            <input type="text" name="slug" class="input-control" value="{{ old('slug') }}" placeholder="automaticky podľa názvu">
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">E-mail (login majiteľa)</label>
+                            <input type="email" name="email" class="input-control" value="{{ old('email') }}" placeholder="info@prevadzka.sk" required>
+                        </div>
+                        <div>
+                            <label class="label">Heslo majiteľa</label>
+                            <input type="password" name="password" class="input-control" placeholder="Min. 8 znakov" required>
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Kategória</label>
+                            <input type="text" name="category" class="input-control" value="{{ old('category') }}" placeholder="Kaderníctvo">
+                        </div>
+                        <div>
+                            <label class="label">Mesto</label>
+                            <input type="text" name="city" class="input-control" value="{{ old('city') }}" placeholder="Bratislava">
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Adresa</label>
+                            <input type="text" name="address_line1" class="input-control" value="{{ old('address_line1') }}" placeholder="Ulica 123">
+                        </div>
+                        <div>
+                            <label class="label">Timezone</label>
+                            <input type="text" name="timezone" class="input-control" value="{{ old('timezone', 'Europe/Bratislava') }}">
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-1 gap-3">
+                        <div>
+                            <label class="label">Popis prevádzky</label>
+                            <textarea name="description" class="input-control" rows="3" placeholder="Krátky popis prevádzky, ktorý uvidia klienti...">{{ old('description') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Logo prevádzky</label>
+                            <input type="file" name="logo" class="input-control !p-2 text-xs" onchange="previewImage(this, 'add-logo-preview-modal')">
+                            <div id="add-logo-preview-modal" class="mt-2 hidden">
+                                <img src="" class="h-12 w-12 object-contain rounded-lg border border-slate-200" alt="Logo preview">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="label">Banner prevádzky</label>
+                            <input type="file" name="banner" class="input-control !p-2 text-xs" onchange="previewImage(this, 'add-banner-preview-modal')">
+                            <div id="add-banner-preview-modal" class="mt-2 hidden">
+                                <img src="" class="h-12 w-24 object-cover rounded-lg border border-slate-200" alt="Banner preview">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid sm:grid-cols-1 gap-3">
+                        <div>
+                            <label class="label">Telefón (voliteľné)</label>
+                            <input type="text" name="phone" class="input-control" value="{{ old('phone') }}" placeholder="+421...">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                        <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
+                        <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200">
+                            Uložiť prevádzku
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -313,6 +336,16 @@
 </div>
 
 <script>
+    function openAddModal() {
+        document.getElementById('add-modal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeAddModal() {
+        document.getElementById('add-modal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
     function previewImage(input, previewId, imgId = null) {
         const preview = document.getElementById(previewId);
         const img = imgId ? document.getElementById(imgId) : preview.querySelector('img');
