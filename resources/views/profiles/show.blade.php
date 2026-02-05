@@ -40,7 +40,7 @@
                     </p>
                 </div>
             </div>
-            <button onclick="openBookingModal({{ $profile->id }}, null, 'Všeobecná rezervácia')" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
+            <button onclick="openBookingModal({{ $profile->id }}, null, 'Všeobecná rezervácia', false)" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
                 Rezervovať teraz
             </button>
         </div>
@@ -90,7 +90,7 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-4">
-                                <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}')" class="p-4 rounded-[20px] bg-slate-50 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-emerald-200 group-hover:-translate-y-0.5">
+                                <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}', {{ $service->is_pakavoz_enabled ? 'true' : 'false' }})" class="p-4 rounded-[20px] bg-slate-50 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-emerald-200 group-hover:-translate-y-0.5">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                                 </button>
                             </div>
@@ -211,6 +211,17 @@
                     </div>
                 </div>
 
+                <div id="pakavoz-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="label !ml-1">EČV (ŠPZ)</label>
+                        <input name="evc" id="modal_evc" type="text" class="input-control" placeholder="napr. BA123XY" />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="label !ml-1">Model vozidla</label>
+                        <input name="vehicle_model" type="text" class="input-control" placeholder="napr. Škoda Octavia" />
+                    </div>
+                </div>
+
                 <div class="grid md:grid-cols-2 gap-6 pt-2">
                     <div class="space-y-3">
                         <label class="label !ml-1">Vyberte dátum</label>
@@ -263,11 +274,14 @@
         serviceId: null
     };
 
-    function openBookingModal(shopId, serviceId, serviceName) {
+    function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false) {
         modalState.shopId = shopId;
         modalState.serviceId = serviceId;
         modalState.calendarStart = new Date();
-        modalState.calendarStart.setDate(modalState.calendarStart.getDate() - (modalState.calendarStart.getDay() === 0 ? 6 : modalState.calendarStart.getDay() - 1));
+        // Nastavenie na pondelok aktuálneho týždňa
+        const day = modalState.calendarStart.getDay();
+        const diff = modalState.calendarStart.getDate() - day + (day === 0 ? -6 : 1);
+        modalState.calendarStart.setDate(diff);
 
         document.getElementById('modal_service_name').textContent = serviceName;
         document.getElementById('modal_shop_id').value = shopId;
@@ -275,7 +289,17 @@
         document.getElementById('bookingModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
 
-        updateModalCalendar();
+        const pakavozFields = document.getElementById('pakavoz-fields');
+        const evcInput = document.getElementById('modal_evc');
+        if (isPakavoz) {
+            pakavozFields.classList.remove('hidden');
+            evcInput.setAttribute('required', 'required');
+        } else {
+            pakavozFields.classList.add('hidden');
+            evcInput.removeAttribute('required');
+        }
+
+        fetchCalendarData();
         fetchModalAvailability();
     }
 
@@ -284,6 +308,25 @@
         document.body.style.overflow = 'auto';
         document.getElementById('modal-booking-output').classList.add('hidden');
         document.getElementById('modal-booking-form').reset();
+    }
+
+    async function fetchCalendarData() {
+        const start = modalState.calendarStart;
+        const startIso = start.getFullYear() + '-' + String(start.getMonth() + 1).padStart(2, '0') + '-' + String(start.getDate()).padStart(2, '0');
+
+        try {
+            const response = await axios.post('/api/availability', {
+                profile_id: modalState.shopId,
+                service_id: modalState.serviceId,
+                date: startIso,
+                days: 7
+            });
+            modalState.closedDays = response.data.closed_days || [];
+            updateModalCalendar();
+        } catch (error) {
+            console.error('Calendar data error', error);
+            updateModalCalendar();
+        }
     }
 
     function updateModalCalendar() {
@@ -303,14 +346,17 @@
 
             const dayEl = document.createElement('button');
             dayEl.type = 'button';
-            const iso = day.toISOString().split('T')[0];
-            const isToday = iso === new Date().toISOString().split('T')[0];
+            const iso = day.getFullYear() + '-' + String(day.getMonth() + 1).padStart(2, '0') + '-' + String(day.getDate()).padStart(2, '0');
+            const isToday = iso === new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + String(new Date().getDate()).padStart(2, '0');
             const isSelected = iso === modalState.selectedDate;
+            const isClosed = modalState.closedDays.includes(iso);
 
             dayEl.className = `calendar-day h-10 w-10 flex items-center justify-center rounded-xl text-xs font-bold transition-all
-                ${isSelected ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'hover:bg-emerald-50 text-slate-700'}`;
+                ${isSelected ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' :
+                  isClosed ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'hover:bg-emerald-50 text-slate-700'}`;
 
-            if (isToday && !isSelected) dayEl.classList.add('border', 'border-emerald-200', 'text-emerald-600');
+            if (isToday && !isSelected && !isClosed) dayEl.classList.add('border', 'border-emerald-200', 'text-emerald-600');
+            if (isToday && isClosed) dayEl.classList.add('border', 'border-red-200');
 
             dayEl.textContent = day.getDate();
             dayEl.onclick = () => {
@@ -377,11 +423,11 @@
 
     document.getElementById('modal-cal-prev').onclick = () => {
         modalState.calendarStart.setDate(modalState.calendarStart.getDate() - 7);
-        updateModalCalendar();
+        fetchCalendarData();
     };
     document.getElementById('modal-cal-next').onclick = () => {
         modalState.calendarStart.setDate(modalState.calendarStart.getDate() + 7);
-        updateModalCalendar();
+        fetchCalendarData();
     };
 
     document.getElementById('modal-booking-form').onsubmit = async (e) => {

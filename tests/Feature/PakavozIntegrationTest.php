@@ -179,4 +179,105 @@ class PakavozIntegrationTest extends TestCase
         $response->assertJsonValidationErrors(['start_at']);
         $this->assertEquals('Tento termín je už obsadený', $response->json('errors.start_at.0'));
     }
+
+    public function test_reservation_requires_evc_when_pakavoz_is_enabled()
+    {
+        $targetDate = now()->addDays(10)->format('Y-m-d');
+        [$profile, $service] = $this->createPakavozService();
+
+        $response = $this->postJson('/api/appointments', [
+            'profile_id' => $profile->id,
+            'service_id' => $service->id,
+            'start_at' => $targetDate . ' 08:00',
+            'customer_name' => 'Ján Novák',
+            'customer_phone' => '+421900111222',
+            // 'evc' chýba
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['evc']);
+        $this->assertEquals('Evidenčné číslo vozidla (EČV) je povinné pre túto službu.', $response->json('errors.evc.0'));
+    }
+
+    public function test_availability_filters_past_slots_for_pakavoz()
+    {
+        $timezone = 'UTC';
+        $now = \Illuminate\Support\Carbon::create(2024, 5, 20, 10, 0, 0, $timezone);
+        \Illuminate\Support\Carbon::setTestNow($now);
+
+        $targetDate = '2024-05-20';
+        Http::fake([
+            'pakavoz.sk/api/v1/availability*' => Http::response([
+                'date' => $targetDate,
+                'availability' => [
+                    [
+                        'time' => '09:00', // V minulosti
+                        'available_slots' => 1,
+                        'total_slots' => 3,
+                        'is_full' => false
+                    ],
+                    [
+                        'time' => '10:30', // V budúcnosti (menej ako 60 min notice ak je default 60)
+                        'available_slots' => 1,
+                        'total_slots' => 3,
+                        'is_full' => false
+                    ],
+                    [
+                        'time' => '12:00', // V budúcnosti (dostatočný notice)
+                        'available_slots' => 1,
+                        'total_slots' => 3,
+                        'is_full' => false
+                    ],
+                ]
+            ], 200),
+        ]);
+
+        [$profile, $service] = $this->createPakavozService();
+        $profile->update(['timezone' => $timezone]);
+
+        $response = $this->postJson('/api/availability', [
+            'service_id' => $service->id,
+            'profile_id' => $profile->id,
+            'date' => $targetDate,
+            'days' => 1
+        ]);
+
+        $response->assertStatus(200);
+        // Očakávame len 1 slot (ten o 12:00), pretože 10:30 je príliš blízko (min_notice = 60min)
+        $response->assertJsonCount(1, 'slots');
+        $this->assertStringContainsString($targetDate.'T12:00:00', $response->json('slots.0.start_at'));
+
+        \Illuminate\Support\Carbon::setTestNow();
+    }
+
+    public function test_availability_returns_closed_days_for_pakavoz_when_no_slots_available()
+    {
+        $targetDate = now()->addDays(5)->format('Y-m-d');
+        Http::fake([
+            'pakavoz.sk/api/v1/availability*' => Http::response([
+                'date' => $targetDate,
+                'availability' => [
+                    [
+                        'time' => '10:00',
+                        'available_slots' => 0, // Plne obsadené
+                        'total_slots' => 3,
+                        'is_full' => true
+                    ],
+                ]
+            ], 200),
+        ]);
+
+        [$profile, $service] = $this->createPakavozService();
+
+        $response = $this->postJson('/api/availability', [
+            'service_id' => $service->id,
+            'profile_id' => $profile->id,
+            'date' => $targetDate,
+            'days' => 1
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(0, 'slots');
+        $response->assertJsonFragment(['closed_days' => [$targetDate]]);
+    }
 }

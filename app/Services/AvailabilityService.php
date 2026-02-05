@@ -64,6 +64,7 @@ class AvailabilityService
         for ($day = 0; $day < $days; $day++) {
             $date = $start->copy()->addDays($day);
             $dateString = $date->toDateString();
+            $hasAnyAvailableSlotOnThisDay = false;
 
             if ($date->greaterThan($maxAdvanceBoundary)) {
                 $closedDays[] = $dateString;
@@ -90,6 +91,10 @@ class AvailabilityService
 
                     $status = $this->getStatus($slotStart, $slotEnd, $appointments, $locks, $employeeId);
 
+                    if ($status === 'available') {
+                        $hasAnyAvailableSlotOnThisDay = true;
+                    }
+
                     $slots[] = [
                         'profile_id' => $profile->id,
                         'service_variant_id' => $variantId,
@@ -99,6 +104,10 @@ class AvailabilityService
                         'status' => $status,
                     ];
                 }
+            }
+
+            if (! $hasAnyAvailableSlotOnThisDay && ! in_array($dateString, $closedDays)) {
+                $closedDays[] = $dateString;
             }
         }
 

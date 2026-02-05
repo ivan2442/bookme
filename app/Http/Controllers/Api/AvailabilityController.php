@@ -57,9 +57,13 @@ class AvailabilityController extends Controller
         $timezone = $profile?->timezone ?? config('app.timezone');
         $startDate = Carbon::parse($validated['date'], $timezone)->startOfDay();
         $days = $validated['days'] ?? 3;
+        $now = Carbon::now($timezone);
+        $settings = $profile->calendarSetting;
+        $minNotice = $settings?->min_notice_minutes ?? 60;
 
         if ($service->is_pakavoz_enabled && $service->pakavoz_api_key) {
             $slots = [];
+            $closedDays = [];
             $dailyWindows = $this->availability->getWorkingWindows($profile, $startDate, $days, $validated['employee_id'] ?? null);
 
             for ($i = 0; $i < $days; $i++) {
@@ -68,15 +72,22 @@ class AvailabilityController extends Controller
                 $windows = $dailyWindows[$dateString] ?? [];
 
                 if (empty($windows)) {
+                    $closedDays[] = $dateString;
                     continue;
                 }
 
                 $response = $this->pakavoz->getAvailability($service->pakavoz_api_key, $dateString);
+                $hasAnyAvailableSlotOnThisDay = false;
 
                 foreach ($response['availability'] ?? [] as $slot) {
                     if (! ($slot['is_full'] ?? false) && ($slot['available_slots'] ?? 0) > 0) {
                         $slotStart = Carbon::parse($dateString.' '.$slot['time'], $timezone);
                         $slotEnd = $slotStart->copy()->addMinutes($duration);
+
+                        // Overenie, či slot nie je v minulosti (zohľadnenie min_notice)
+                        if ($slotStart->lessThan($now->copy()->addMinutes($minNotice))) {
+                            continue;
+                        }
 
                         // Overenie, či slot spadá do otváracích hodín prevádzky
                         $isInWindow = false;
@@ -91,6 +102,7 @@ class AvailabilityController extends Controller
                             continue;
                         }
 
+                        $hasAnyAvailableSlotOnThisDay = true;
                         $slots[] = [
                             'profile_id' => $profile->id,
                             'service_variant_id' => $variant?->id,
@@ -101,6 +113,10 @@ class AvailabilityController extends Controller
                         ];
                     }
                 }
+
+                if (! $hasAnyAvailableSlotOnThisDay) {
+                    $closedDays[] = $dateString;
+                }
             }
 
             return response()->json([
@@ -109,7 +125,7 @@ class AvailabilityController extends Controller
                 'service_variant_id' => $variant?->id,
                 'currency' => $currency,
                 'slots' => $slots,
-                'closed_days' => [],
+                'closed_days' => array_values(array_unique($closedDays)),
             ]);
         }
 
