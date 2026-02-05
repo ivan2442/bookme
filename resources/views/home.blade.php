@@ -190,6 +190,18 @@
                     <input name="customer_email" type="email" class="input-control" value="{{ old('customer_email') }}" placeholder="na@priklad.sk" required />
                 </div>
             </div>
+
+            <div id="home-pakavoz-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="label">EČV (ŠPZ)</label>
+                    <input name="evc" id="home_evc" type="text" class="input-control" placeholder="napr. BA123XY" />
+                </div>
+                <div>
+                    <label class="label">Model vozidla</label>
+                    <input name="vehicle_model" type="text" class="input-control" placeholder="napr. Škoda Octavia" />
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div>

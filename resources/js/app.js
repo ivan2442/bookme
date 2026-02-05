@@ -18,6 +18,8 @@ const timeInput = document.querySelector('[data-time-input]');
 const dateInput = document.querySelector('[data-date-input]');
 const employeeInput = document.querySelector('[data-employee-input]');
 const bookingForm = document.querySelector('[data-booking-form]');
+const homePakavozFields = document.getElementById('home-pakavoz-fields');
+const homeEvcInput = document.getElementById('home_evc');
 const bookingOutput = document.querySelector('[data-booking-output]');
 const timePlaceholder = document.querySelector('[data-time-placeholder]');
 const calendarGrid = document.querySelector('[data-cal-grid]');
@@ -334,8 +336,25 @@ function populateServicesForShop(shopId) {
         });
 }
 
+function updatePakavozFieldsVisibility(serviceId) {
+    if (!homePakavozFields || !homeEvcInput) return;
+
+    const service = state.serviceById[serviceId];
+    if (service && service.is_pakavoz_enabled) {
+        homePakavozFields.classList.remove('hidden');
+        homeEvcInput.setAttribute('required', 'required');
+    } else {
+        homePakavozFields.classList.add('hidden');
+        homeEvcInput.removeAttribute('required');
+    }
+}
+
 function populateVariants(serviceId) {
     if (!variantSelect) return;
+
+    // Update Pakavoz fields visibility
+    updatePakavozFieldsVisibility(serviceId);
+
     const variants = state.variantsByService[serviceId] || [];
     variantSelect.innerHTML = '<option value="">Žiadny (použiť základ služby)</option>';
     variants.forEach((variant) => {
@@ -742,6 +761,8 @@ bookingForm?.addEventListener('submit', (event) => {
             customer_email: payload.customer_email,
             customer_phone: payload.customer_phone,
             notes: payload.notes,
+            evc: payload.evc || null,
+            vehicle_model: payload.vehicle_model || null,
         })
         .then((response) => {
             const appointment = response.data;
@@ -809,6 +830,7 @@ shopSelect?.addEventListener('change', () => {
     }
     variantSelect && (variantSelect.innerHTML = '<option value=\"\">Vyber variant</option>');
     resetSlots('Vyber variant.');
+    updatePakavozFieldsVisibility(null);
 });
 
 serviceSelect?.addEventListener('change', () => {
@@ -819,6 +841,7 @@ serviceSelect?.addEventListener('change', () => {
     } else {
         variantSelect && (variantSelect.innerHTML = '<option value=\"\">Vyber variant</option>');
         resetSlots('Vyber službu.');
+        updatePakavozFieldsVisibility(null);
     }
 });
 
