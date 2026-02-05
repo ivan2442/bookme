@@ -816,4 +816,39 @@ class OwnerDashboardController extends Controller
 
         return view('owner.payments', compact('stats', 'chartData', 'latestPayments', 'selectedMonth', 'selectedYear', 'selectedDate', 'monthsSlovak'));
     }
+
+    public function billingSettings(Request $request): View
+    {
+        $profileIds = Profile::where('owner_id', $request->user()->id)->pluck('id');
+        $profiles = Profile::whereIn('id', $profileIds)->get();
+
+        return view('owner.billing_settings', compact('profiles'));
+    }
+
+    public function storeBillingSettings(Request $request): RedirectResponse
+    {
+        $profileIds = Profile::where('owner_id', $request->user()->id)->pluck('id')->toArray();
+        $data = $request->validate([
+            'profile_id' => ['required', 'exists:profiles,id'],
+            'billing_name' => ['required', 'string', 'max:255'],
+            'billing_address' => ['required', 'string', 'max:255'],
+            'billing_city' => ['required', 'string', 'max:255'],
+            'billing_postal_code' => ['required', 'string', 'max:20'],
+            'billing_country' => ['required', 'string', 'max:255'],
+            'billing_ico' => ['nullable', 'string', 'max:20'],
+            'billing_dic' => ['nullable', 'string', 'max:20'],
+            'billing_ic_dph' => ['nullable', 'string', 'max:20'],
+            'billing_iban' => ['nullable', 'string', 'max:50'],
+            'billing_swift' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        if (!in_array($data['profile_id'], $profileIds)) {
+            abort(403);
+        }
+
+        $profile = Profile::findOrFail($data['profile_id']);
+        $profile->update($data);
+
+        return back()->with('status', 'Fakturačné údaje boli uložené.');
+    }
 }

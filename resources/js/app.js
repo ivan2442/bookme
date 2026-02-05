@@ -147,10 +147,10 @@ function renderShops() {
         const nextSlot = formatRelativeSlot(shop.next_slot);
 
         const bannerHtml = shop.banner_url
-            ? `<div class="h-32 w-full overflow-hidden">
+            ? `<div class="h-52 w-full overflow-hidden">
                  <img src="${shop.banner_url}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${shop.name}">
                </div>`
-            : `<div class="h-32 w-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+            : `<div class="h-52 w-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
                  <span class="text-white/20 text-3xl font-bold">${shop.name}</span>
                </div>`;
 

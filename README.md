@@ -63,6 +63,13 @@ Aplikácia bude dostupná na `http://localhost:8000`.
 Ak chcete spustiť všetko naraz po úprave `.env` súboru:
 
 ```bash
+
+APP_ENV=production
+APP_URL=https://bookme.sk
+FILESYSTEM_DISK=public
+
+php artisan storage:link
+
 cd ../
 rm -r web
 git clone https://github.com/ivan2442/bookme.git
@@ -76,6 +83,11 @@ rm public/storage
 php artisan storage:link
 cd ../
 mv bookme web
-cd web 
-chmod -R 755 storage
+cd web
+rm public/storage
+ln -s ../storage/app/public public/storage 
+chmod -R 755 storage/app/public
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
 ```

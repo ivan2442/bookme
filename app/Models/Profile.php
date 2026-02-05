@@ -36,6 +36,16 @@ class Profile extends Model
         'logo_path',
         'banner_path',
         'settings',
+        'billing_name',
+        'billing_address',
+        'billing_city',
+        'billing_postal_code',
+        'billing_country',
+        'billing_ico',
+        'billing_dic',
+        'billing_ic_dph',
+        'billing_iban',
+        'billing_swift',
     ];
 
     protected $appends = [

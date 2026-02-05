@@ -56,6 +56,12 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/invoices', [AdminController::class, 'invoices'])->name('invoices');
     Route::post('/invoices', [AdminController::class, 'storeInvoice'])->name('invoices.store');
     Route::post('/invoices/{invoice}/status', [AdminController::class, 'updateInvoiceStatus'])->name('invoices.status.update');
+    Route::delete('/invoices/{invoice}', [AdminController::class, 'deleteInvoice'])->name('invoices.delete');
+    Route::get('/invoices/{invoice}/preview', [AdminController::class, 'previewInvoice'])->name('invoices.preview');
+    Route::post('/invoices/{invoice}/send', [AdminController::class, 'sendInvoice'])->name('invoices.send');
+
+    Route::get('/billing-settings', [AdminController::class, 'billingSettings'])->name('billing.settings');
+    Route::post('/billing-settings', [AdminController::class, 'storeBillingSettings'])->name('billing.settings.store');
 });
 
 Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
@@ -103,4 +109,8 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
 
     // Platby (zatial len prehlad)
     Route::get('/payments', [OwnerDashboardController::class, 'payments'])->name('payments');
+
+    // Fakturačné údaje
+    Route::get('/billing-settings', [OwnerDashboardController::class, 'billingSettings'])->name('billing.settings');
+    Route::post('/billing-settings', [OwnerDashboardController::class, 'storeBillingSettings'])->name('billing.settings.store');
 });

@@ -613,4 +613,88 @@ class AdminController extends Controller
 
         return back()->with('status', 'Stav faktúry bol aktualizovaný.');
     }
+
+    public function deleteInvoice(\App\Models\Invoice $invoice): RedirectResponse
+    {
+        $invoice->delete();
+        return back()->with('status', 'Faktúra bola odstránená.');
+    }
+
+    public function previewInvoice(\App\Models\Invoice $invoice): View
+    {
+        $invoice->load('profile');
+
+        $ourBilling = [
+            'name' => \App\Models\Setting::get('billing_name'),
+            'address' => \App\Models\Setting::get('billing_address'),
+            'city' => \App\Models\Setting::get('billing_city'),
+            'postal_code' => \App\Models\Setting::get('billing_postal_code'),
+            'country' => \App\Models\Setting::get('billing_country'),
+            'ico' => \App\Models\Setting::get('billing_ico'),
+            'dic' => \App\Models\Setting::get('billing_dic'),
+            'ic_dph' => \App\Models\Setting::get('billing_ic_dph'),
+            'iban' => \App\Models\Setting::get('billing_iban'),
+            'swift' => \App\Models\Setting::get('billing_swift'),
+        ];
+
+        return view('admin.invoices.preview', compact('invoice', 'ourBilling'));
+    }
+
+    public function sendInvoice(\App\Models\Invoice $invoice): RedirectResponse
+    {
+        $invoice->load('profile.owner');
+        $email = $invoice->profile->email ?: $invoice->profile->owner->email;
+
+        if (!$email) {
+            return back()->with('error', 'Prevádzka nemá nastavený e-mail.');
+        }
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\InvoiceMail($invoice));
+            return back()->with('status', 'Faktúra bola odoslaná na ' . $email);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Chyba pri odosielaní faktúry: ' . $e->getMessage());
+            return back()->with('error', 'Nepodarilo sa odoslať faktúru: ' . $e->getMessage());
+        }
+    }
+
+    public function billingSettings(): View
+    {
+        $billingData = [
+            'name' => \App\Models\Setting::get('billing_name'),
+            'address' => \App\Models\Setting::get('billing_address'),
+            'city' => \App\Models\Setting::get('billing_city'),
+            'postal_code' => \App\Models\Setting::get('billing_postal_code'),
+            'country' => \App\Models\Setting::get('billing_country'),
+            'ico' => \App\Models\Setting::get('billing_ico'),
+            'dic' => \App\Models\Setting::get('billing_dic'),
+            'ic_dph' => \App\Models\Setting::get('billing_ic_dph'),
+            'iban' => \App\Models\Setting::get('billing_iban'),
+            'swift' => \App\Models\Setting::get('billing_swift'),
+        ];
+
+        return view('admin.billing_settings', compact('billingData'));
+    }
+
+    public function storeBillingSettings(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'postal_code' => ['required', 'string', 'max:20'],
+            'country' => ['required', 'string', 'max:255'],
+            'ico' => ['nullable', 'string', 'max:20'],
+            'dic' => ['nullable', 'string', 'max:20'],
+            'ic_dph' => ['nullable', 'string', 'max:20'],
+            'iban' => ['nullable', 'string', 'max:50'],
+            'swift' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        foreach ($data as $key => $value) {
+            \App\Models\Setting::set('billing_' . $key, $value);
+        }
+
+        return back()->with('status', 'Fakturačné údaje boli uložené.');
+    }
 }
