@@ -161,7 +161,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden">
                 <div>
                     <label class="label">Prevádzka</label>
-                    <select name="shop_id" class="input-control" required data-shop-select>
+                    <select name="profile_id" class="input-control" required data-shop-select>
                         <option value="">Vyber prevádzku</option>
                     </select>
                 </div>
@@ -206,7 +206,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="label">Telefón</label>
-                        <input name="customer_phone" type="text" class="input-control" value="{{ old('customer_phone') }}" placeholder="+421..." />
+                        <input name="customer_phone" id="home_customer_phone" type="text" class="input-control" value="{{ old('customer_phone') }}" placeholder="+421..." required />
                     </div>
                     <div>
                         <label class="label">Poznámka</label>

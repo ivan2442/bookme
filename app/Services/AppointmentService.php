@@ -113,6 +113,9 @@ class AppointmentService
             $hasLocks = AppointmentLock::query()
                 ->where('profile_id', $profile->id)
                 ->where('expires_at', '>', Carbon::now($timezone))
+                ->when(!empty($data['lock_token']), function ($query) use ($data) {
+                    $query->where('token', '!=', $data['lock_token']);
+                })
                 ->when($employeeId, function ($query) use ($employeeId) {
                     $query->where(function ($q) use ($employeeId) {
                         $q->whereNull('employee_id')->orWhere('employee_id', $employeeId);

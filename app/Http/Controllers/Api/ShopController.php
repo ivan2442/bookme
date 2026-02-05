@@ -38,7 +38,7 @@ class ShopController extends Controller
         $profiles = $query
             ->with([
                 'services' => function ($q) {
-                    $q->select('id', 'profile_id', 'name', 'category', 'base_price', 'base_duration_minutes', 'is_active');
+                    $q->select('id', 'profile_id', 'name', 'category', 'base_price', 'base_duration_minutes', 'is_active', 'is_pakavoz_enabled');
                 },
                 'services.employees:id,name',
                 'services.variants' => function ($q) {

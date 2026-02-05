@@ -82,6 +82,7 @@ let state = {
     variantMap: {},
     calendarStart: null,
     closedDays: [],
+    lockToken: null,
 };
 
 function formatRelativeSlot(isoDate) {
@@ -444,10 +445,10 @@ async function fetchShops() {
         });
 
         renderShops();
-        renderServices();
         populateShopSelect();
         populateServiceSelect();
         populateCategorySelect();
+        renderServices();
     } catch (error) {
         console.error('Nepodarilo sa načítať prevádzky', error);
         if (shopList) {
@@ -691,7 +692,8 @@ let lockTimeout = null;
                         };
 
                         axios.post('/api/locks', payload)
-                            .then(() => {
+                            .then((response) => {
+                                state.lockToken = response.data.token;
                                 startLockTimer();
                             })
                             .catch(err => console.error('Nepodarilo sa vytvoriť zámok', err));
@@ -727,6 +729,10 @@ bookingForm?.addEventListener('submit', (event) => {
     const formData = new FormData(bookingForm);
     const payload = Object.fromEntries(formData.entries());
 
+    if (state.lockToken) {
+        payload.lock_token = state.lockToken;
+    }
+
     if (!payload.start_at) {
         bookingOutput.textContent = 'Vyber čas, aby sme zamkli slot.';
         return;
@@ -750,20 +756,7 @@ bookingForm?.addEventListener('submit', (event) => {
     }
 
     axios
-        .post('/api/appointments', {
-            profile_id: payload.shop_id,
-            service_id: payload.service_id,
-            service_variant_id: payload.service_variant_id,
-            employee_id: payload.employee_id || null,
-            start_at: payload.start_at,
-            date: payload.date || null,
-            customer_name: payload.customer_name,
-            customer_email: payload.customer_email,
-            customer_phone: payload.customer_phone,
-            notes: payload.notes,
-            evc: payload.evc || null,
-            vehicle_model: payload.vehicle_model || null,
-        })
+        .post('/api/appointments', payload)
         .then((response) => {
             const appointment = response.data;
             const successMessage = `Termín potvrdený: ${appointment.service?.name ?? 'Služba'} ${dateTimeFormatter.format(
@@ -775,7 +768,7 @@ bookingForm?.addEventListener('submit', (event) => {
             if (typeof Swal !== 'undefined') {
                 const title = appointment.service?.name ?? 'Služba';
                 const start = appointment.start_at;
-                const shopName = state.shops.find(s => String(s.id) === String(payload.shop_id))?.name ?? 'BookMe';
+                const shopName = state.shops.find(s => String(s.id) === String(payload.profile_id))?.name ?? 'BookMe';
 
                 Swal.fire({
                     title: 'Rezervácia úspešná!',
@@ -815,8 +808,11 @@ bookingForm?.addEventListener('submit', (event) => {
         .catch((error) => {
             console.error('Chyba pri rezervácii', error);
             const errors = error.response?.data?.errors;
-            const message = error.response?.data?.message || (errors ? JSON.stringify(errors) : 'Nepodarilo sa vytvoriť rezerváciu.');
-    bookingOutput.textContent = message;
+            let message = error.response?.data?.message || 'Nepodarilo sa vytvoriť rezerváciu.';
+            if (errors) {
+                message = Object.values(errors).flat().join(' ');
+            }
+            bookingOutput.textContent = message;
         });
 });
 

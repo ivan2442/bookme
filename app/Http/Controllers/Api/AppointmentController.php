@@ -28,6 +28,7 @@ class AppointmentController extends Controller
             'notes' => ['nullable', 'string'],
             'evc' => ['nullable', 'string', 'max:20'],
             'vehicle_model' => ['nullable', 'string', 'max:255'],
+            'lock_token' => ['nullable', 'string'],
         ]);
 
         $appointment = $this->appointments->book([

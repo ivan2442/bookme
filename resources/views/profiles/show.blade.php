@@ -183,7 +183,7 @@
 
             <form class="space-y-4" id="modal-booking-form">
                 @csrf
-                <input type="hidden" name="shop_id" id="modal_shop_id">
+                <input type="hidden" name="profile_id" id="modal_profile_id">
                 <input type="hidden" name="service_id" id="modal_service_id">
                 <input type="hidden" name="start_at" id="modal_start_at">
                 <input type="hidden" name="date" id="modal_date" value="{{ date('Y-m-d') }}">
@@ -203,7 +203,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="label !ml-1">Telefón</label>
-                        <input name="customer_phone" type="text" class="input-control" placeholder="+421..." />
+                        <input name="customer_phone" id="modal_customer_phone" type="text" class="input-control" placeholder="+421..." required />
                     </div>
                     <div class="space-y-1">
                         <label class="label !ml-1">Poznámka</label>
@@ -271,7 +271,8 @@
         closedDays: [],
         selectedDate: '{{ date('Y-m-d') }}',
         shopId: null,
-        serviceId: null
+        serviceId: null,
+        lockToken: null
     };
 
     function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false) {
@@ -284,7 +285,7 @@
         modalState.calendarStart.setDate(diff);
 
         document.getElementById('modal_service_name').textContent = serviceName;
-        document.getElementById('modal_shop_id').value = shopId;
+        document.getElementById('modal_profile_id').value = shopId;
         document.getElementById('modal_service_id').value = serviceId;
         document.getElementById('bookingModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -411,6 +412,8 @@
                         service_id: modalState.serviceId,
                         start_at: slot.start_at,
                         date: modalState.selectedDate
+                    }).then(response => {
+                        modalState.lockToken = response.data.token;
                     }).catch(err => console.error('Lock error', err));
                 };
 
@@ -448,6 +451,10 @@
             const formData = new FormData(form);
             const payload = Object.fromEntries(formData.entries());
 
+            if (modalState.lockToken) {
+                payload.lock_token = modalState.lockToken;
+            }
+
             const response = await axios.post('/api/appointments', payload);
             out.classList.add('text-emerald-600');
             out.textContent = 'Rezervácia bola úspešná!';
@@ -464,7 +471,12 @@
 
         } catch (error) {
             out.classList.add('text-red-500');
-            out.textContent = error.response?.data?.message || 'Chyba pri rezervácii.';
+            const errors = error.response?.data?.errors;
+            let message = error.response?.data?.message || 'Chyba pri rezervácii.';
+            if (errors) {
+                message = Object.values(errors).flat().join(' ');
+            }
+            out.textContent = message;
         }
     };
 </script>
