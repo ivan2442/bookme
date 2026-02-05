@@ -82,11 +82,17 @@
                 <div class="grid sm:grid-cols-2 gap-3">
                     <div>
                         <label class="label">Logo prevádzky</label>
-                        <input type="file" name="logo" class="input-control !p-2 text-xs">
+                        <input type="file" name="logo" class="input-control !p-2 text-xs" onchange="previewImage(this, 'add-logo-preview')">
+                        <div id="add-logo-preview" class="mt-2 hidden">
+                            <img src="" class="h-12 w-12 object-contain rounded-lg border border-slate-200" alt="Logo preview">
+                        </div>
                     </div>
                     <div>
                         <label class="label">Banner prevádzky</label>
-                        <input type="file" name="banner" class="input-control !p-2 text-xs">
+                        <input type="file" name="banner" class="input-control !p-2 text-xs" onchange="previewImage(this, 'add-banner-preview')">
+                        <div id="add-banner-preview" class="mt-2 hidden">
+                            <img src="" class="h-12 w-24 object-cover rounded-lg border border-slate-200" alt="Banner preview">
+                        </div>
                     </div>
                 </div>
                 <div class="grid sm:grid-cols-1 gap-3">
@@ -117,27 +123,36 @@
                      data-name="{{ strtolower($profile->name) }}"
                      data-city="{{ strtolower($profile->city) }}"
                      data-category="{{ strtolower($profile->category) }}">
-                    <div>
-                        <p class="font-semibold text-slate-900">{{ $profile->name }}</p>
-                        <p class="text-xs text-slate-500">{{ $profile->category }} • {{ $profile->city }}</p>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase
-                                {{ $profile->status === 'published' ? 'bg-emerald-100 text-emerald-700' :
-                                   ($profile->status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600') }}">
-                                {{ $profile->status }}
-                            </span>
-                            <span class="text-[10px] text-slate-400">{{ $profile->owner ? $profile->owner->email : '' }}</span>
+                    <div class="flex items-center gap-4">
+                        <div class="h-12 w-12 flex-shrink-0 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center">
+                            @if($profile->logo_url)
+                                <img src="{{ $profile->logo_url }}" alt="{{ $profile->name }} logo" class="w-full h-full object-contain">
+                            @else
+                                <span class="text-slate-300 font-bold text-lg">{{ substr($profile->name, 0, 1) }}</span>
+                            @endif
                         </div>
-                        @if($profile->subscription_starts_at)
-                            <div class="mt-2 flex items-center gap-2">
-                                <span class="text-[10px] font-bold uppercase tracking-tight text-slate-400">Bezplatná verzia:</span>
-                                @if($profile->trial_days_left > 0)
-                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Zostáva {{ $profile->trial_time_left }}</span>
-                                @else
-                                    <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Skončila ({{ $profile->trial_ends_at->format('d.m.Y') }})</span>
-                                @endif
+                        <div>
+                            <p class="font-semibold text-slate-900">{{ $profile->name }}</p>
+                            <p class="text-xs text-slate-500">{{ $profile->category }} • {{ $profile->city }}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase
+                                    {{ $profile->status === 'published' ? 'bg-emerald-100 text-emerald-700' :
+                                       ($profile->status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600') }}">
+                                    {{ $profile->status }}
+                                </span>
+                                <span class="text-[10px] text-slate-400">{{ $profile->owner ? $profile->owner->email : '' }}</span>
                             </div>
-                        @endif
+                            @if($profile->subscription_starts_at)
+                                <div class="mt-2 flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-tight text-slate-400">Bezplatná verzia:</span>
+                                    @if($profile->trial_days_left > 0)
+                                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Zostáva {{ $profile->trial_time_left }}</span>
+                                    @else
+                                        <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Skončila ({{ $profile->trial_ends_at->format('d.m.Y') }})</span>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     <div class="flex gap-1">
                         @if($profile->status === 'pending')
@@ -263,7 +278,7 @@
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
                             <label class="label">Logo prevádzky</label>
-                            <input type="file" name="logo" class="input-control !p-2 text-xs">
+                            <input type="file" name="logo" class="input-control !p-2 text-xs" onchange="previewImage(this, 'edit-logo-preview', 'edit-logo-img')">
                             <div id="edit-logo-preview" class="mt-2 hidden">
                                 <img src="" id="edit-logo-img" class="h-12 w-12 object-contain rounded-lg border border-slate-200" alt="Logo preview">
                                 <p class="text-[10px] text-emerald-600 mt-1 font-bold">Logo je nahrané</p>
@@ -271,7 +286,7 @@
                         </div>
                         <div>
                             <label class="label">Banner prevádzky</label>
-                            <input type="file" name="banner" class="input-control !p-2 text-xs">
+                            <input type="file" name="banner" class="input-control !p-2 text-xs" onchange="previewImage(this, 'edit-banner-preview', 'edit-banner-img')">
                             <div id="edit-banner-preview" class="mt-2 hidden">
                                 <img src="" id="edit-banner-img" class="h-12 w-24 object-cover rounded-lg border border-slate-200" alt="Banner preview">
                                 <p class="text-[10px] text-emerald-600 mt-1 font-bold">Banner je nahraný</p>
@@ -298,6 +313,20 @@
 </div>
 
 <script>
+    function previewImage(input, previewId, imgId = null) {
+        const preview = document.getElementById(previewId);
+        const img = imgId ? document.getElementById(imgId) : preview.querySelector('img');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     function openEditModal(profile) {
         const modal = document.getElementById('edit-modal');
         const form = document.getElementById('edit-form');

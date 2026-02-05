@@ -76,4 +76,6 @@ rm public/storage
 php artisan storage:link
 cd ../
 mv bookme web
+cd web 
+chmod -R 755 storage
 ```
