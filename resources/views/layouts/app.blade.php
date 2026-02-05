@@ -110,6 +110,7 @@
 </head>
 <body class="bg-sand text-slate-900 selection:bg-emerald-200/80 selection:text-slate-900 overflow-x-hidden">
     <div class="bg-gradient radial-fade"></div>
+    <div class="bg-grainy"></div>
     <div class="min-h-screen relative overflow-x-hidden">
         @if(session('status'))
             <script>
@@ -147,7 +148,6 @@
                 <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
                     <a class="hover:text-slate-900 transition" href="/#search">Vyhľadať prevádzku</a>
                     <a class="hover:text-slate-900 transition" href="{{ route('for-businesses') }}">Pre prevádzky</a>
-                    <a class="hover:text-slate-900 transition" href="/#services">Služby</a>
                     {{-- <a class="hover:text-slate-900 transition" href="{{ route('articles.index') }}">Blog</a> --}}
                     @auth
                         @if(auth()->user()->role === 'admin')
@@ -181,7 +181,6 @@
             <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-2 mt-2 shadow-xl rounded-b-2xl mx-4">
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">Vyhľadať prevádzku</a>
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('for-businesses') }}">Pre prevádzky</a>
-                <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#services">Služby</a>
                 {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}
                 @auth
                     @if(auth()->user()->role === 'admin')

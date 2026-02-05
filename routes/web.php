@@ -110,6 +110,10 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     // Platby (zatial len prehlad)
     Route::get('/payments', [OwnerDashboardController::class, 'payments'])->name('payments');
 
+    // Faktúry
+    Route::get('/invoices', [OwnerDashboardController::class, 'invoices'])->name('invoices');
+    Route::get('/invoices/{invoice}/preview', [OwnerDashboardController::class, 'previewInvoice'])->name('invoices.preview');
+
     // Fakturačné údaje
     Route::get('/billing-settings', [OwnerDashboardController::class, 'billingSettings'])->name('billing.settings');
     Route::post('/billing-settings', [OwnerDashboardController::class, 'storeBillingSettings'])->name('billing.settings.store');

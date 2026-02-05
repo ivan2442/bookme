@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Employee;
 use App\Models\Holiday;
+use App\Models\Invoice;
 use App\Models\Profile;
 use App\Models\Schedule;
 use App\Models\Service;
@@ -858,5 +859,42 @@ class OwnerDashboardController extends Controller
         $profile->update($data);
 
         return back()->with('status', 'Fakturačné údaje boli uložené.');
+    }
+
+    public function invoices(Request $request): View
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+
+        $invoices = Invoice::with('profile')
+            ->whereIn('profile_id', $profileIds)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('owner.invoices', compact('invoices'));
+    }
+
+    public function previewInvoice(Invoice $invoice): View
+    {
+        $profileIds = $this->getOwnerProfileIds(request());
+        if (!in_array($invoice->profile_id, $profileIds)) {
+            abort(403);
+        }
+
+        $invoice->load('profile');
+
+        $ourBilling = [
+            'name' => \App\Models\Setting::get('billing_name'),
+            'address' => \App\Models\Setting::get('billing_address'),
+            'city' => \App\Models\Setting::get('billing_city'),
+            'postal_code' => \App\Models\Setting::get('billing_postal_code'),
+            'country' => \App\Models\Setting::get('billing_country'),
+            'ico' => \App\Models\Setting::get('billing_ico'),
+            'dic' => \App\Models\Setting::get('billing_dic'),
+            'ic_dph' => \App\Models\Setting::get('billing_ic_dph'),
+            'iban' => \App\Models\Setting::get('billing_iban'),
+            'swift' => \App\Models\Setting::get('billing_swift'),
+        ];
+
+        return view('admin.invoices.preview', compact('invoice', 'ourBilling'));
     }
 }

@@ -3,9 +3,13 @@
 @section('content')
 <div class="overflow-x-hidden">
 <section class="pt-4 lg:pt-16 pb-10 relative">
-    <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -left-24 top-10 h-48 w-48 rounded-full bg-emerald-300/40 blur-3xl"></div>
-        <div class="absolute right-0 bottom-10 h-56 w-56 rounded-full bg-orange-200/40 blur-3xl"></div>
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-emerald-100/40 blur-[120px]"></div>
+        <div class="absolute top-[20%] -right-[5%] w-[30%] h-[30%] rounded-full bg-orange-100/30 blur-[100px]"></div>
+
+        <div class="absolute top-[15%] left-[5%] w-12 h-12 bg-emerald-200/20 rounded-2xl rotate-12 animate-float hidden md:block"></div>
+        <div class="absolute bottom-[20%] left-[15%] w-8 h-8 bg-orange-200/20 rounded-full animate-float-delayed hidden md:block"></div>
+        <div class="absolute top-[40%] right-[10%] w-10 h-10 border-2 border-emerald-200/30 rounded-full animate-float hidden md:block"></div>
     </div>
     <div class="relative grid lg:grid-cols-2 gap-10 items-center">
         <div class="space-y-6">
@@ -14,7 +18,10 @@
                 Rezervácia do 3 minút, bez telefonovania
             </div>
             <h1 class="font-display text-4xl md:text-5xl leading-tight text-slate-900">
-                BookMe spája prevádzky a ich klientov.
+                BookMe spája <span class="relative inline-block">
+                    <span class="relative z-10 text-emerald-600">prevádzky</span>
+                    <span class="absolute bottom-1 left-0 w-full h-3 bg-emerald-100/60 -z-0 rounded-full"></span>
+                </span> a ich klientov.
             </h1>
             <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">
                 Moderný rezervačný systém pre vaše podnikanie. Objavte služby vo vašom okolí a rezervujte si termín behom pár sekúnd.
@@ -26,9 +33,9 @@
             </div>
             <div class="flex items-center gap-6 pt-4">
                 <div class="flex -space-x-3">
-                    <div class="h-10 w-10 rounded-full bg-emerald-100 border-2 border-white flex items-center justify-center text-emerald-600 font-bold text-xs shadow-sm">L</div>
-                    <div class="h-10 w-10 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-orange-600 font-bold text-xs shadow-sm">M</div>
-                    <div class="h-10 w-10 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-blue-600 font-bold text-xs shadow-sm">K</div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-200 border-2 border-white flex items-center justify-center text-white font-bold text-xs shadow-md">L</div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-orange-400 to-orange-200 border-2 border-white flex items-center justify-center text-white font-bold text-xs shadow-md">M</div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-400 to-blue-200 border-2 border-white flex items-center justify-center text-white font-bold text-xs shadow-md">K</div>
                 </div>
                 <p class="text-sm text-slate-500 font-medium">Už stovky spokojných klientov</p>
             </div>
@@ -42,10 +49,10 @@
                         <p class="text-[10px] uppercase font-bold text-emerald-600 tracking-widest mb-1">Rýchly náhľad</p>
                         <h3 class="font-display text-xl text-slate-900">Vyberte si svoj čas</h3>
                     </div>
-                    <div class="flex gap-1">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-200"></span>
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-100"></span>
+                    <div class="flex gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-100"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-50"></div>
                     </div>
                 </div>
 
@@ -88,11 +95,11 @@
 </section>
 
 <section id="search" class="py-12 space-y-8">
-    <div class="flex items-center gap-3">
-        <span class="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold">1</span>
+    <div class="flex items-center gap-4">
+        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-emerald-200 font-bold text-lg">1</div>
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Vyhľadať prevádzku</p>
-            <h2 class="font-display text-2xl text-slate-900">Filtrovanie prevádzok</h2>
+            <h2 class="font-display text-3xl text-slate-900">Vyhľadať prevádzku</h2>
+            <p class="text-slate-500 text-sm italic">Objavte najlepšie služby vo vašom okolí</p>
         </div>
     </div>
 
@@ -136,11 +143,11 @@
 </section>
 
 <section id="services" class="py-12 space-y-6 hidden max-w-full overflow-x-hidden">
-    <div class="flex items-center gap-3">
-        <span class="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-700 font-semibold">2</span>
+    <div class="flex items-center gap-4">
+        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-400 flex items-center justify-center text-white shadow-lg shadow-orange-200 font-bold text-lg">2</div>
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Vyber službu</p>
-            <h2 class="font-display text-2xl text-slate-900">Služby podľa dĺžky a ceny</h2>
+            <h2 class="font-display text-3xl text-slate-900">Vyberte si službu</h2>
+            <p class="text-slate-500 text-sm italic">Široká ponuka variantov pre každého</p>
         </div>
     </div>
     <div class="grid md:grid-cols-3 gap-4 max-w-full" data-services-list>
@@ -149,11 +156,11 @@
 </section>
 
 <section id="booking" class="py-12 space-y-6 hidden max-w-full overflow-x-hidden">
-    <div class="flex items-center gap-3">
-        <span class="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-semibold">3</span>
+    <div class="flex items-center gap-4">
+        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center text-white shadow-lg shadow-slate-200 font-bold text-lg">3</div>
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Potvrď termín</p>
-            <h2 class="font-display text-2xl text-slate-900">Rezervácia s pripomienkou</h2>
+            <h2 class="font-display text-3xl text-slate-900">Potvrďte termín</h2>
+            <p class="text-slate-500 text-sm italic">Stačí pár klikov a máte zarezervované</p>
         </div>
     </div>
     <div class="grid lg:grid-cols-[2fr,1.2fr] gap-6">

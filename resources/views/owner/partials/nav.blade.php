@@ -7,5 +7,6 @@
     <a href="{{ route('owner.calendar.settings') }}" class="admin-tab {{ request()->routeIs('owner.calendar.settings') ? 'is-active' : '' }}">Kalendár</a>
     <a href="{{ route('owner.holidays') }}" class="admin-tab {{ request()->routeIs('owner.holidays') ? 'is-active' : '' }}">Sviatky</a>
     <a href="{{ route('owner.payments') }}" class="admin-tab {{ request()->routeIs('owner.payments') ? 'is-active' : '' }}">Platby</a>
+    <a href="{{ route('owner.invoices') }}" class="admin-tab {{ request()->routeIs('owner.invoices') ? 'is-active' : '' }}">Faktúry</a>
     <a href="{{ route('owner.billing.settings') }}" class="admin-tab {{ request()->routeIs('owner.billing.settings') ? 'is-active' : '' }}">Fakturačné údaje</a>
 </div>
