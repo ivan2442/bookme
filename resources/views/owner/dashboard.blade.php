@@ -107,8 +107,8 @@
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-6 items-start">
-        <div class="lg:col-span-2 space-y-6">
+    <div class="grid grid-cols-1 gap-6 items-start">
+        <div class="space-y-6">
             <div class="card overflow-hidden !p-0">
                 <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
                     <h2 class="font-bold text-slate-900" id="upcoming-title">Termíny na dnes</h2>
@@ -119,13 +119,13 @@
                 </div>
                 <div class="divide-y divide-slate-100" id="appointments-list">
                     @forelse($upcoming as $appointment)
-                        <div class="px-6 py-5 px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                        <div class="px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-slate-50/50 transition-colors {{ $appointment->status === 'completed' ? 'opacity-50' : '' }}">
                             <div class="flex items-center gap-4">
-                                <div class="text-center min-w-[50px] px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">
+                                <div class="text-center min-w-[50px] px-2 py-1 rounded-lg {{ $appointment->status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-emerald-50 text-emerald-700' }}">
                                     <p class="text-lg font-bold leading-tight">{{ $appointment->start_at->format('H:i') }}</p>
                                 </div>
                                 <div>
-                                    <p class="font-bold text-slate-900 leading-tight">
+                                    <p class="font-bold {{ $appointment->status === 'completed' ? 'text-slate-500' : 'text-slate-900' }} leading-tight">
                                         {{ $appointment->metadata['service_name_manual'] ?? ($appointment->service?->name ?? 'Manuálna služba') }}
                                     </p>
                                     <p class="text-xs text-slate-500">{{ $appointment->customer_name }} • {{ $appointment->customer_phone }}</p>
@@ -134,8 +134,9 @@
                             <div class="flex items-center gap-2">
                                 <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
                                     {{ $appointment->status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
-                                       ($appointment->status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500') }}">
-                                    {{ $appointment->status }}
+                                       ($appointment->status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                       ($appointment->status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500')) }}">
+                                    @if($appointment->status === 'completed') Vybavené @elseif($appointment->status === 'confirmed') Potvrdené @elseif($appointment->status === 'pending') Čaká @else {{ $appointment->status }} @endif
                                 </span>
                                 <div class="flex items-center gap-1">
                                     @if($appointment->status === 'pending')
@@ -146,6 +147,17 @@
                                             </button>
                                         </form>
                                     @endif
+
+                                    @if($appointment->status !== 'completed' && $appointment->status !== 'cancelled')
+                                        <form method="POST" action="{{ route('owner.appointments.status.update', $appointment) }}">
+                                            @csrf
+                                            <input type="hidden" name="status" value="completed">
+                                            <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="Označiť ako vybavené">
+                                                Vybavené
+                                            </button>
+                                        </form>
+                                    @endif
+
                                     <button onclick='openEditAppointmentModal({{ json_encode([
                                         "id" => $appointment->id,
                                         "customer_name" => $appointment->customer_name,
@@ -159,9 +171,17 @@
                                         "service_name" => $appointment->metadata["service_name_manual"] ?? ($appointment->service?->name ?? "Manuálna služba"),
                                         "employee_id" => $appointment->employee_id,
                                         "price" => $appointment->price
-                                    ]) }})' class="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    ]) }})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="Presunúť">
+                                        Presunúť
                                     </button>
+
+                                    <form method="POST" action="{{ route('owner.appointments.delete', $appointment) }}" onsubmit="return confirm('Naozaj chcete vymazať túto rezerváciu?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="Vymazať">
+                                            Vymazať
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -174,6 +194,7 @@
             </div>
         </div>
 
+        {{--
         <div class="space-y-6">
             <div class="card p-6">
                 <h2 class="font-bold text-slate-900 mb-4">Rýchle akcie</h2>
@@ -193,6 +214,7 @@
                 </div>
             </div>
         </div>
+        --}}
     </div>
 </div>
 

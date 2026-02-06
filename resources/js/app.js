@@ -1231,21 +1231,22 @@ function initAdminDashboard() {
             }
 
             appointmentsList.innerHTML = appointments.map(a => `
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                <div class="px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-slate-50/50 transition-colors ${a.status === 'completed' ? 'opacity-50' : ''}">
                     <div class="flex items-center gap-4">
-                        <div class="text-center min-w-[50px] px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">
+                        <div class="text-center min-w-[50px] px-2 py-1 rounded-lg ${a.status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-emerald-50 text-emerald-700'}">
                             <p class="text-lg font-bold leading-tight">${a.start_time}</p>
                         </div>
                         <div>
-                            <p class="font-bold text-slate-900 leading-tight">${a.service_name}</p>
+                            <p class="font-bold ${a.status === 'completed' ? 'text-slate-500' : 'text-slate-900'} leading-tight">${a.service_name}</p>
                             <p class="text-xs text-slate-500">${a.customer_name} • ${a.customer_phone || ''}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
                             ${a.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
-                               (a.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500')}">
-                            ${a.status}
+                               (a.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                               (a.status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500'))}">
+                            ${a.status === 'completed' ? 'Vybavené' : (a.status === 'confirmed' ? 'Potvrdené' : (a.status === 'pending' ? 'Čaká' : a.status))}
                         </span>
                         <div class="flex items-center gap-1">
                             ${a.status === 'pending' ? `
@@ -1256,6 +1257,17 @@ function initAdminDashboard() {
                                     </button>
                                 </form>
                             ` : ''}
+
+                            ${a.status !== 'completed' && a.status !== 'cancelled' ? `
+                                <form method="POST" action="${a.status_update_url}">
+                                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                                    <input type="hidden" name="status" value="completed">
+                                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="Označiť ako vybavené">
+                                        Vybavené
+                                    </button>
+                                </form>
+                            ` : ''}
+
                             <button onclick='openEditAppointmentModal(${JSON.stringify({
                                 id: a.id,
                                 customer_name: a.customer_name,
@@ -1267,9 +1279,17 @@ function initAdminDashboard() {
                                 price: a.price,
                                 employee_id: a.employee_id,
                                 notes: ''
-                            })})' class="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            })})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="Presunúť">
+                                Presunúť
                             </button>
+
+                            <form method="POST" action="${a.delete_url}" onsubmit="return confirm('Naozaj chcete vymazať túto rezerváciu?')">
+                                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="Vymazať">
+                                    Vymazať
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

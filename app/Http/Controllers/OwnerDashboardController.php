@@ -44,11 +44,10 @@ class OwnerDashboardController extends Controller
                 ->sum('price'),
         ];
 
-        // Fetch only today's non-completed appointments with eager loading
+        // Fetch today's appointments with eager loading (including completed)
         $upcoming = (clone $baseQuery)
             ->with(['profile', 'service', 'employee'])
             ->whereBetween('start_at', [$todayStart, $todayEnd])
-            ->where('status', '!=', 'completed')
             ->orderBy('start_at')
             ->get();
 
@@ -72,7 +71,6 @@ class OwnerDashboardController extends Controller
 
         $appointments = (clone $query)
             ->with(['profile', 'service', 'employee'])
-            ->where('status', '!=', 'completed')
             ->orderBy('start_at')
             ->get()
             ->map(function($a) {
