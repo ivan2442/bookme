@@ -136,8 +136,8 @@
                 }
             </script>
         @endif
-        <div id="header-wrapper" class="fixed top-0 left-0 right-0 z-50 transition-transform duration-300 translate-y-0">
-            <header id="main-header" class="max-w-6xl mx-auto px-4 py-4 md:py-6 flex items-center justify-between gap-4 bg-sand/80 backdrop-blur-md rounded-b-[20px] md:rounded-none transition-all duration-300">
+        <div id="header-wrapper" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 translate-y-0">
+            <header id="main-header" class="max-w-6xl mx-auto px-4 py-4 md:py-6 flex items-center justify-between gap-4 transition-all duration-300">
                 <a href="/" id="logo" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-200/60 flex items-center justify-center text-slate-900 font-semibold">B</div>
                     <div>
@@ -178,7 +178,7 @@
             </header>
 
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-2 mt-2 shadow-xl rounded-b-2xl mx-4">
+            <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border border-slate-100 px-4 py-4 space-y-2 shadow-2xl mx-4">
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">Vyhľadať prevádzku</a>
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('for-businesses') }}">Pre prevádzky</a>
                 {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}

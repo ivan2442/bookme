@@ -928,21 +928,23 @@ window.addEventListener('scroll', () => {
     // Sticky Header Logic
     if (headerWrapper && mainHeader) {
         // Hide on scroll down, show on scroll up
-        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        if (currentScrollY > lastScrollY && currentScrollY > 200) {
             // Scrolling down
             headerWrapper.classList.replace('translate-y-0', '-translate-y-full');
+            headerWrapper.classList.remove('is-scrolled');
         } else {
             // Scrolling up
             headerWrapper.classList.replace('-translate-y-full', 'translate-y-0');
-        }
 
-        // Visual feedback for sticky state
-        if (currentScrollY > 20) {
-            mainHeader.classList.add('shadow-xl', 'shadow-slate-200/50', '!py-3');
-            mainHeader.classList.remove('md:py-6');
-        } else {
-            mainHeader.classList.remove('shadow-xl', 'shadow-slate-200/50', '!py-3');
-            mainHeader.classList.add('md:py-6');
+            if (currentScrollY > 20) {
+                headerWrapper.classList.add('is-scrolled');
+                mainHeader.classList.add('!py-3');
+                mainHeader.classList.remove('md:py-6');
+            } else {
+                headerWrapper.classList.remove('is-scrolled');
+                mainHeader.classList.remove('!py-3');
+                mainHeader.classList.add('md:py-6');
+            }
         }
     }
 
