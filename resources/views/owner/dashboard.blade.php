@@ -1,21 +1,17 @@
-@extends('layouts.app')
+@extends('layouts.owner')
 
 @section('content')
-<section class="pt-12 pb-6 space-y-6">
-    <div class="flex items-center justify-between gap-3 mb-6">
+<div class="space-y-6">
+    <div class="flex items-center justify-between gap-3 mb-2">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Prevádzka</p>
-            <h1 class="font-display text-3xl text-slate-900">Dashboard prevádzky</h1>
+            <h1 class="font-display text-3xl text-slate-900">Prehľad prevádzky</h1>
+            <p class="text-sm text-slate-500">Vitajte v dashboarde vášho profilu.</p>
         </div>
-        <div class="flex gap-2">
-            <button onclick="openManualAppointmentModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>Pridať rezerváciu</span>
-            </button>
-        </div>
+        <button onclick="openManualAppointmentModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Pridať rezerváciu</span>
+        </button>
     </div>
-
-    @include('owner.partials.nav')
 
     @if($allProfiles->first() && $allProfiles->first()->subscription_starts_at)
         @php $profile = $allProfiles->first(); @endphp
@@ -50,25 +46,121 @@
         @endif
     @endif
 
-    <div class="grid md:grid-cols-3 gap-4">
-        <div class="card">
-            <p class="text-sm text-slate-500 mb-1">Rezervácie dnes</p>
-            <p class="text-3xl font-semibold text-slate-900">{{ $stats['appointments_today'] }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card flex flex-col justify-between p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dnes</span>
+            </div>
+            <div>
+                <p class="text-3xl font-bold text-slate-900">{{ $stats['appointments_today'] }}</p>
+                <p class="text-sm text-slate-500 font-medium">Rezervácií na dnes</p>
+            </div>
         </div>
-        <div class="card">
-            <p class="text-sm text-slate-500 mb-1">Rezervácie tento mesiac</p>
-            <p class="text-3xl font-semibold text-slate-900">{{ $stats['appointments_month'] }}</p>
+
+        <div class="card flex flex-col justify-between p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tento mesiac</span>
+            </div>
+            <div>
+                <p class="text-3xl font-bold text-slate-900">{{ $stats['appointments_month'] }}</p>
+                <p class="text-sm text-slate-500 font-medium">Rezervácií spolu</p>
+            </div>
+        </div>
+
+        <div class="card flex flex-col justify-between p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tržba</span>
+            </div>
+            <div>
+                <p class="text-3xl font-bold text-slate-900">€{{ number_format($upcoming->where('status', 'completed')->sum('price'), 2) }}</p>
+                <p class="text-sm text-slate-500 font-medium">Vybavené objednávky</p>
+            </div>
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-[1fr,350px] gap-6 items-start">
-        <div class="space-y-4 lg:order-2">
-            <div class="card p-4">
+    <div class="grid lg:grid-cols-3 gap-6 items-start">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="card overflow-hidden !p-0">
+                <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+                    <h2 class="font-bold text-slate-900" id="upcoming-title">Termíny na dnes</h2>
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Aktuálne</span>
+                    </div>
+                </div>
+                <div class="divide-y divide-slate-100" id="appointments-list">
+                    @forelse($upcoming->filter(fn($a) => $a->status !== 'completed' && $a->start_at->isToday())->sortBy('start_at') as $appointment)
+                        <div class="px-6 py-5 px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="text-center min-w-[50px] px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">
+                                    <p class="text-lg font-bold leading-tight">{{ $appointment->start_at->format('H:i') }}</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 leading-tight">
+                                        {{ $appointment->metadata['service_name_manual'] ?? ($appointment->service?->name ?? 'Manuálna služba') }}
+                                    </p>
+                                    <p class="text-xs text-slate-500">{{ $appointment->customer_name }} • {{ $appointment->customer_phone }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
+                                    {{ $appointment->status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                                       ($appointment->status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500') }}">
+                                    {{ $appointment->status }}
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    @if($appointment->status === 'pending')
+                                        <form method="POST" action="{{ route('owner.appointments.confirm', $appointment) }}">
+                                            @csrf
+                                            <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="Potvrdiť">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <button onclick='openEditAppointmentModal({{ json_encode([
+                                        "id" => $appointment->id,
+                                        "customer_name" => $appointment->customer_name,
+                                        "customer_email" => $appointment->customer_email,
+                                        "customer_phone" => $appointment->customer_phone,
+                                        "status" => $appointment->status,
+                                        "notes" => $appointment->metadata["notes"] ?? "",
+                                        "date" => $appointment->start_at->format("Y-m-d"),
+                                        "start_time" => $appointment->start_at->format("H:i"),
+                                        "duration_minutes" => $appointment->metadata["duration_minutes"] ?? (int) (($appointment->end_at->timestamp - $appointment->start_at->timestamp) / 60),
+                                        "service_name" => $appointment->metadata["service_name_manual"] ?? ($appointment->service?->name ?? "Manuálna služba"),
+                                        "employee_id" => $appointment->employee_id,
+                                        "price" => $appointment->price
+                                    ]) }})' class="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-12 text-center">
+                            <p class="text-sm text-slate-500 italic">Na dnes nie sú naplánované žiadne rezervácie.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
                 <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     Kalendár
                 </h3>
-                <div class="date-calendar !shadow-none !border-slate-100" data-admin-calendar>
+                <div class="date-calendar !shadow-none !border-slate-100">
                     <div class="flex items-center justify-between mb-2">
                         <button type="button" class="cal-nav cal-prev" data-admin-cal-prev>‹</button>
                         <div class="text-center cal-month text-sm" data-admin-cal-month>—</div>
@@ -86,117 +178,27 @@
                 </div>
                 <input type="hidden" id="admin-selected-date" value="{{ date('Y-m-d') }}">
             </div>
-        </div>
 
-        <div class="card lg:order-1">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="font-semibold text-lg text-slate-900" id="upcoming-title">Termíny na dnes</h2>
-            </div>
-            <div class="divide-y divide-slate-100" id="appointments-list">
-                @forelse($upcoming->filter(fn($a) => $a->status !== 'completed' && $a->start_at->isToday())->sortBy('start_at') as $appointment)
-                    <div class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <p class="font-bold text-slate-900 leading-tight">
-                                    {{ $appointment->metadata['service_name_manual'] ?? ($appointment->service?->name ?? 'Manuálna služba') }}
-                                </p>
-                                <span class="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-bold uppercase tracking-tight">
-                                    {{ optional($appointment->employee)->name ?? 'Bez zamestnanca' }}
-                                </span>
-                            </div>
-                            <div class="flex flex-col text-sm text-slate-600">
-                                <span class="font-medium text-slate-900">{{ $appointment->customer_name }}</span>
-                                @if($appointment->customer_phone)
-                                    <span class="text-xs text-slate-500">{{ $appointment->customer_phone }}</span>
-                                @endif
-                            </div>
+            <div class="card p-6">
+                <h2 class="font-bold text-slate-900 mb-4">Rýchle akcie</h2>
+                <div class="grid grid-cols-1 gap-2">
+                    <a href="{{ route('owner.services') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 transition-all group">
+                        <div class="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-emerald-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
-                            <div class="md:text-right space-y-2 flex-1">
-                                @php
-                                    $daysNames = [1=>'Pondelok',2=>'Utorok',3=>'Streda',4=>'Štvrtok',5=>'Piatok',6=>'Sobota',0=>'Nedeľa'];
-                                    $dayName = $daysNames[$appointment->start_at->dayOfWeek] ?? '';
-                                @endphp
-                                <div class="flex flex-col md:items-end">
-                                    <p class="font-bold text-slate-900 leading-none">
-                                        {{ $appointment->start_at?->format('d.m.Y') }} {{ $dayName }}
-                                    </p>
-                                    <div class="flex items-center gap-3 mt-1 md:justify-end">
-                                        <p class="text-sm font-semibold text-emerald-600">
-                                            {{ $appointment->start_at?->format('H:i') }} - {{ $appointment->end_at?->format('H:i') }}
-                                        </p>
-                                        <span class="h-1 w-1 rounded-full bg-slate-200"></span>
-                                        <p class="text-sm font-bold text-slate-900">€{{ number_format($appointment->price, 2) }}</p>
-                                    </div>
-                                    <p class="text-[10px] uppercase font-bold text-slate-400 mt-1">{{ $appointment->status }}</p>
-                                </div>
-
-                                <div class="flex flex-wrap items-center gap-2 md:justify-end">
-                                @if($appointment->status !== 'completed' && $appointment->status !== 'no-show')
-                                    <form method="POST" action="{{ route('owner.appointments.status.update', $appointment) }}">
-                                        @csrf
-                                        <input type="hidden" name="status" value="completed">
-                                        <button type="submit" class="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Vybavené">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Vybavené</span>
-                                        </button>
-                                    </form>
-
-                                    <form method="POST" action="{{ route('owner.appointments.status.update', $appointment) }}">
-                                        @csrf
-                                        <input type="hidden" name="status" value="no-show">
-                                        <button type="submit" class="p-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Neprišiel">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                            <span>Neprišiel</span>
-                                        </button>
-                                    </form>
-
-                                    <button type="button"
-                                        onclick="openRescheduleModal({{ $appointment->id }}, '{{ $appointment->start_at->format('Y-m-d') }}', '{{ $appointment->start_at->format('H:i') }}', {{ $appointment->metadata['duration_minutes'] ?? (int) (($appointment->end_at->timestamp - $appointment->start_at->timestamp) / 60) }}, {{ $appointment->employee_id ?? 'null' }})"
-                                        class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Presunúť">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                                        <span>Presunúť</span>
-                                    </button>
-
-                                    <button type="button"
-                                        onclick="openEditAppointmentModal({{ json_encode([
-                                            'id' => $appointment->id,
-                                            'customer_name' => $appointment->customer_name,
-                                            'customer_phone' => $appointment->customer_phone,
-                                            'service_name' => $appointment->metadata['service_name_manual'] ?? ($appointment->service?->name ?? 'Manuálna služba'),
-                                            'date' => $appointment->start_at->format('Y-m-d'),
-                                            'start_time' => $appointment->start_at->format('H:i'),
-                                            'duration_minutes' => $appointment->metadata['duration_minutes'] ?? (int) (($appointment->end_at->timestamp - $appointment->start_at->timestamp) / 60),
-                                            'price' => $appointment->price,
-                                            'employee_id' => $appointment->employee_id,
-                                            'notes' => $appointment->metadata['notes'] ?? ''
-                                        ]) }})"
-                                        class="p-2 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Upraviť">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                        <span>Upraviť</span>
-                                    </button>
-                                @endif
-
-                                <form method="POST" action="{{ route('owner.appointments.delete', $appointment) }}" onsubmit="return confirmDelete(event, 'Naozaj vymazať túto rezerváciu?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tight" title="Vymazať">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        <span>Vymazať</span>
-                                    </button>
-                                </form>
-                            </div>
+                        <span class="text-sm font-bold">Moje služby</span>
+                    </a>
+                    <a href="{{ route('owner.employees') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 transition-all group">
+                        <div class="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-emerald-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         </div>
-                    </div>
-                @empty
-                    <div class="py-8 text-center" id="no-appointments">
-                        <p class="text-sm text-slate-500 italic">Žiadne nadchádzajúce rezervácie na tento deň.</p>
-                    </div>
-                @endforelse
+                        <span class="text-sm font-bold">Zamestnanci</span>
+                    </a>
+                </div>
             </div>
         </div>
-
     </div>
-</section>
+</div>
 
 <!-- Manual Appointment Modal -->
 <div id="manualAppointmentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
@@ -213,7 +215,6 @@
 
             <form method="POST" action="{{ route('owner.appointments.manual.store') }}" class="space-y-4">
                 @csrf
-                {{-- Skrytý výber prevádzky - defaultne prvá, ak ich má majiteľ viac, v dashboarde pracujeme s konkrétnou (predpokladáme kontext jednej prevádzky pre zjednodušenie podľa zadania) --}}
                 <input type="hidden" name="profile_id" id="manual_profile_id" value="{{ $allProfiles->first()->id }}">
 
                 @if($allProfiles->first()->employees->count() > 1)
@@ -246,7 +247,7 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="label">Názov služby</label>
-                        <input type="text" name="service_name" class="input-control" placeholder="Napr. Pánsky strih" required>
+                        <input type="text" name="service_name_manual" class="input-control" placeholder="Napr. Pánsky strih" required>
                     </div>
                     <div>
                         <label class="label">Dátum</label>
@@ -284,125 +285,13 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" onclick="closeManualAppointmentModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
+                    <button type="button" onclick="closeManualAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
                     <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50">Uložiť rezerváciu</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    function openManualAppointmentModal() {
-        document.getElementById('manualAppointmentModal').classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        $('#manualAppointmentModal .nice-select').niceSelect('update');
-        checkBusySlots();
-    }
-
-    function closeManualAppointmentModal() {
-        document.getElementById('manualAppointmentModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    function checkBusySlots() {
-        const date = document.getElementById('manual_date').value;
-        const employeeId = document.getElementById('manual_employee_select')?.value || '';
-        const profileId = document.getElementById('manual_profile_id').value;
-        const timeSelect = document.getElementById('manual_start_time');
-
-        if (!date) return;
-
-        axios.get('/owner/appointments/day-full', { params: { date, employee_id: employeeId, profile_id: profileId } })
-            .then(response => {
-                const appointments = response.data;
-
-                Array.from(timeSelect.options).forEach(option => {
-                    const time = option.value;
-                    const isBusy = appointments.some(app => {
-                        return time >= app.start && time < app.end;
-                    });
-
-                    if (isBusy) {
-                        if (!option.text.includes('(obsadené)')) {
-                            option.text = `${time} (obsadené)`;
-                        }
-                        option.classList.add('busy-option');
-                    } else {
-                        option.text = time;
-                        option.classList.remove('busy-option');
-                    }
-                });
-                $(timeSelect).niceSelect('update');
-            })
-            .catch(err => console.error('Chyba pri kontrole obsadenosti', err));
-    }
-
-    function openRescheduleModal(id, date, startTime, duration, employeeId) {
-        const modal = document.getElementById('rescheduleModal');
-        const form = document.getElementById('rescheduleForm');
-
-        // Update form action with the ID
-        form.action = `/owner/appointments/${id}/reschedule`;
-
-        // Set values
-        document.getElementById('reschedule_date').value = date;
-        document.getElementById('reschedule_start_time').value = startTime;
-        document.getElementById('reschedule_duration').value = duration;
-
-        const employeeSelect = document.getElementById('reschedule_employee_select');
-        if (employeeSelect) {
-            employeeSelect.value = employeeId || '';
-        }
-
-        modal.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        $('#rescheduleModal .nice-select').niceSelect('update');
-    }
-
-    function closeRescheduleModal() {
-        document.getElementById('rescheduleModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    function openEditAppointmentModal(appointment) {
-        const modal = document.getElementById('editAppointmentModal');
-        const form = document.getElementById('editAppointmentForm');
-
-        form.action = `/owner/appointments/${appointment.id}/update`;
-
-        document.getElementById('edit_customer_name').value = appointment.customer_name || '';
-        document.getElementById('edit_customer_phone').value = appointment.customer_phone || '';
-        document.getElementById('edit_service_name').value = appointment.service_name || '';
-        document.getElementById('edit_date').value = appointment.date || '';
-        document.getElementById('edit_start_time').value = appointment.start_time || '';
-        document.getElementById('edit_duration').value = appointment.duration_minutes || '';
-        document.getElementById('edit_price').value = appointment.price || '';
-        document.getElementById('edit_notes').value = appointment.notes || '';
-
-        const employeeSelect = document.getElementById('edit_employee_select');
-        if (employeeSelect) {
-            employeeSelect.value = appointment.employee_id || '';
-        }
-
-        modal.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        $('#editAppointmentModal .nice-select').niceSelect('update');
-    }
-
-    function closeEditAppointmentModal() {
-        document.getElementById('editAppointmentModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    $(document).ready(function() {
-        $('.nice-select').niceSelect();
-
-        $('#manual_date, #manual_employee_select').on('change', function() {
-            checkBusySlots();
-        });
-    });
-</script>
 
 <!-- Edit Appointment Modal -->
 <div id="editAppointmentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
@@ -433,7 +322,7 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="label">Názov služby</label>
-                        <input type="text" name="service_name" id="edit_service_name" class="input-control" required>
+                        <input type="text" name="service_name_manual" id="edit_service_name" class="input-control" required>
                     </div>
                     <div>
                         <label class="label">Dátum</label>
@@ -487,75 +376,106 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
-                    <button type="button" onclick="closeEditAppointmentModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50">Uložiť zmeny</button>
+                    <button type="button" onclick="closeEditAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg">Uložiť zmeny</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Reschedule Appointment Modal -->
-<div id="rescheduleModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeRescheduleModal()"></div>
+<script>
+    function openManualAppointmentModal() {
+        document.getElementById('manualAppointmentModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        if ($.fn.niceSelect) {
+            $('#manualAppointmentModal .nice-select').niceSelect('update');
+        }
+        checkBusySlots();
+    }
 
-        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 overflow-hidden">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-display font-semibold text-slate-900">Presunúť rezerváciu</h3>
-                <button onclick="closeRescheduleModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
+    function closeManualAppointmentModal() {
+        document.getElementById('manualAppointmentModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
 
-            <form id="rescheduleForm" method="POST" action="" class="space-y-4">
-                @csrf
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="label">Nový dátum</label>
-                        <input type="date" name="date" id="reschedule_date" class="input-control" required>
-                    </div>
-                    <div>
-                        <label class="label">Nový čas začiatku</label>
-                        <div class="nice-select-wrapper">
-                            <select name="start_time" id="reschedule_start_time" class="nice-select nice-select-time" required>
-                                @for($h = 7; $h <= 21; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}">{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
-                    </div>
-                </div>
+    function openEditAppointmentModal(appointment) {
+        const modal = document.getElementById('editAppointmentModal');
+        const form = document.getElementById('editAppointmentForm');
 
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="label">Dĺžka (min)</label>
-                        <input type="number" name="duration_minutes" id="reschedule_duration" class="input-control" min="1" required>
-                    </div>
-                    @if($allProfiles->first()->employees->count() > 1)
-                    <div>
-                        <label class="label">Zamestnanec</label>
-                        <div class="nice-select-wrapper">
-                            <select name="employee_id" id="reschedule_employee_select" class="nice-select">
-                                <option value="">Bez zamestnanca</option>
-                                @foreach($allProfiles->first()->employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    @endif
-                </div>
+        form.action = `/owner/appointments/${appointment.id}/update`;
 
-                <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
-                    <button type="button" onclick="closeRescheduleModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-blue-500 text-white font-semibold hover:bg-blue-600 transition shadow-md shadow-blue-200/50">Uložiť zmeny</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+        document.getElementById('edit_customer_name').value = appointment.customer_name || '';
+        document.getElementById('edit_customer_phone').value = appointment.customer_phone || '';
+        document.getElementById('edit_service_name').value = appointment.service_name || '';
+        document.getElementById('edit_date').value = appointment.date || '';
+        document.getElementById('edit_start_time').value = appointment.start_time || '';
+        document.getElementById('edit_duration').value = appointment.duration_minutes || '';
+        document.getElementById('edit_price').value = appointment.price || '';
+        document.getElementById('edit_notes').value = appointment.notes || '';
+
+        const employeeSelect = document.getElementById('edit_employee_select');
+        if (employeeSelect) {
+            employeeSelect.value = appointment.employee_id || '';
+        }
+
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        if ($.fn.niceSelect) {
+            $('#editAppointmentModal .nice-select').niceSelect('update');
+        }
+    }
+
+    function closeEditAppointmentModal() {
+        document.getElementById('editAppointmentModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function checkBusySlots() {
+        const date = document.getElementById('manual_date').value;
+        const employeeId = document.getElementById('manual_employee_select')?.value || '';
+        const profileId = document.getElementById('manual_profile_id').value;
+        const timeSelect = document.getElementById('manual_start_time');
+
+        if (!date) return;
+
+        axios.get('/owner/appointments/day-full', { params: { date, employee_id: employeeId, profile_id: profileId } })
+            .then(response => {
+                const appointments = response.data;
+
+                Array.from(timeSelect.options).forEach(option => {
+                    const time = option.value;
+                    const isBusy = appointments.some(app => {
+                        const appStart = new Date(app.start_at).toTimeString().slice(0, 5);
+                        const appEnd = new Date(app.end_at).toTimeString().slice(0, 5);
+                        return time >= appStart && time < appEnd;
+                    });
+
+                    if (isBusy) {
+                        if (!option.text.includes('(obsadené)')) {
+                            option.text = `${time} (obsadené)`;
+                        }
+                        option.classList.add('busy-option');
+                    } else {
+                        option.text = time;
+                        option.classList.remove('busy-option');
+                    }
+                });
+                if ($.fn.niceSelect) {
+                    $(timeSelect).niceSelect('update');
+                }
+            })
+            .catch(err => console.error('Chyba pri kontrole obsadenosti', err));
+    }
+
+    $(document).ready(function() {
+        if ($.fn.niceSelect) {
+            $('.nice-select').niceSelect();
+        }
+
+        $('#manual_date, #manual_employee_select').on('change', function() {
+            checkBusySlots();
+        });
+    });
+</script>
 @endsection

@@ -1,42 +1,37 @@
-@extends('layouts.app')
+@extends('layouts.owner')
 
 @section('content')
-<section class="pt-12 pb-6 space-y-6">
-    <div class="flex items-center justify-between gap-3 mb-6">
+<div class="space-y-6">
+    <div class="flex items-center justify-between gap-3 mb-2">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Prevádzka</p>
             <h1 class="font-display text-3xl text-slate-900">Môj tím</h1>
+            <p class="text-sm text-slate-500">Správa zamestnancov a ich priradenie k prevádzke.</p>
         </div>
-        <div class="flex gap-2">
-            <button onclick="openAddEmployeeModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>Pridať člena tímu</span>
-            </button>
-        </div>
+        <button onclick="openAddEmployeeModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Pridať člena tímu</span>
+        </button>
     </div>
 
-    @include('owner.partials.nav')
-
-    @if(session('status'))
-        <div class="card border-emerald-200 bg-emerald-50 text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <div class="max-w-4xl mx-auto">
+    <div class="grid lg:grid-cols-[1fr,350px] gap-6 items-start">
         <div class="card space-y-3">
             <h2 class="font-semibold text-lg text-slate-900">Aktuálny tím</h2>
             <div class="space-y-3 max-h-[75vh] overflow-y-auto pr-1">
                 @forelse($employees as $employee)
-                    <div class="border border-slate-100 rounded-xl p-4 bg-white/80 space-y-3 shadow-sm">
+                    <div class="border border-slate-100 rounded-xl p-4 bg-white/80 space-y-3 shadow-sm hover:border-emerald-100 transition-colors">
                         <div class="flex items-center justify-between gap-3">
-                            <div>
-                                <h3 class="font-bold text-slate-900">{{ $employee->name }}</h3>
-                                <p class="text-xs text-slate-500 uppercase tracking-wider">{{ $employee->profile->name }}</p>
-                                <p class="text-sm text-slate-600 mt-1">
-                                    {{ $employee->email ?? 'Bez e-mailu' }}
-                                    @if($employee->phone) • {{ $employee->phone }} @endif
-                                </p>
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold uppercase border-2 border-white shadow-sm">
+                                    {{ substr($employee->name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900">{{ $employee->name }}</h3>
+                                    <p class="text-xs text-slate-500 uppercase tracking-wider">{{ $employee->profile->name }}</p>
+                                    <p class="text-xs text-slate-600 mt-0.5">
+                                        {{ $employee->email ?? 'Bez e-mailu' }}
+                                        @if($employee->phone) • {{ $employee->phone }} @endif
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -63,12 +58,24 @@
                         </details>
                     </div>
                 @empty
-                    <p class="text-sm text-slate-500">Zatiaľ nemáte v tíme žiadnych zamestnancov.</p>
+                    <p class="text-sm text-slate-500 italic p-8 text-center">Zatiaľ nemáte v tíme žiadnych zamestnancov.</p>
                 @endforelse
             </div>
         </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Informácia
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Zamestnanci sú kľúčovou súčasťou vášho rezervačného systému. Každému členovi tímu môžete priradiť konkrétne služby v sekcii Služby.
+                </p>
+            </div>
+        </div>
     </div>
-</section>
+</div>
 
 <!-- Add Employee Modal -->
 <div id="addEmployeeModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
@@ -111,7 +118,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
-                    <button type="button" onclick="closeAddEmployeeModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
+                    <button type="button" onclick="closeAddEmployeeModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
                     <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-200/50">Uložiť zamestnanca</button>
                 </div>
             </form>
@@ -121,18 +128,22 @@
 
 <script>
     $(document).ready(function() {
-        $('.nice-select').niceSelect();
+        if ($.fn.niceSelect) {
+            $('.nice-select').niceSelect();
+        }
     });
 
     function openAddEmployeeModal() {
         document.getElementById('addEmployeeModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        $('#addEmployeeModal .nice-select').niceSelect('update');
+        document.body.classList.add('overflow-hidden');
+        if ($.fn.niceSelect) {
+            $('#addEmployeeModal .nice-select').niceSelect('update');
+        }
     }
 
     function closeAddEmployeeModal() {
         document.getElementById('addEmployeeModal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
+        document.body.classList.remove('overflow-hidden');
     }
 </script>
 @endsection

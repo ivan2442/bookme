@@ -1,30 +1,19 @@
-@extends('layouts.app')
+@extends('layouts.owner')
 
 @section('content')
-<div class="overflow-x-hidden">
-<section class="pt-12 pb-6 space-y-6">
-    <div class="flex items-center justify-between gap-3 mb-6">
+<div class="space-y-6">
+    <div class="flex items-center justify-between gap-3 mb-2">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Prevádzka</p>
             <h1 class="font-display text-3xl text-slate-900">Pracovná doba</h1>
+            <p class="text-sm text-slate-500">Definícia otváracích hodín a dostupnosti vášho tímu.</p>
         </div>
-        <div class="flex gap-2">
-            <button onclick="openAddScheduleModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>Pridať pracovný čas</span>
-            </button>
-        </div>
+        <button onclick="openAddScheduleModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Pridať čas</span>
+        </button>
     </div>
 
-    @include('owner.partials.nav')
-
-    @if(session('status'))
-        <div class="card border-emerald-200 bg-emerald-50 text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <div class="max-w-4xl mx-auto">
+    <div class="grid lg:grid-cols-[1fr,350px] gap-6 items-start">
         <div class="card space-y-3">
             <h2 class="font-semibold text-lg text-slate-900">Aktuálny rozvrh</h2>
             <div class="space-y-3 max-h-[75vh] overflow-y-auto pr-1">
@@ -32,7 +21,7 @@
                     $daysNames = [1=>'Pondelok',2=>'Utorok',3=>'Streda',4=>'Štvrtok',5=>'Piatok',6=>'Sobota',0=>'Nedeľa'];
                 @endphp
                 @forelse($schedules as $schedule)
-                    <div class="border border-slate-100 rounded-xl p-4 bg-white/80 flex items-center justify-between gap-3 shadow-sm">
+                    <div class="border border-slate-100 rounded-xl p-4 bg-white/80 flex items-center justify-between gap-3 shadow-sm hover:border-emerald-100 transition-colors">
                         <div>
                             <p class="font-bold text-slate-900">{{ isset($daysNames[$schedule->day_of_week]) ? $daysNames[$schedule->day_of_week] : 'Neznámy deň' }}</p>
                             <p class="text-sm text-slate-600">
@@ -53,24 +42,36 @@
                         <div class="flex items-center gap-1">
                             <button type="button"
                                 onclick="openEditModal({{ $schedule->id }}, {{ $schedule->profile_id }}, {{ $schedule->employee_id ?? 'null' }}, {{ $schedule->day_of_week }}, '{{ substr($schedule->start_time, 0, 5) }}', '{{ substr($schedule->end_time, 0, 5) }}', {{ $schedule->breaks->isNotEmpty() ? 'true' : 'false' }}, '{{ $schedule->breaks->isNotEmpty() ? substr($schedule->breaks->first()->start_time, 0, 5) : '' }}', '{{ $schedule->breaks->isNotEmpty() ? substr($schedule->breaks->first()->end_time, 0, 5) : '' }}')"
-                                class="p-2 text-slate-300 hover:text-blue-500 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                class="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
-                            <form method="POST" action="{{ route('owner.schedules.delete', $schedule) }}" onsubmit="return confirmDelete(event, 'Naozaj odstrániť tento čas?')">
+                            <form method="POST" action="{{ route('owner.schedules.delete', $schedule) }}" onsubmit="return confirmDelete(event, 'Naozaj odstrániť tento pracovný čas?')">
                                 @csrf @method('DELETE')
-                                <button class="p-2 text-slate-300 hover:text-red-500 transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                <button type="submit" class="p-2 rounded-lg bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                             </form>
                         </div>
                     </div>
                 @empty
-                    <p class="text-sm text-slate-500 italic text-center py-4">Zatiaľ nie sú nastavené žiadne pracovné časy.</p>
+                    <p class="text-sm text-slate-500 italic p-8 text-center">Zatiaľ nie sú nastavené žiadne pracovné časy.</p>
                 @endforelse
             </div>
         </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Informácia
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Nastavte si pracovnú dobu pre celú prevádzku alebo individuálne pre jednotlivých zamestnancov. Systém automaticky vygeneruje voľné termíny na základe týchto nastavení.
+                </p>
+            </div>
+        </div>
     </div>
-</section>
+</div>
 
 <!-- Add Schedule Modal -->
 <div id="addScheduleModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
@@ -130,7 +131,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">Otvárame o</label>
                         <div class="nice-select-wrapper">
@@ -258,7 +259,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">Otvárame o</label>
                         <div class="nice-select-wrapper">
@@ -337,13 +338,17 @@
 
 <script>
     $(document).ready(function() {
-        $('.nice-select').niceSelect();
+        if ($.fn.niceSelect) {
+            $('.nice-select').niceSelect();
+        }
     });
 
     function openAddScheduleModal() {
         document.getElementById('addScheduleModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        $('#addScheduleModal .nice-select').niceSelect('update');
+        document.body.classList.add('overflow-hidden');
+        if ($.fn.niceSelect) {
+            $('#addScheduleModal .nice-select').niceSelect('update');
+        }
     }
 
     function closeAddScheduleModal() {
@@ -357,7 +362,6 @@
 
     function selectWorkDays() {
         clearDays();
-        // 1-5 are Monday-Friday
         document.querySelectorAll('.day-checkbox').forEach(cb => {
             if (['1', '2', '3', '4', '5'].includes(cb.value)) {
                 cb.checked = true;
@@ -382,7 +386,7 @@
         const modal = document.getElementById('editScheduleModal');
         const form = document.getElementById('editScheduleForm');
 
-        form.action = `/owner/schedules/${id}`;
+        form.action = `/owner/schedules/${id}/update`;
         document.getElementById('edit_schedule_id').value = id;
         document.getElementById('edit_profile_id').value = profileId;
         document.getElementById('edit_employee_id').value = employeeId || '';
@@ -405,8 +409,10 @@
         }
 
         modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        $('#editScheduleModal .nice-select').niceSelect('update');
+        document.body.classList.add('overflow-hidden');
+        if ($.fn.niceSelect) {
+            $('#editScheduleModal .nice-select').niceSelect('update');
+        }
     }
 
     function closeEditModal() {
@@ -414,6 +420,5 @@
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
-    </script>
-</div>
+</script>
 @endsection

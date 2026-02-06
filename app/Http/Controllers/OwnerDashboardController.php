@@ -79,6 +79,7 @@ class OwnerDashboardController extends Controller
                     'employee_id' => $a->employee_id,
                     'date_raw' => $a->start_at->format('Y-m-d'),
                     'reschedule_url' => route('owner.appointments.reschedule', $a),
+                    'confirm_url' => route('owner.appointments.confirm', $a),
                     'status_update_url' => route('owner.appointments.status.update', $a),
                     'delete_url' => route('owner.appointments.delete', $a),
                 ];

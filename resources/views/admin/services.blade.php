@@ -1,27 +1,18 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<section class="pt-12 pb-6 space-y-6">
+<div class="space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Admin</p>
             <h1 class="font-display text-3xl text-slate-900">Služby a varianty</h1>
+            <p class="text-sm text-slate-500">Globálna správa služieb pre všetky prevádzky.</p>
         </div>
-        <span class="badge">CRUD</span>
     </div>
 
-    @include('admin.partials.nav')
-
-    @if(session('status'))
-        <div class="card border-emerald-200 bg-emerald-50 text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <div class="grid lg:grid-cols-[1.3fr,1fr] gap-4">
-        <div class="card space-y-4">
-            <h2 class="font-semibold text-lg text-slate-900">Pridať službu</h2>
-            <form method="POST" action="{{ route('admin.services.store') }}" class="space-y-3">
+    <div class="grid lg:grid-cols-[1.3fr,1fr] gap-6">
+        <div class="card space-y-6 p-6">
+            <h2 class="text-xl font-bold text-slate-900">Pridať službu</h2>
+            <form method="POST" action="{{ route('admin.services.store') }}" class="space-y-4">
                 @csrf
                 <div>
                     <label class="label">Prevádzka</label>
@@ -205,7 +196,7 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <script>
     function togglePakavozKeyAdmin(id) {

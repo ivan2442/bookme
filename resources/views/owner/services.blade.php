@@ -1,34 +1,24 @@
-@extends('layouts.app')
+@extends('layouts.owner')
 
 @section('content')
-<section class="pt-12 pb-6 space-y-6">
-    <div class="flex items-center justify-between gap-3 mb-6">
+<div class="space-y-6">
+    <div class="flex items-center justify-between gap-3 mb-2">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Prevádzka</p>
             <h1 class="font-display text-3xl text-slate-900">Moje služby</h1>
+            <p class="text-sm text-slate-500">Správa ponuky služieb pre vašu prevádzku.</p>
         </div>
-        <div class="flex gap-2">
-            <button onclick="openAddServiceModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>Pridať novú službu</span>
-            </button>
-        </div>
+        <button onclick="openAddServiceModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Pridať službu</span>
+        </button>
     </div>
 
-    @include('owner.partials.nav')
-
-    @if(session('status'))
-        <div class="card border-emerald-200 bg-emerald-50 text-emerald-900">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <div class="max-w-4xl mx-auto">
+    <div class="grid lg:grid-cols-[1fr,350px] gap-6 items-start">
         <div class="card space-y-3">
             <h2 class="font-semibold text-lg text-slate-900">Zoznam služieb</h2>
             <div class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
                 @forelse($services as $service)
-                    <div class="border border-slate-100 rounded-xl p-4 bg-white/80 space-y-3 shadow-sm">
+                    <div class="border border-slate-100 rounded-xl p-4 bg-white/80 space-y-3 shadow-sm hover:border-emerald-100 transition-colors">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h3 class="font-bold text-slate-900">{{ $service->name }}</h3>
@@ -85,47 +75,26 @@
                                 <button class="w-full px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">Uložiť zmeny</button>
                             </form>
                         </details>
-
-{{--
-                        <div class="mt-4 space-y-2">
-                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Varianty služby</p>
-                            @foreach($service->variants as $variant)
-                                <div class="bg-slate-50 rounded-lg p-2 text-sm flex items-center justify-between group">
-                                    <span>{{ $variant->name }} ({{ $variant->duration_minutes }} min)</span>
-                                    <div class="flex items-center gap-3">
-                                        <span class="font-bold">€{{ number_format($variant->price, 2) }}</span>
-                                        <form action="{{ route('owner.services.variants.delete', [$service, $variant]) }}" method="POST" onsubmit="return confirmDelete(event, 'Odstrániť variant?')">
-                                            @csrf @method('DELETE')
-                                            <button class="text-slate-300 hover:text-red-500">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            @endforeach
-
-                            <details class="text-sm">
-                                <summary class="cursor-pointer text-emerald-600 hover:text-emerald-700 font-medium py-1">+ Pridať variant</summary>
-                                <form method="POST" action="{{ route('owner.services.variants.store', $service) }}" class="space-y-2 mt-2 pt-2 border-t border-slate-100">
-                                    @csrf
-                                    <input type="text" name="name" class="input-control !py-1.5 !text-sm" placeholder="Názov variantu (napr. S umytím)" required>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <input type="number" name="duration_minutes" class="input-control !py-1.5 !text-sm" placeholder="Extra čas (min)" required>
-                                        <input type="number" name="price" class="input-control !py-1.5 !text-sm" placeholder="Extra cena (€)" step="0.01" required>
-                                    </div>
-                                    <button class="w-full px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold">Pridať variant</button>
-                                </form>
-                            </details>
-                        </div>
---}}
                     </div>
                 @empty
-                    <p class="text-sm text-slate-500">Zatiaľ nemáte žiadne služby.</p>
+                    <p class="text-sm text-slate-500 italic p-8 text-center">Zatiaľ nemáte pridané žiadne služby.</p>
                 @endforelse
             </div>
         </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Informácia
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Služby definujú, čo ponúkate svojim klientom. Môžete nastaviť dĺžku trvania, cenu a priradiť konkrétnych zamestnancov, ktorí danú službu vykonávajú.
+                </p>
+            </div>
+        </div>
     </div>
-</section>
+</div>
 
 <!-- Add Service Modal -->
 <div id="addServiceModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
@@ -209,18 +178,22 @@
 
 <script>
     $(document).ready(function() {
-        $('.nice-select').niceSelect();
+        if ($.fn.niceSelect) {
+            $('.nice-select').niceSelect();
+        }
     });
 
     function openAddServiceModal() {
         document.getElementById('addServiceModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        $('#addServiceModal .nice-select').niceSelect('update');
+        document.body.classList.add('overflow-hidden');
+        if ($.fn.niceSelect) {
+            $('#addServiceModal .nice-select').niceSelect('update');
+        }
     }
 
     function closeAddServiceModal() {
         document.getElementById('addServiceModal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
+        document.body.classList.remove('overflow-hidden');
     }
 
     function togglePakavozKey(id) {

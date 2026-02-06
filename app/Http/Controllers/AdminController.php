@@ -288,12 +288,19 @@ class AdminController extends Controller
         return back()->with('status', 'Rezervácia bola odstránená.');
     }
 
-    public function profiles(): View
+    public function profiles(Request $request): View
     {
-        $profiles = Profile::with('owner')->orderBy('created_at', 'desc')->get();
+        $query = Profile::with('owner')->orderBy('created_at', 'desc');
+
+        $plan = $request->query('plan');
+        if (in_array($plan, ['free', 'basic', 'premium'])) {
+            $query->where('subscription_plan', $plan);
+        }
+
+        $profiles = $query->get();
         $owners = \App\Models\User::where('role', 'owner')->orderBy('name')->get();
 
-        return view('admin.profiles', compact('profiles', 'owners'));
+        return view('admin.profiles', compact('profiles', 'owners', 'plan'));
     }
 
     public function storeProfile(Request $request): RedirectResponse
@@ -454,6 +461,29 @@ class AdminController extends Controller
         return back()->with('status', 'Prevádzka bola úspešne zverejnená.');
     }
 
+    public function deleteProfile(Profile $profile): RedirectResponse
+    {
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            if ($profile->logo_path) {
+                Storage::disk('public')->delete($profile->logo_path);
+            }
+            if ($profile->banner_path) {
+                Storage::disk('public')->delete($profile->banner_path);
+            }
+
+            $profile->delete();
+
+            \Illuminate\Support\Facades\DB::commit();
+            return back()->with('status', 'Prevádzka bola odstránená.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Chyba pri odstraňovaní prevádzky: ' . $e->getMessage());
+            return back()->with('error', 'Nepodarilo sa odstrániť prevádzku.');
+        }
+    }
+
     public function schedules(): View
     {
         $profiles = Profile::with('employees')->orderBy('name')->get();
@@ -573,19 +603,36 @@ class AdminController extends Controller
         return back()->with('status', 'Sviatok/uzávierka bola odstránená.');
     }
 
-    public function payments(): View
+    public function payments(Request $request, \App\Services\RevolutService $revolut): View
     {
-        $payments = \App\Models\Payment::with('appointment.profile')->orderBy('created_at', 'desc')->paginate(30);
+        $payments = \App\Models\Payment::with('appointment.profile')->orderBy('created_at', 'desc')->paginate(15);
 
-        return view('admin.payments', compact('payments'));
+        $revolutTransactions = [];
+        $isRevolutConfigured = \App\Models\Setting::get('revolut_client_id') && \App\Models\Setting::get('revolut_refresh_token');
+
+        if ($isRevolutConfigured) {
+            $revolutTransactions = $revolut->getTransactions();
+        }
+
+        return view('admin.payments', compact('payments', 'revolutTransactions', 'isRevolutConfigured'));
     }
 
-    public function invoices(): View
+    public function invoices(Request $request): View
     {
-        $invoices = \App\Models\Invoice::with('profile')->orderBy('created_at', 'desc')->paginate(30);
+        $query = \App\Models\Invoice::with('profile');
+
+        $status = $request->query('status');
+
+        if ($status === 'paid') {
+            $query->where('status', 'paid');
+        } elseif ($status === 'overdue') {
+            $query->where('status', 'unpaid')->where('due_at', '<', now());
+        }
+
+        $invoices = $query->orderBy('created_at', 'desc')->paginate(30)->withQueryString();
         $profiles = Profile::orderBy('name')->get();
 
-        return view('admin.invoices', compact('invoices', 'profiles'));
+        return view('admin.invoices', compact('invoices', 'profiles', 'status'));
     }
 
     public function storeInvoice(Request $request): RedirectResponse
@@ -681,28 +728,42 @@ class AdminController extends Controller
             'swift' => \App\Models\Setting::get('billing_swift'),
         ];
 
-        return view('admin.billing_settings', compact('billingData'));
+        $revolutData = [
+            'client_id' => \App\Models\Setting::get('revolut_client_id'),
+            'jwt' => \App\Models\Setting::get('revolut_jwt'),
+            'refresh_token' => \App\Models\Setting::get('revolut_refresh_token'),
+        ];
+
+        return view('admin.billing_settings', compact('billingData', 'revolutData'));
     }
 
     public function storeBillingSettings(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'address' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:20'],
-            'country' => ['required', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
+            'country' => ['nullable', 'string', 'max:255'],
             'ico' => ['nullable', 'string', 'max:20'],
             'dic' => ['nullable', 'string', 'max:20'],
             'ic_dph' => ['nullable', 'string', 'max:20'],
             'iban' => ['nullable', 'string', 'max:50'],
             'swift' => ['nullable', 'string', 'max:20'],
+            // Revolut
+            'revolut_client_id' => ['nullable', 'string', 'max:255'],
+            'revolut_jwt' => ['nullable', 'string'],
+            'revolut_refresh_token' => ['nullable', 'string', 'max:512'],
         ]);
 
         foreach ($data as $key => $value) {
-            \App\Models\Setting::set('billing_' . $key, $value);
+            if (str_starts_with($key, 'revolut_')) {
+                \App\Models\Setting::set($key, $value);
+            } else {
+                \App\Models\Setting::set('billing_' . $key, $value);
+            }
         }
 
-        return back()->with('status', 'Fakturačné údaje boli uložené.');
+        return back()->with('status', 'Nastavenia boli uložené.');
     }
 }

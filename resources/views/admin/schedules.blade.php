@@ -1,28 +1,18 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<section class="pt-12 pb-6 space-y-6">
+<div class="space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Admin</p>
             <h1 class="font-display text-3xl text-slate-900">Pracovné dni a časy</h1>
+            <p class="text-sm text-slate-500">Definícia otváracích hodín a dostupnosti zamestnancov.</p>
         </div>
-        <span class="badge">Dostupnosť</span>
     </div>
 
-    @include('admin.partials.nav')
-
-    @if(session('error'))
-        <div class="card border-red-200 bg-red-50 text-red-800">{{ session('error') }}</div>
-    @endif
-    @if(session('status'))
-        <div class="card border-emerald-200 bg-emerald-50 text-emerald-800">{{ session('status') }}</div>
-    @endif
-
-    <div class="grid lg:grid-cols-[1.1fr,1fr] gap-4">
-        <div class="card space-y-4">
-            <h2 class="font-semibold text-lg text-slate-900">Pridať pracovný čas</h2>
-            <form method="POST" action="{{ route('admin.schedules.store') }}" class="space-y-3">
+    <div class="grid lg:grid-cols-[1.1fr,1fr] gap-6">
+        <div class="card space-y-6 p-6">
+            <h2 class="text-xl font-bold text-slate-900">Pridať pracovný čas</h2>
+            <form method="POST" action="{{ route('admin.schedules.store') }}" class="space-y-4">
                 @csrf
                 <div>
                     <label class="label">Prevádzka</label>
@@ -96,5 +86,5 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 @endsection

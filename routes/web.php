@@ -38,6 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/profiles', [AdminController::class, 'profiles'])->name('profiles');
     Route::post('/profiles', [AdminController::class, 'storeProfile'])->name('profiles.store');
     Route::post('/profiles/{profile}', [AdminController::class, 'updateProfile'])->name('profiles.update');
+    Route::delete('/profiles/{profile}', [AdminController::class, 'deleteProfile'])->name('profiles.delete');
     Route::post('/profiles/{profile}/publish', [AdminController::class, 'publishProfile'])->name('profiles.publish');
 
     Route::get('/schedules', [AdminController::class, 'schedules'])->name('schedules');

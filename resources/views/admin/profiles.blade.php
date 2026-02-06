@@ -1,43 +1,38 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<section class="pt-12 pb-6 space-y-6">
+<div class="space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
-            <p class="text-xs uppercase tracking-widest text-slate-500">Admin</p>
-            <h1 class="font-display text-3xl text-slate-900">Prevádzky</h1>
+            <h1 class="font-display text-3xl text-slate-900">Správa prevádzok</h1>
+            <p class="text-sm text-slate-500">Prehľad a správa registrovaných prevádzok v systéme.</p>
         </div>
-        <div class="flex items-center gap-3">
-            <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200">
-                Pridať prevádzku
-            </button>
-            <span class="badge">Správa</span>
-        </div>
+        <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200">
+            + Pridať prevádzku
+        </button>
     </div>
 
-    @include('admin.partials.nav')
 
-    @if($errors->any())
-        <div class="card border-red-200 bg-red-50 text-red-800">
-            <ul class="list-disc list-inside">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="card border-red-200 bg-red-50 text-red-800">{{ session('error') }}</div>
-    @endif
-    @if(session('status'))
-        <div class="card border-emerald-200 bg-emerald-50 text-emerald-800">{{ session('status') }}</div>
-    @endif
+    <div class="flex flex-wrap gap-2 mb-6">
+        <a href="{{ route('admin.profiles') }}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all {{ !$plan ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100' }}">
+            Všetky
+        </a>
+        <a href="{{ route('admin.profiles', ['plan' => 'premium']) }}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all {{ $plan === 'premium' ? 'bg-amber-500 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100' }}">
+            Premium
+        </a>
+        <a href="{{ route('admin.profiles', ['plan' => 'basic']) }}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all {{ $plan === 'basic' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100' }}">
+            Basic
+        </a>
+        <a href="{{ route('admin.profiles', ['plan' => 'free']) }}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all {{ $plan === 'free' ? 'bg-emerald-500 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100' }}">
+            Trial
+        </a>
+    </div>
 
     <div class="card space-y-3">
         <div class="flex items-center justify-between gap-3">
             <h2 class="font-semibold text-lg text-slate-900">Zoznam prevádzok</h2>
             <div class="relative flex-1 max-w-xs">
-                <input type="text" id="profile-search" class="input-control !py-2 !text-sm pl-9" placeholder="Hľadať prevádzku...">
+                <input type="text" id="profile-search" class="input-control !py-2 !text-sm pl-10" placeholder="Hľadať prevádzku...">
                 <svg class="w-4 h-4 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
         </div>
@@ -93,7 +88,7 @@
                                 class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition">
                                 Upraviť
                         </button>
-                        <form action="{{ route('admin.profiles.update', $profile) }}" method="POST" onsubmit="return confirmDelete(event, 'Naozaj chcete odstrániť túto prevádzku? (Zmeňte stav na neaktívny alebo ju vymažte z DB ak je to implementované)')">
+                        <form action="{{ route('admin.profiles.delete', $profile) }}" method="POST" onsubmit="return confirmDelete(event, 'Naozaj chcete odstrániť túto prevádzku?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition">
@@ -431,5 +426,4 @@
         });
     });
 </script>
-</section>
 @endsection
