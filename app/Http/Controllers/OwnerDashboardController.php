@@ -27,19 +27,27 @@ class OwnerDashboardController extends Controller
         $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
 
         $now = Carbon::now();
+        $todayStart = $now->copy()->startOfDay();
+        $todayEnd = $now->copy()->endOfDay();
         $monthStart = $now->copy()->startOfMonth();
 
-        $appointmentsQuery = Appointment::with(['profile', 'service', 'employee'])
-            ->whereIn('profile_id', $profileIds);
+        // Base query for stats - NO eager loading here for better performance
+        $baseQuery = Appointment::whereIn('profile_id', $profileIds);
 
         $stats = [
-            'appointments_today' => (clone $appointmentsQuery)->whereDate('start_at', $now)->count(),
-            'appointments_month' => (clone $appointmentsQuery)->whereBetween('start_at', [$monthStart, $now])->count(),
+            'appointments_today' => (clone $baseQuery)->whereBetween('start_at', [$todayStart, $todayEnd])->count(),
+            'appointments_month' => (clone $baseQuery)->whereBetween('start_at', [$monthStart, $now])->count(),
             'services' => Service::whereIn('profile_id', $profileIds)->count(),
+            'revenue_today' => (clone $baseQuery)
+                ->whereBetween('start_at', [$todayStart, $todayEnd])
+                ->where('status', 'completed')
+                ->sum('price'),
         ];
 
-        // Fetch all appointments for these profiles to allow JS filtering or initially for today
-        $upcoming = (clone $appointmentsQuery)
+        // Fetch only today's non-completed appointments with eager loading
+        $upcoming = (clone $baseQuery)
+            ->with(['profile', 'service', 'employee'])
+            ->whereBetween('start_at', [$todayStart, $todayEnd])
             ->where('status', '!=', 'completed')
             ->orderBy('start_at')
             ->get();
@@ -54,10 +62,12 @@ class OwnerDashboardController extends Controller
         $user = $request->user();
         $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
         $date = $request->date;
+        $dayStart = Carbon::parse($date)->startOfDay();
+        $dayEnd = Carbon::parse($date)->endOfDay();
 
         $appointments = Appointment::with(['profile', 'service', 'employee'])
             ->whereIn('profile_id', $profileIds)
-            ->whereDate('start_at', $date)
+            ->whereBetween('start_at', [$dayStart, $dayEnd])
             ->where('status', '!=', 'completed')
             ->orderBy('start_at')
             ->get()
@@ -94,9 +104,11 @@ class OwnerDashboardController extends Controller
         $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
         $date = $request->date;
         $employeeId = $request->employee_id;
+        $dayStart = Carbon::parse($date)->startOfDay();
+        $dayEnd = Carbon::parse($date)->endOfDay();
 
         $query = Appointment::whereIn('profile_id', $profileIds)
-            ->whereDate('start_at', $date)
+            ->whereBetween('start_at', [$dayStart, $dayEnd])
             ->where('status', '!=', 'cancelled');
 
         if ($employeeId) {
@@ -778,16 +790,15 @@ class OwnerDashboardController extends Controller
             9 => 'September', 10 => 'Október', 11 => 'November', 12 => 'December'
         ];
 
-        // Vybraný mesiac - vybavené rezervácie
-        $monthlyAppointments = Appointment::whereIn('profile_id', $profileIds)
+        // Vybraný mesiac - štatistiky (optimalizované query)
+        $statsBaseQuery = Appointment::whereIn('profile_id', $profileIds)
             ->where('status', 'completed')
-            ->whereBetween('start_at', [$startOfMonth, $endOfMonth])
-            ->get();
+            ->whereBetween('start_at', [$startOfMonth, $endOfMonth]);
 
         $stats = [
-            'count' => $monthlyAppointments->count(),
-            'revenue' => $monthlyAppointments->sum('price'),
-            'hours' => $monthlyAppointments->reduce(function ($carry, $appointment) {
+            'count' => (clone $statsBaseQuery)->count(),
+            'revenue' => (clone $statsBaseQuery)->sum('price'),
+            'hours' => (clone $statsBaseQuery)->get(['start_at', 'end_at'])->reduce(function ($carry, $appointment) {
                 if ($appointment->start_at && $appointment->end_at) {
                     return $carry + $appointment->start_at->diffInMinutes($appointment->end_at);
                 }

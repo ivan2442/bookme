@@ -81,7 +81,7 @@
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tržba</span>
             </div>
             <div>
-                <p class="text-3xl font-bold text-slate-900">€{{ number_format($upcoming->where('status', 'completed')->sum('price'), 2) }}</p>
+                <p class="text-3xl font-bold text-slate-900">€{{ number_format($stats['revenue_today'], 2) }}</p>
                 <p class="text-sm text-slate-500 font-medium">Vybavené objednávky</p>
             </div>
         </div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
                 <div class="divide-y divide-slate-100" id="appointments-list">
-                    @forelse($upcoming->filter(fn($a) => $a->status !== 'completed' && $a->start_at->isToday())->sortBy('start_at') as $appointment)
+                    @forelse($upcoming as $appointment)
                         <div class="px-6 py-5 px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-slate-50/50 transition-colors">
                             <div class="flex items-center gap-4">
                                 <div class="text-center min-w-[50px] px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">
