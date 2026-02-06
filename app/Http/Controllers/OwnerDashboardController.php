@@ -65,9 +65,13 @@ class OwnerDashboardController extends Controller
         $dayStart = Carbon::parse($date)->startOfDay();
         $dayEnd = Carbon::parse($date)->endOfDay();
 
-        $appointments = Appointment::with(['profile', 'service', 'employee'])
-            ->whereIn('profile_id', $profileIds)
-            ->whereBetween('start_at', [$dayStart, $dayEnd])
+        $query = Appointment::whereIn('profile_id', $profileIds)
+            ->whereBetween('start_at', [$dayStart, $dayEnd]);
+
+        $revenue = (clone $query)->where('status', 'completed')->sum('price');
+
+        $appointments = (clone $query)
+            ->with(['profile', 'service', 'employee'])
             ->where('status', '!=', 'completed')
             ->orderBy('start_at')
             ->get()
@@ -95,7 +99,11 @@ class OwnerDashboardController extends Controller
                 ];
             });
 
-        return response()->json($appointments);
+        return response()->json([
+            'appointments' => $appointments,
+            'revenue' => (float) $revenue,
+            'revenue_formatted' => number_format($revenue, 2, ',', ' ')
+        ]);
     }
 
     public function getAppointmentsForDayFull(Request $request): JsonResponse

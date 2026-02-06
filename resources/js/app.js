@@ -1193,12 +1193,18 @@ function initAdminDashboard() {
     async function fetchAdminAppointments(date) {
         if (!appointmentsList) return;
 
+        const revenueElement = document.getElementById('revenue-today-value');
+
         // Loading animation
         appointmentsList.innerHTML = `
             <div class="flex items-center justify-center py-12">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
             </div>
         `;
+
+        if (revenueElement) {
+            revenueElement.classList.add('opacity-50');
+        }
 
         // Predbežný vizuálny feedback
         const d = new Date(date);
@@ -1208,7 +1214,13 @@ function initAdminDashboard() {
 
         try {
             const response = await axios.get(`/owner/appointments/day?date=${date}`);
-            const appointments = response.data;
+            const data = response.data;
+            const appointments = data.appointments;
+
+            if (revenueElement) {
+                revenueElement.textContent = data.revenue_formatted;
+                revenueElement.classList.remove('opacity-50');
+            }
 
             if (appointments.length === 0) {
                 appointmentsList.innerHTML = `
