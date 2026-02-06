@@ -85,6 +85,7 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     Route::get('/appointments', [OwnerDashboardController::class, 'appointments'])->name('appointments');
     Route::get('/appointments/day', [OwnerDashboardController::class, 'getAppointmentsForDay'])->name('appointments.day');
     Route::get('/appointments/day-full', [OwnerDashboardController::class, 'getAppointmentsForDayFull'])->name('appointments.day-full');
+    Route::get('/appointments/free-slots', [OwnerDashboardController::class, 'getFreeSlots'])->name('appointments.free-slots');
     Route::post('/appointments', [OwnerDashboardController::class, 'storeManualAppointment'])->name('appointments.manual.store');
     Route::post('/appointments/{appointment}/confirm', [OwnerDashboardController::class, 'confirmAppointment'])->name('appointments.confirm');
     Route::post('/appointments/{appointment}/status', [OwnerDashboardController::class, 'updateAppointmentStatus'])->name('appointments.status.update');

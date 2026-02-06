@@ -1158,7 +1158,8 @@ function initAdminDashboard() {
     function renderAdminCalendar() {
         if (!adminCalGrid || !adminCalMonth) return;
         const start = adminState.calendarStart;
-        const monthFormatter = new Intl.DateTimeFormat('sk-SK', { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
+        const locale = window.locale || 'sk-SK';
+        const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
         adminCalMonth.textContent = monthFormatter.format(start);
 
         adminCalGrid.querySelectorAll('.calendar-item').forEach((el) => el.remove());
@@ -1193,6 +1194,7 @@ function initAdminDashboard() {
     async function fetchAdminAppointments(date) {
         if (!appointmentsList) return;
 
+        const translations = window.translations || {};
         const revenueElement = document.getElementById('revenue-today-value');
 
         // Loading animation
@@ -1208,8 +1210,20 @@ function initAdminDashboard() {
 
         // Predbežný vizuálny feedback
         const d = new Date(date);
-        const dayNames = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
-        const formattedTitle = (d.toDateString() === new Date().toDateString()) ? 'Termíny na dnes' : `Termíny na ${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${dayNames[d.getDay()]}`;
+        const dayNames = [
+            translations["Sunday"] || 'Nedeľa',
+            translations["Monday"] || 'Pondelok',
+            translations["Tuesday"] || 'Utorok',
+            translations["Wednesday"] || 'Streda',
+            translations["Thursday"] || 'Štvrtok',
+            translations["Friday"] || 'Piatok',
+            translations["Saturday"] || 'Sobota'
+        ];
+
+        const formattedTitle = (d.toDateString() === new Date().toDateString())
+            ? (translations["Appointments for today"] || 'Termíny na dnes')
+            : `${translations["Appointments for"] || 'Termíny na'} ${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${dayNames[d.getDay()]}`;
+
         if (upcomingTitle) upcomingTitle.textContent = formattedTitle;
 
         try {
@@ -1225,7 +1239,7 @@ function initAdminDashboard() {
             if (appointments.length === 0) {
                 appointmentsList.innerHTML = `
                     <div class="py-8 text-center" id="no-appointments">
-                        <p class="text-sm text-slate-500 italic">Žiadne nadchádzajúce rezervácie na tento deň.</p>
+                        <p class="text-sm text-slate-500 italic">${translations["No upcoming appointments for this day."] || 'Žiadne nadchádzajúce rezervácie na tento deň.'}</p>
                     </div>`;
                 return;
             }
@@ -1242,17 +1256,19 @@ function initAdminDashboard() {
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
-                            ${a.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
-                               (a.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                               (a.status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500'))}">
-                            ${a.status === 'completed' ? 'Vybavené' : (a.status === 'confirmed' ? 'Potvrdené' : (a.status === 'pending' ? 'Čaká' : a.status))}
-                        </span>
+                        ${a.status !== 'confirmed' || (a.requires_confirmation ?? true) ? `
+                            <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
+                                ${a.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                                   (a.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                   (a.status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500'))}">
+                                ${a.status === 'completed' ? (translations["Completed"] || 'Vybavené') : (a.status === 'confirmed' ? (translations["Confirmed"] || 'Potvrdené') : (a.status === 'pending' ? (translations["Pending"] || 'Čaká') : a.status))}
+                            </span>
+                        ` : ''}
                         <div class="flex items-center gap-1">
                             ${a.status === 'pending' ? `
                                 <form method="POST" action="${a.confirm_url}">
                                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                                    <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="Potvrdiť">
+                                    <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="${translations["Confirm"] || 'Potvrdiť'}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
                                 </form>
@@ -1262,8 +1278,8 @@ function initAdminDashboard() {
                                 <form method="POST" action="${a.status_update_url}">
                                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                                     <input type="hidden" name="status" value="completed">
-                                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="Označiť ako vybavené">
-                                        Vybavené
+                                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="${translations["Mark as completed"] || 'Označiť ako vybavené'}">
+                                        ${translations["Completed"] || 'Vybavené'}
                                     </button>
                                 </form>
                             ` : ''}
@@ -1279,15 +1295,15 @@ function initAdminDashboard() {
                                 price: a.price,
                                 employee_id: a.employee_id,
                                 notes: ''
-                            })})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="Presunúť">
-                                Presunúť
+                            })})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="${translations["Reschedule"] || 'Presunúť'}">
+                                ${translations["Reschedule"] || 'Presunúť'}
                             </button>
 
-                            <form method="POST" action="${a.delete_url}" onsubmit="return confirm('Naozaj chcete vymazať túto rezerváciu?')">
+                            <form method="POST" action="${a.delete_url}" onsubmit="return confirm('${translations["Are you sure you want to delete this appointment?"] || 'Naozaj chcete vymazať túto rezerváciu?'}')">
                                 <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="Vymazať">
-                                    Vymazať
+                                <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="${translations["Delete"] || 'Vymazať'}">
+                                    ${translations["Delete"] || 'Vymazať'}
                                 </button>
                             </form>
                         </div>
@@ -1296,7 +1312,7 @@ function initAdminDashboard() {
             `).join('');
         } catch (error) {
             console.error('Chyba pri načítaní termínov', error);
-            appointmentsList.innerHTML = '<div class="py-8 text-center text-red-500">Nepodarilo sa načítať termíny.</div>';
+            appointmentsList.innerHTML = `<div class="py-8 text-center text-red-500">${translations["Failed to load appointments."] || 'Nepodarilo sa načítať termíny.'}</div>`;
         }
     }
 

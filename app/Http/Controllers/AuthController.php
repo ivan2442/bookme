@@ -31,7 +31,7 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (! Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
-            return back()->withInput()->with('error', 'Nesprávne prihlasovacie údaje.');
+            return back()->withInput()->with('error', __('Invalid login credentials.'));
         }
 
         $request->session()->regenerate();
@@ -102,11 +102,11 @@ class AuthController extends Controller
 
             Auth::login($user);
 
-            return redirect()->route('owner.dashboard')->with('status', 'Registrácia prebehla úspešne. Vaša prevádzka bude po odobrení adminom verejná. Momentálne je však plne funkčná cez váš unikátny odkaz.');
+            return redirect()->route('owner.dashboard')->with('status', __('Registration successful. Your business will be public after admin approval. Currently, it is fully functional via your unique link.'));
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Registrácia zlyhala: ' . $e->getMessage());
+            return back()->withInput()->with('error', __('Registration failed:') . ' ' . $e->getMessage());
         }
     }
 
@@ -117,6 +117,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('auth.login')->with('status', 'Odhlásenie prebehlo.');
+        return redirect()->route('auth.login')->with('status', __('Logout successful.'));
     }
 }

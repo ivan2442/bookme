@@ -40,8 +40,8 @@
                     </p>
                 </div>
             </div>
-            <button onclick="openBookingModal({{ $profile->id }}, null, 'Všeobecná rezervácia', false)" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
-                Rezervovať teraz
+            <button onclick="openBookingModal({{ $profile->id }}, null, '{{ __('General reservation') }}', false)" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
+                {{ __('Book now') }}
             </button>
         </div>
     </div>
@@ -52,17 +52,17 @@
             <section class="space-y-6">
                 <h2 class="text-2xl font-display font-bold text-slate-900 flex items-center gap-3">
                     <span class="w-8 h-1 bg-emerald-500 rounded-full"></span>
-                    O nás
+                    {{ __('About us') }}
                 </h2>
                 <div class="text-slate-600 text-lg leading-relaxed whitespace-pre-line bg-white rounded-[32px] p-8 border border-slate-50 shadow-sm">
-                    {{ $profile->description ?? 'Táto prevádzka zatiaľ nemá pridaný popis.' }}
+                    {{ $profile->description ?? __('Táto prevádzka zatiaľ nemá pridaný popis.') }}
                 </div>
             </section>
 
             <section class="space-y-6">
                 <h2 class="text-2xl font-display font-bold text-slate-900 flex items-center gap-3">
                     <span class="w-8 h-1 bg-emerald-500 rounded-full"></span>
-                    Naša ponuka
+                    {{ __('Our services') }}
                 </h2>
                 <div class="grid sm:grid-cols-1 gap-4">
                     @foreach($profile->services as $service)
@@ -108,23 +108,23 @@
                     <div class="h-10 w-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    Otváracie hodiny
+                    {{ __('Opening hours') }}
                 </h2>
                 <div class="space-y-4">
                     @php
-                        $days = [1 => 'Pondelok', 2 => 'Utorok', 3 => 'Streda', 4 => 'Štvrtok', 5 => 'Piatok', 6 => 'Sobota', 7 => 'Nedeľa'];
+                        $days = [1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'];
                         $schedules = $profile->schedules->groupBy('day_of_week');
                     @endphp
                     @foreach($days as $dayNum => $dayName)
                         <div class="flex items-center justify-between text-sm group">
-                            <span class="text-slate-500 font-medium group-hover:text-slate-900 transition-colors">{{ $dayName }}</span>
+                            <span class="text-slate-500 font-medium group-hover:text-slate-900 transition-colors">{{ __($dayName) }}</span>
                             @if($schedules->has($dayNum))
                                 <span class="text-slate-900 font-bold bg-slate-50 px-3 py-1 rounded-full group-hover:bg-emerald-50 transition-colors">
                                     {{ \Carbon\Carbon::parse($schedules[$dayNum]->first()->start_time)->format('H:i') }} —
                                     {{ \Carbon\Carbon::parse($schedules[$dayNum]->first()->end_time)->format('H:i') }}
                                 </span>
                             @else
-                                <span class="text-rose-400 font-medium italic">Zatvorené</span>
+                                <span class="text-rose-400 font-medium italic">{{ __('Closed') }}</span>
                             @endif
                         </div>
                     @endforeach
@@ -137,7 +137,7 @@
                     <div class="h-10 w-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
-                    Kde nás nájdete
+                    {{ __('Where to find us') }}
                 </h2>
                 <div class="bg-slate-50 p-4 rounded-2xl">
                     <p class="font-bold text-slate-900">{{ $profile->address_line1 }}</p>

@@ -8,6 +8,37 @@
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <script>
+        window.locale = "{{ app()->getLocale() }}";
+        window.translations = {
+            "mon": "{{ __('mon') }}",
+            "tue": "{{ __('tue') }}",
+            "wed": "{{ __('wed') }}",
+            "thu": "{{ __('thu') }}",
+            "fri": "{{ __('fri') }}",
+            "sat": "{{ __('sat') }}",
+            "sun": "{{ __('sun') }}",
+            "Appointments for today": "{{ __('Appointments for today') }}",
+            "Appointments for": "{{ __('Appointments for') }}",
+            "Today": "{{ __('Today') }}",
+            "Monday": "{{ __('Monday') }}",
+            "Tuesday": "{{ __('Tuesday') }}",
+            "Wednesday": "{{ __('Wednesday') }}",
+            "Thursday": "{{ __('Thursday') }}",
+            "Friday": "{{ __('Friday') }}",
+            "Saturday": "{{ __('Saturday') }}",
+            "Sunday": "{{ __('Sunday') }}",
+            "Completed": "{{ __('Completed') }}",
+            "Confirmed": "{{ __('Confirmed') }}",
+            "Pending": "{{ __('Pending') }}",
+            "Confirm": "{{ __('Confirm') }}",
+            "Mark as completed": "{{ __('Mark as completed') }}",
+            "Reschedule": "{{ __('Reschedule') }}",
+            "Delete": "{{ __('Delete') }}",
+            "Are you sure you want to delete this appointment?": "{{ __('Are you sure you want to delete this appointment?') }}",
+            "No upcoming appointments for this day.": "{{ __('No upcoming appointments for this day.') }}"
+        };
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -31,52 +62,52 @@
                 </div>
 
                 <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-4">Prehľad</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-4">{{ __('Prehľad') }}</p>
                     <a href="{{ route('owner.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.dashboard') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Dashboard
+                        {{ __('Dashboard') }}
                     </a>
                     <a href="{{ route('owner.appointments') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.appointments') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Rezervácie
+                        {{ __('Appointments') }}
                     </a>
 
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">Správa prevádzky</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Správa prevádzky') }}</p>
                     <a href="{{ route('owner.services') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.services') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        Služby
+                        {{ __('Services') }}
                     </a>
                     <a href="{{ route('owner.employees') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.employees') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        Zamestnanci
+                        {{ __('Employees') }}
                     </a>
                     <a href="{{ route('owner.schedules') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.schedules') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Pracovná doba
+                        {{ __('Working hours') }}
                     </a>
                     <a href="{{ route('owner.holidays') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.holidays') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Sviatky a voľno
+                        {{ __('Holidays') }}
                     </a>
 
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">Nastavenia</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Nastavenia') }}</p>
                     <a href="{{ route('owner.calendar.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.calendar.settings') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Kalendár
+                        {{ __('Calendar') }}
                     </a>
                     <a href="{{ route('owner.billing.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.billing.settings') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Fakturačné údaje
+                        {{ __('Billing details') }}
                     </a>
 
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">Financie</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Financie') }}</p>
                     <a href="{{ route('owner.payments') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.payments') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Tržby
+                        {{ __('Revenue') }}
                     </a>
                     <a href="{{ route('owner.invoices') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.invoices') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        Faktúry predplatného
+                        {{ __('Subscription invoices') }}
                     </a>
                 </nav>
 
@@ -85,7 +116,7 @@
                         @csrf
                         <button type="submit" class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                            Odhlásiť sa
+                            {{ __('Logout') }}
                         </button>
                     </form>
                 </div>
@@ -104,6 +135,7 @@
                 </div>
 
                 <div class="flex items-center gap-4">
+                    @include('partials.language-switcher')
                     <div class="text-right hidden sm:block">
                         <p class="text-xs font-bold text-slate-900 leading-tight">{{ auth()->user()->name }}</p>
                         <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Majiteľ prevádzky</p>

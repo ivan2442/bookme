@@ -26,19 +26,19 @@
                                     @if($holiday->start_time && $holiday->end_time)
                                         {{ substr($holiday->start_time, 0, 5) }} - {{ substr($holiday->end_time, 0, 5) }}
                                     @else
-                                        celý deň
+                                        {{ __('all day') }}
                                     @endif
                                     <span class="text-xs text-slate-400 font-normal ml-1">({{ $holiday->profile->name }})</span>
                                 </p>
                                 <p class="text-[10px] uppercase font-bold text-emerald-600 mt-1">
-                                    {{ $holiday->employee->name ?? 'Celá prevádzka' }} — {{ $holiday->reason ?? 'blokácia' }}
+                                    {{ $holiday->employee->name ?? __('Whole business') }} — {{ $holiday->reason ?? __('blockage') }}
                                 </p>
                             </div>
                             <div class="flex gap-1">
                                 <button onclick="toggleEdit({{ $holiday->id }})" class="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition shadow-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 </button>
-                                <form action="{{ route('owner.holidays.delete', $holiday) }}" method="POST" onsubmit="return confirmDelete(event, 'Odstrániť túto blokáciu?')">
+                                <form action="{{ route('owner.holidays.delete', $holiday) }}" method="POST" onsubmit="return confirmDelete(event, '{{ __('Delete this blockage?') }}')">
                                     @csrf @method('DELETE')
                                     <button class="p-2 rounded-lg bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -54,10 +54,10 @@
                             <input type="hidden" name="profile_id" value="{{ $holiday->profile_id }}">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-[10px] uppercase font-bold text-slate-500">Zamestnanec</label>
+                                    <label class="text-[10px] uppercase font-bold text-slate-500">{{ __('Employee') }}</label>
                                     <div class="nice-select-wrapper">
                                         <select name="employee_id" class="nice-select">
-                                            <option value="">Celá prevádzka</option>
+                                            <option value="">{{ __('Whole business') }}</option>
                                             @foreach($profiles->where('id', $holiday->profile_id) as $p)
                                                 @foreach($p->employees as $e)
                                                     <option value="{{ $e->id }}" @selected($holiday->employee_id == $e->id)>{{ $e->name }}</option>
@@ -67,7 +67,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] uppercase font-bold text-slate-500">Dátum</label>
+                                    <label class="text-[10px] uppercase font-bold text-slate-500">{{ __('Date') }}</label>
                                     <input type="date" name="date" value="{{ $holiday->date->format('Y-m-d') }}" class="input-control !py-1.5 !text-sm" required>
                                 </div>
                             </div>
@@ -102,23 +102,23 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="text-[10px] uppercase font-bold text-slate-500">Dôvod</label>
-                                <input type="text" name="reason" value="{{ $holiday->reason }}" class="input-control !py-1.5 !text-sm" placeholder="Dôvod">
+                                <label class="text-[10px] uppercase font-bold text-slate-500">{{ __('Reason') }}</label>
+                                <input type="text" name="reason" value="{{ $holiday->reason }}" class="input-control !py-1.5 !text-sm" placeholder="{{ __('Reason') }}">
                             </div>
                             <div class="flex items-center justify-between border-t border-slate-100 pt-4">
                                 <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
                                     <input type="checkbox" name="is_closed" value="1" @checked($holiday->is_closed) class="h-4 w-4 text-emerald-600 rounded border-slate-300">
-                                    Zatvorené
+                                    {{ __('Closed') }}
                                 </label>
                                 <div class="flex gap-2">
-                                    <button type="button" onclick="toggleEdit({{ $holiday->id }})" class="px-3 py-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition">Zrušiť</button>
-                                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold shadow-md hover:bg-emerald-600 transition">Uložiť</button>
+                                    <button type="button" onclick="toggleEdit({{ $holiday->id }})" class="px-3 py-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition">{{ __('Cancel') }}</button>
+                                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold shadow-md hover:bg-emerald-600 transition">{{ __('Save') }}</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 @empty
-                    <p class="text-sm text-slate-500 italic p-8 text-center">Zatiaľ nemáte nastavené žiadne sviatky alebo blokácie.</p>
+                    <p class="text-sm text-slate-500 italic p-8 text-center">{{ __('No holidays or blockages set yet.') }}</p>
                 @endforelse
             </div>
             @if($holidays->hasPages())
@@ -132,10 +132,10 @@
             <div class="card p-6">
                 <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Informácia
+                    {{ __('Information') }}
                 </h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
-                    Sviatky a uzávierky slúžia na jednorazové zablokovanie termínov (napr. dovolenka, štátny sviatok alebo nečakaná udalosť). Môžete zablokovať celú prevádzku alebo len konkrétneho zamestnanca.
+                    {{ __('Holidays and closures are used for one-time blocking of slots (e.g., vacation, public holiday, or unexpected event). You can block the entire business or just a specific employee.') }}
                 </p>
             </div>
         </div>
@@ -149,7 +149,7 @@
 
         <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 overflow-hidden">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-display font-semibold text-slate-900">Pridať sviatok / blokáciu</h3>
+                <h3 class="text-xl font-display font-semibold text-slate-900">{{ __('Add holiday / blockage') }}</h3>
                 <button onclick="closeAddHolidayModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -159,7 +159,7 @@
                 @csrf
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="label">Prevádzka</label>
+                        <label class="label">{{ __('Business profile') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="profile_id" class="nice-select" required>
                                 @foreach($profiles as $profile)
@@ -169,10 +169,10 @@
                         </div>
                     </div>
                     <div>
-                        <label class="label">Zamestnanec (voliteľné)</label>
+                        <label class="label">{{ __('Employee (optional)') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="employee_id" class="nice-select">
-                                <option value="">Celá prevádzka</option>
+                                <option value="">{{ __('Whole business') }}</option>
                                 @foreach($profiles as $profile)
                                     @foreach($profile->employees as $employee)
                                         <option value="{{ $employee->id }}" @selected(old('employee_id') == $employee->id)>{{ $employee->name }} — {{ $profile->name }}</option>
@@ -185,14 +185,14 @@
 
                 <div class="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
                     <div>
-                        <label class="label">Dátum</label>
+                        <label class="label">{{ __('Date') }}</label>
                         <input type="text" name="date" id="add_holiday_date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD">
                     </div>
                     <div>
-                        <label class="label">Od</label>
+                        <label class="label">{{ __('From') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="start_time" class="nice-select nice-select-time">
-                                <option value="">Celý deň</option>
+                                <option value="">{{ __('all day') }}</option>
                                 @for($h = 0; $h <= 23; $h++)
                                     @foreach(['00', '30'] as $m)
                                         @php $time = sprintf('%02d:%s', $h, $m); @endphp
@@ -203,10 +203,10 @@
                         </div>
                     </div>
                     <div>
-                        <label class="label">Do</label>
+                        <label class="label">{{ __('To') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="end_time" class="nice-select nice-select-time">
-                                <option value="">Celý deň</option>
+                                <option value="">{{ __('all day') }}</option>
                                 @for($h = 0; $h <= 23; $h++)
                                     @foreach(['00', '30'] as $m)
                                         @php $time = sprintf('%02d:%s', $h, $m); @endphp
@@ -220,20 +220,20 @@
 
                 <div class="grid sm:grid-cols-[1fr,200px] gap-4">
                     <div>
-                        <label class="label">Dôvod</label>
-                        <input type="text" name="reason" class="input-control" value="{{ old('reason') }}" placeholder="Dôvod (sviatok, dovolenka)">
+                        <label class="label">{{ __('Reason') }}</label>
+                        <input type="text" name="reason" class="input-control" value="{{ old('reason') }}" placeholder="{{ __('Reason (holiday, vacation)') }}">
                     </div>
                     <div class="flex items-end pb-3">
                         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
                             <input type="checkbox" name="is_closed" value="1" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 rounded border-slate-300" @checked(old('is_closed', '1') == '1')>
-                            Celý deň zatvorené
+                            {{ __('Closed whole day') }}
                         </label>
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
-                    <button type="button" onclick="closeAddHolidayModal()" class="px-6 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Zrušiť</button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-200/50">Pridať blokáciu</button>
+                    <button type="button" onclick="closeAddHolidayModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">{{ __('Cancel') }}</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-200/50">{{ __('Add blockage') }}</button>
                 </div>
             </form>
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Profile extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'owner_id',
@@ -18,6 +19,7 @@ class Profile extends Model
         'slug',
         'category',
         'description',
+        'is_multilingual',
         'email',
         'phone',
         'website',
@@ -55,9 +57,19 @@ class Profile extends Model
         'trial_time_left',
     ];
 
+    protected $translatable = [
+        'name',
+        'category',
+        'description',
+    ];
+
     protected $casts = [
+        'name' => 'array',
+        'category' => 'array',
+        'description' => 'array',
         'settings' => 'array',
         'subscription_starts_at' => 'datetime',
+        'is_multilingual' => 'boolean',
     ];
 
     public function getLogoUrlAttribute()

@@ -4,8 +4,8 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
-            <h1 class="font-display text-3xl text-slate-900">Globálny zoznam rezervácií</h1>
-            <p class="text-sm text-slate-500">Prehľad všetkých termínov v systéme naprieč prevádzkami.</p>
+            <h1 class="font-display text-3xl text-slate-900">{{ __('Global list of appointments') }}</h1>
+            <p class="text-sm text-slate-500">{{ __('Overview of all appointments in the system across businesses.') }}</p>
         </div>
     </div>
 
@@ -14,12 +14,12 @@
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="bg-slate-50 text-left text-slate-500 uppercase tracking-widest text-[10px] font-bold">
-                        <th class="px-6 py-4">Služba / Klient</th>
-                        <th class="px-6 py-4">Prevádzka</th>
-                        <th class="px-6 py-4">Zamestnanec</th>
-                        <th class="px-6 py-4">Čas</th>
-                        <th class="px-6 py-4">Stav</th>
-                        <th class="px-6 py-4 text-right">Cena</th>
+                        <th class="px-6 py-4">{{ __('Service / Client') }}</th>
+                        <th class="px-6 py-4">{{ __('Business') }}</th>
+                        <th class="px-6 py-4">{{ __('Employee') }}</th>
+                        <th class="px-6 py-4">{{ __('Time') }}</th>
+                        <th class="px-6 py-4">{{ __('Status') }}</th>
+                        <th class="px-6 py-4 text-right">{{ __('Price') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white/50">
@@ -44,18 +44,18 @@
                                     <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-tight
                                         {{ $appointment->status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
                                            ($appointment->status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600') }}">
-                                        {{ $appointment->status }}
+                                        @if($appointment->status === 'confirmed') {{ __('Confirmed') }} @elseif($appointment->status === 'pending') {{ __('Pending') }} @else {{ $appointment->status }} @endif
                                     </span>
                                     @if($appointment->status === 'pending')
                                         <form method="POST" action="{{ route('admin.appointments.confirm', $appointment) }}">
                                             @csrf
-                                            <button class="text-[10px] font-bold text-emerald-600 hover:underline">Potvrdiť</button>
+                                            <button class="text-[10px] font-bold text-emerald-600 hover:underline">{{ __('Confirm') }}</button>
                                         </form>
                                     @endif
                                     <form method="POST" action="{{ route('admin.appointments.delete', $appointment) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-[10px] font-bold text-rose-600 hover:underline" onclick="return confirmDelete(event, 'Odstrániť rezerváciu?')">Odstrániť</button>
+                                        <button class="text-[10px] font-bold text-rose-600 hover:underline" onclick="return confirmDelete(event, '{{ __('Are you sure you want to delete this appointment?') }}')">{{ __('Delete') }}</button>
                                     </form>
                                 </div>
                             </td>

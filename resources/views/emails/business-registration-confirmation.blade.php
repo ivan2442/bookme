@@ -4,61 +4,61 @@
 <img src="{{ asset('favicon.png') }}" width="80" height="80" alt="BookMe Logo">
 </div>
 
-# Potvrdenie registrácie prevádzky
+# {{ __('Business registration confirmation') }}
 
-Dobrý deň,
+{{ __('Hello') }},
 
-Vaša prevádzka **{{ $profile->name }}** bola úspešne zaregistrovaná v systéme BookMe.
+{{ __('Your business **:name** has been successfully registered in the BookMe system.', ['name' => $profile->name]) }}
 
-Ako bonus získavate **prvé 3 mesiace používania systému úplne zadarmo**. Vaše bezplatné obdobie končí {{ $profile->trial_ends_at->format('d.m.Y') }}. Potom bude systém spoplatnený sumou 20 € mesačne.
+{{ __('As a bonus, you get **the first 3 months of using the system completely for free**. Your free period ends on :date. After that, the system will be charged 20 € per month.', ['date' => $profile->trial_ends_at->format('d.m.Y')]) }}
 
-Momentálne čaká na odobrenie administrátorom. Po schválení bude vaša prevádzka verejne dohľadateľná na našej hlavnej stránke.
+{{ __('It is currently waiting for admin approval. After approval, your business will be publicly searchable on our main page.') }}
 
-**Dovtedy je však váš profil plne funkčný!** Môžete ho zdieľať so svojimi zákazníkmi cez tento unikátny odkaz:
+**{{ __('Until then, your profile is fully functional!') }}** {{ __('You can share it with your customers via this unique link:') }}
 
 <x-mail::button :url="route('profiles.show', $profile->slug)">
-Zobraziť môj profil
+{{ __('View my profile') }}
 </x-mail::button>
 
-Váš rezervačný odkaz: [{{ route('profiles.show', $profile->slug) }}]({{ route('profiles.show', $profile->slug) }})
+{{ __('Your booking link:') }} [{{ route('profiles.show', $profile->slug) }}]({{ route('profiles.show', $profile->slug) }})
 
-Môžete sa prihlásiť do svojho dashboardu a začať nastavovať služby, zamestnancov a pracovnú dobu:
+{{ __('You can log in to your dashboard and start setting up services, employees, and working hours:') }}
 
 <x-mail::button :url="route('auth.login')">
-Prihlásiť sa do systému
+{{ __('Log in to the system') }}
 </x-mail::button>
 
 ---
 
-### 🛠 Návod na správu vašej prevádzky
+### 🛠 {{ __('Guide to managing your business') }}
 
-Aby vaša prevádzka mohla začať naplno prijímať rezervácie, odporúčame nasledovný postup:
+{{ __('To allow your business to fully accept bookings, we recommend the following procedure:') }}
 
-1. **Služby (sekcia Služby)**
-Vytvorte si zoznam služieb, ktoré ponúkate. Pri každej službe zadajte názov, dĺžku trvania a cenu. Bez vytvorených služieb si zákazníci nebudú môcť vytvoriť rezerváciu.
+1. **{{ __('Services (Services section)') }}**
+{{ __('Create a list of services you offer. For each service, enter a name, duration, and price. Without created services, customers will not be able to create a booking.') }}
 
-2. **Zamestnanci (sekcia Zamestnanci)**
-Pridajte členov vášho tímu. Každému zamestnancovi môžete následne priradiť konkrétne služby, ktoré vykonáva.
+2. **{{ __('Employees (Employees section)') }}**
+{{ __('Add members of your team. You can then assign specific services to each employee.') }}
 
-3. **Pracovná doba (sekcia Časy)**
-Nastavte si časy, kedy ste pre klientov dostupní. Môžete definovať všeobecné otváracie hodiny alebo individuálne rozvrhy pre jednotlivých zamestnancov vrátane prestávok.
+3. **{{ __('Working hours (Times section)') }}**
+{{ __('Set the times when you are available for clients. You can define general opening hours or individual schedules for each employee, including breaks.') }}
 
-4. **Sviatky a uzávierky (sekcia Sviatky)**
-Ak potrebujete jednorazovo zablokovať termín (napr. dovolenka alebo návšteva lekára), využite túto sekciu na vytvorenie blokácie.
+4. **{{ __('Holidays and closures (Holidays section)') }}**
+{{ __('If you need to block a slot once (e.g., vacation or doctor visit), use this section to create a blockage.') }}
 
-5. **Vzhľad a nastavenia (sekcia Kalendár)**
-Nahrajte si logo a banner prevádzky, napíšte krátky popis a upravte dĺžku rezervačných slotov (napr. každých 30 minút).
+5. **{{ __('Appearance and settings (Calendar section)') }}**
+{{ __('Upload a logo and business banner, write a short description, and adjust the length of booking slots (e.g., every 30 minutes).') }}
 
-6. **Dashboard (Prehľad)**
-Na hlavnej obrazovke uvidíte všetky nadchádzajúce rezervácie, interaktívny kalendár na vybraný deň a rýchle štatistiky. Rezervácie môžete presúvať, upravovať alebo označovať ako vybavené.
+6. **{{ __('Dashboard (Overview)') }}**
+{{ __('On the main screen, you will see all upcoming bookings, an interactive calendar for the selected day, and quick statistics. You can move, edit, or mark bookings as completed.') }}
 
-7. **Platby (Prehľad platieb)**
-Detailné vyhodnotenie vašej prevádzky – počet rezervácií, odpracované hodiny a celkové tržby za vybrané obdobie.
+7. **{{ __('Payments (Payment Overview)') }}**
+{{ __('Detailed evaluation of your business - number of bookings, hours worked, and total revenue for the selected period.') }}
 
 ---
 
-Tešíme sa na spoluprácu!
+{{ __('We look forward to working with you!') }}
 
-S pozdravom,<br>
-Tím {{ config('app.name') }}
+{{ __('Best regards,') }}<br>
+{{ __('Team') }} {{ config('app.name') }}
 </x-mail::message>

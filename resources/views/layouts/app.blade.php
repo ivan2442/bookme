@@ -24,6 +24,28 @@
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <script>
+        window.locale = "{{ app()->getLocale() }}";
+        window.translations = {
+            "mon": "{{ __('mon') }}",
+            "tue": "{{ __('tue') }}",
+            "wed": "{{ __('wed') }}",
+            "thu": "{{ __('thu') }}",
+            "fri": "{{ __('fri') }}",
+            "sat": "{{ __('sat') }}",
+            "sun": "{{ __('sun') }}",
+            "Appointments for today": "{{ __('Appointments for today') }}",
+            "Appointments for": "{{ __('Appointments for') }}",
+            "Today": "{{ __('Today') }}",
+            "Monday": "{{ __('Monday') }}",
+            "Tuesday": "{{ __('Tuesday') }}",
+            "Wednesday": "{{ __('Wednesday') }}",
+            "Thursday": "{{ __('Thursday') }}",
+            "Friday": "{{ __('Friday') }}",
+            "Saturday": "{{ __('Saturday') }}",
+            "Sunday": "{{ __('Sunday') }}"
+        };
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Nice Select -->
@@ -146,25 +168,26 @@
                     </div>
                 </a>
                 <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
-                    <a class="hover:text-slate-900 transition" href="/#search">Vyhľadať prevádzku</a>
-                    <a class="hover:text-slate-900 transition" href="{{ route('for-businesses') }}">Pre prevádzky</a>
+                    @include('partials.language-switcher')
+                    <a class="hover:text-slate-900 transition" href="/#search">{{ __('Search business') }}</a>
+                    <a class="hover:text-slate-900 transition" href="{{ route('for-businesses') }}">{{ __('For businesses') }}</a>
                     {{-- <a class="hover:text-slate-900 transition" href="{{ route('articles.index') }}">Blog</a> --}}
                     @auth
                         @if(auth()->user()->role === 'admin')
                             {{-- <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a> --}}
                         @else
-                            <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
+                            <a class="hover:text-slate-900 transition font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">{{ __('My business') }}</a>
                         @endif
                         <form method="POST" action="{{ route('auth.logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="hover:text-red-600 transition font-medium text-slate-700">Odhlásiť sa</button>
+                            <button type="submit" class="hover:text-red-600 transition font-medium text-slate-700">{{ __('Logout') }}</button>
                         </form>
                     @else
-                        <a class="hover:text-slate-900 transition" href="{{ route('auth.login') }}">Prihlásiť sa</a>
+                        <a class="hover:text-slate-900 transition" href="{{ route('auth.login') }}">{{ __('Login') }}</a>
                     @endauth
                 </nav>
                 <div class="hidden sm:flex gap-3 items-center">
-                    <a href="#booking" class="px-6 py-2.5 text-sm font-bold rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-200/50 border border-emerald-400 hover:bg-emerald-600 hover:shadow-emerald-300/60 transition-all transform hover:scale-105">Začať rezerváciu</a>
+                    <a href="#booking" class="px-6 py-2.5 text-sm font-bold rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-200/50 border border-emerald-400 hover:bg-emerald-600 hover:shadow-emerald-300/60 transition-all transform hover:scale-105">{{ __('Start booking') }}</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -179,24 +202,27 @@
 
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border border-slate-100 px-4 py-4 space-y-2 shadow-2xl mx-4">
-                <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">Vyhľadať prevádzku</a>
-                <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('for-businesses') }}">Pre prevádzky</a>
+                <div class="flex justify-center pb-2 mb-2 border-b border-slate-100">
+                    @include('partials.language-switcher')
+                </div>
+                <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">{{ __('Search business') }}</a>
+                <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('for-businesses') }}">{{ __('For businesses') }}</a>
                 {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}
                 @auth
                     @if(auth()->user()->role === 'admin')
                         {{-- <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('admin.dashboard') }}">Admin</a> --}}
                     @else
-                        <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">Moja prevádzka</a>
+                        <a class="block py-2 text-base font-bold text-emerald-600" href="{{ route('owner.dashboard') }}">{{ __('My business') }}</a>
                     @endif
                     <form method="POST" action="{{ route('auth.logout') }}">
                         @csrf
-                        <button type="submit" class="block w-full text-left py-2 text-base font-medium text-red-600 hover:text-red-700">Odhlásiť sa</button>
+                        <button type="submit" class="block w-full text-left py-2 text-base font-medium text-red-600 hover:text-red-700">{{ __('Logout') }}</button>
                     </form>
                 @else
-                    <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('auth.login') }}">Prihlásiť sa</a>
+                    <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('auth.login') }}">{{ __('Login') }}</a>
                 @endauth
                 <div class="pt-2 border-t border-slate-100">
-                    <a href="#booking" class="block py-2 text-center text-sm font-semibold rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition">Začať rezerváciu</a>
+                    <a href="#booking" class="block py-2 text-center text-sm font-semibold rounded-full bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition">{{ __('Start booking') }}</a>
                 </div>
             </div>
         </div>

@@ -3,8 +3,8 @@
 @section('content')
 <div class="py-12">
     <div class="text-center mb-12">
-        <h1 class="text-4xl font-display font-bold text-slate-900 mb-4">Náš Blog</h1>
-        <p class="text-lg text-slate-600">Novinky, tipy a rady pre váš biznis aj relax.</p>
+        <h1 class="text-4xl font-display font-bold text-slate-900 mb-4">{{ __('Our Blog') }}</h1>
+        <p class="text-lg text-slate-600">{{ __('News, tips and advice for your business and relaxation.') }}</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -28,12 +28,12 @@
                     <p class="text-slate-600 text-sm mb-4 line-clamp-3">
                         {{ $article->excerpt ?? Str::limit(strip_tags($article->content), 120) }}
                     </p>
-                    <a href="{{ route('articles.show', $article->slug) }}" class="text-emerald-600 text-sm font-semibold hover:underline">Čítať viac →</a>
+                    <a href="{{ route('articles.show', $article->slug) }}" class="text-emerald-600 text-sm font-semibold hover:underline">{{ __('Read more') }} →</a>
                 </div>
             </article>
         @empty
             <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
-                <p class="text-slate-500 italic">Zatiaľ sme nepublikovali žiadne články.</p>
+                <p class="text-slate-500 italic">{{ __('No articles published yet.') }}</p>
             </div>
         @endforelse
     </div>

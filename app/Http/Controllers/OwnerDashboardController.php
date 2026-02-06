@@ -11,6 +11,7 @@ use App\Models\Schedule;
 use App\Models\Service;
 use App\Models\ServiceVariant;
 use App\Models\CalendarSetting;
+use App\Services\AvailabilityService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
@@ -21,10 +22,15 @@ use Illuminate\View\View;
 
 class OwnerDashboardController extends Controller
 {
+    public function __construct(private AvailabilityService $availability)
+    {
+    }
+
     public function index(Request $request): View
     {
         $user = $request->user();
-        $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
+        $allProfiles = Profile::with(['employees', 'calendarSetting', 'services'])->where('owner_id', $user->id)->get();
+        $profileIds = $allProfiles->pluck('id');
 
         $now = Carbon::now();
         $todayStart = $now->copy()->startOfDay();
@@ -34,6 +40,18 @@ class OwnerDashboardController extends Controller
         // Base query for stats - NO eager loading here for better performance
         $baseQuery = Appointment::whereIn('profile_id', $profileIds);
 
+        // Calculate free slots for today
+        $freeSlotsCount = 0;
+        foreach ($allProfiles as $profile) {
+            $slots = $this->availability->slots(
+                $profile,
+                30, // Default duration 30 min for counting free slots
+                $now,
+                1
+            );
+            $freeSlotsCount += collect($slots['slots'])->where('status', 'available')->count();
+        }
+
         $stats = [
             'appointments_today' => (clone $baseQuery)->whereBetween('start_at', [$todayStart, $todayEnd])->count(),
             'appointments_month' => (clone $baseQuery)->whereBetween('start_at', [$monthStart, $now])->count(),
@@ -42,16 +60,15 @@ class OwnerDashboardController extends Controller
                 ->whereBetween('start_at', [$todayStart, $todayEnd])
                 ->where('status', 'completed')
                 ->sum('price'),
+            'free_slots_today' => $freeSlotsCount,
         ];
 
         // Fetch today's appointments with eager loading (including completed)
         $upcoming = (clone $baseQuery)
-            ->with(['profile', 'service', 'employee'])
+            ->with(['profile.calendarSetting', 'service', 'employee'])
             ->whereBetween('start_at', [$todayStart, $todayEnd])
             ->orderBy('start_at')
             ->get();
-
-        $allProfiles = Profile::with('employees')->whereIn('id', $profileIds)->get();
 
         return view('owner.dashboard', compact('stats', 'upcoming', 'allProfiles'));
     }
@@ -70,23 +87,32 @@ class OwnerDashboardController extends Controller
         $revenue = (clone $query)->where('status', 'completed')->sum('price');
 
         $appointments = (clone $query)
-            ->with(['profile', 'service', 'employee'])
+            ->with(['profile.calendarSetting', 'service', 'employee'])
             ->orderBy('start_at')
             ->get()
             ->map(function($a) {
-                $daysNames = [1=>'Pondelok',2=>'Utorok',3=>'Streda',4=>'Štvrtok',5=>'Piatok',6=>'Sobota',0=>'Nedeľa'];
+                $daysNames = [
+                    1 => __('Monday'),
+                    2 => __('Tuesday'),
+                    3 => __('Wednesday'),
+                    4 => __('Thursday'),
+                    5 => __('Friday'),
+                    6 => __('Saturday'),
+                    0 => __('Sunday')
+                ];
                 return [
                     'id' => $a->id,
                     'customer_name' => $a->customer_name,
                     'customer_phone' => $a->customer_phone,
-                    'service_name' => $a->metadata['service_name_manual'] ?? ($a->service?->name ?? 'Manuálna služba'),
-                    'employee_name' => optional($a->employee)->name ?? 'Bez zamestnanca',
+                    'service_name' => $a->metadata['service_name_manual'] ?? ($a->service?->name ?? __('Manual service')),
+                    'employee_name' => optional($a->employee)->name ?? __('No employee'),
                     'start_time' => $a->start_at->format('H:i'),
                     'end_time' => $a->end_at->format('H:i'),
                     'date_formatted' => $a->start_at->format('d.m.Y'),
                     'day_name' => $daysNames[$a->start_at->dayOfWeek] ?? '',
                     'price' => number_format($a->price, 2),
                     'status' => $a->status,
+                    'requires_confirmation' => $a->profile->calendarSetting->requires_confirmation ?? true,
                     'duration_minutes' => $a->metadata['duration_minutes'] ?? (int) (($a->end_at->timestamp - $a->start_at->timestamp) / 60),
                     'employee_id' => $a->employee_id,
                     'date_raw' => $a->start_at->format('Y-m-d'),
@@ -100,7 +126,7 @@ class OwnerDashboardController extends Controller
         return response()->json([
             'appointments' => $appointments,
             'revenue' => (float) $revenue,
-            'revenue_formatted' => number_format($revenue, 2, ',', ' ')
+            'revenue_formatted' => number_format($revenue, 2, ',', ' ') . ' €'
         ]);
     }
 
@@ -133,6 +159,55 @@ class OwnerDashboardController extends Controller
         return response()->json($appointments);
     }
 
+    public function getFreeSlots(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $allProfiles = Profile::with(['employees', 'calendarSetting', 'services'])->where('owner_id', $user->id)->get();
+        $date = $request->date ?: Carbon::today()->toDateString();
+        $startDate = Carbon::parse($date);
+
+        $allSlots = [];
+
+        foreach ($allProfiles as $profile) {
+            $result = $this->availability->slots(
+                $profile,
+                30, // Default duration
+                $startDate,
+                1
+            );
+
+            foreach ($result['slots'] as $slot) {
+                if ($slot['status'] === 'available') {
+                    $startAt = Carbon::parse($slot['start_at']);
+                    $allSlots[] = [
+                        'profile_id' => $profile->id,
+                        'profile_name' => $profile->name,
+                        'start_at' => $slot['start_at'],
+                        'time' => $startAt->format('H:i'),
+                        'date' => $startAt->format('Y-m-d'),
+                        'services' => $profile->services->map(function ($s) {
+                            return [
+                                'id' => $s->id,
+                                'name' => $s->name,
+                                'price' => $s->base_price,
+                            ];
+                        }),
+                    ];
+                }
+            }
+        }
+
+        // Sort by time
+        usort($allSlots, function ($a, $b) {
+            return strcmp($a['start_at'], $b['start_at']);
+        });
+
+        return response()->json([
+            'slots' => $allSlots,
+            'count' => count($allSlots),
+        ]);
+    }
+
     private function getOwnerProfileIds(Request $request)
     {
         return Profile::where('owner_id', $request->user()->id)->pluck('id')->toArray();
@@ -155,8 +230,8 @@ class OwnerDashboardController extends Controller
         $profileIds = $this->getOwnerProfileIds($request);
         $data = $request->validate([
             'profile_id' => ['required', 'exists:profiles,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'category' => ['nullable', 'string', 'max:255'],
+            'name' => ['required'],
+            'category' => ['nullable'],
             'base_price' => ['required', 'numeric', 'min:0'],
             'base_duration_minutes' => ['required', 'integer', 'min:1'],
             'employee_ids' => ['nullable', 'array'],
@@ -169,15 +244,18 @@ class OwnerDashboardController extends Controller
             abort(403);
         }
 
+        $profile = Profile::find($data['profile_id']);
+        $name = $data['name'];
+        $slugSource = is_array($name) ? ($name['sk'] ?? reset($name)) : $name;
+
         $service = Service::create([
             'profile_id' => $data['profile_id'],
-            'name' => $data['name'],
-            'slug' => Str::slug($data['name']),
+            'name' => $name,
+            'slug' => Str::slug($slugSource),
             'category' => $data['category'],
             'base_price' => $data['base_price'],
             'base_duration_minutes' => $data['base_duration_minutes'],
             'currency' => 'EUR',
-            'status' => 'published',
             'is_pakavoz_enabled' => $request->boolean('is_pakavoz_enabled'),
             'pakavoz_api_key' => $data['pakavoz_api_key'] ?? null,
         ]);
@@ -187,7 +265,7 @@ class OwnerDashboardController extends Controller
             // Also sync to variants if needed, or rely on service relationship
         }
 
-        return back()->with('status', 'Služba bola vytvorená.');
+        return back()->with('status', __('Service created.'));
     }
 
     public function updateService(Request $request, Service $service): RedirectResponse
@@ -198,8 +276,8 @@ class OwnerDashboardController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'category' => ['nullable', 'string', 'max:255'],
+            'name' => ['required'],
+            'category' => ['nullable'],
             'base_price' => ['required', 'numeric', 'min:0'],
             'base_duration_minutes' => ['required', 'integer', 'min:1'],
             'employee_ids' => ['nullable', 'array'],
@@ -221,7 +299,7 @@ class OwnerDashboardController extends Controller
             $service->employees()->sync($data['employee_ids']);
         }
 
-        return back()->with('status', 'Služba bola upravená.');
+        return back()->with('status', __('Service updated.'));
     }
 
     public function storeVariant(Request $request, Service $service): RedirectResponse
@@ -232,7 +310,7 @@ class OwnerDashboardController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
             'duration_minutes' => ['required', 'integer', 'min:1'],
         ]);
@@ -244,7 +322,7 @@ class OwnerDashboardController extends Controller
             'currency' => 'EUR',
         ]);
 
-        return back()->with('status', 'Variant bol pridaný.');
+        return back()->with('status', __('Variant added.'));
     }
 
     public function updateVariant(Request $request, Service $service, ServiceVariant $variant): RedirectResponse
@@ -255,14 +333,14 @@ class OwnerDashboardController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
             'duration_minutes' => ['required', 'integer', 'min:1'],
         ]);
 
         $variant->update($data);
 
-        return back()->with('status', 'Variant bol upravený.');
+        return back()->with('status', __('Variant updated.'));
     }
 
     public function deleteVariant(Service $service, ServiceVariant $variant): RedirectResponse
@@ -274,7 +352,7 @@ class OwnerDashboardController extends Controller
 
         $variant->delete();
 
-        return back()->with('status', 'Variant bol odstránený.');
+        return back()->with('status', __('Variant removed.'));
     }
 
     public function employees(Request $request): View
@@ -302,7 +380,7 @@ class OwnerDashboardController extends Controller
 
         Employee::create($data);
 
-        return back()->with('status', 'Zamestnanec bol vytvorený.');
+        return back()->with('status', __('Employee created.'));
     }
 
     public function updateEmployee(Request $request, Employee $employee): RedirectResponse
@@ -320,7 +398,7 @@ class OwnerDashboardController extends Controller
 
         $employee->update($data);
 
-        return back()->with('status', 'Zamestnanec bol upravený.');
+        return back()->with('status', __('Employee updated.'));
     }
 
     public function appointments(Request $request): View
@@ -343,7 +421,7 @@ class OwnerDashboardController extends Controller
 
         $appointment->update(['status' => 'confirmed']);
 
-        return back()->with('status', 'Rezervácia potvrdená.');
+        return back()->with('status', __('Appointment confirmed.'));
     }
 
     public function deleteAppointment(Appointment $appointment): RedirectResponse
@@ -355,7 +433,7 @@ class OwnerDashboardController extends Controller
 
         $appointment->delete();
 
-        return back()->with('status', 'Rezervácia bola odstránená.');
+        return back()->with('status', __('Appointment deleted.'));
     }
 
     public function updateAppointmentStatus(Request $request, Appointment $appointment): RedirectResponse
@@ -372,10 +450,10 @@ class OwnerDashboardController extends Controller
         $appointment->update(['status' => $data['status']]);
 
         $message = match($data['status']) {
-            'completed' => 'Rezervácia bola označená ako vybavená.',
-            'no-show' => 'Zákazník bol označený ako neprišiel.',
-            'cancelled' => 'Rezervácia bola zrušená.',
-            default => 'Stav rezervácie bol aktualizovaný.',
+            'completed' => __('Appointment marked as completed.'),
+            'no-show' => __('Customer marked as no-show.'),
+            'cancelled' => __('Appointment cancelled.'),
+            default => __('Appointment status updated.'),
         };
 
         return back()->with('status', $message);
@@ -384,6 +462,15 @@ class OwnerDashboardController extends Controller
     public function storeManualAppointment(Request $request): RedirectResponse
     {
         $profileIds = $this->getOwnerProfileIds($request);
+
+        // Pre podporu rýchlej rezervácie skontrolujeme aj alternatívne polia
+        if ($request->has('service_name_manual') && !$request->has('service_name')) {
+            $request->merge(['service_name' => $request->input('service_name_manual')]);
+        }
+        if ($request->has('price_manual') && (!$request->has('price') || $request->input('price') == 0)) {
+            $request->merge(['price' => $request->input('price_manual')]);
+        }
+
         $data = $request->validate([
             'profile_id' => ['required', 'exists:profiles,id'],
             'employee_id' => ['nullable', 'exists:employees,id'],
@@ -391,7 +478,7 @@ class OwnerDashboardController extends Controller
             'customer_phone' => ['nullable', 'string', 'max:50'],
             'service_name' => ['required', 'string', 'max:255'],
             'date' => ['required', 'date'],
-            'start_time' => ['required', 'date_format:H:i'],
+            'start_time' => ['required', 'string'], // Support H:i or ISO
             'duration_minutes' => ['required', 'integer', 'min:1'],
             'price' => ['required', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string'],
@@ -401,7 +488,12 @@ class OwnerDashboardController extends Controller
             abort(403);
         }
 
-        $startAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['start_time']);
+        // Handle start_time that might be full ISO date or just H:i
+        if (Str::contains($data['start_time'], 'T')) {
+            $startAt = Carbon::parse($data['start_time']);
+        } else {
+            $startAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['start_time']);
+        }
         $endAt = $startAt->copy()->addMinutes((int) $data['duration_minutes']);
 
         // Pre manuálne rezervácie použijeme prvú nájdenú službu ako placeholder,
@@ -623,7 +715,7 @@ class OwnerDashboardController extends Controller
             ]);
         }
 
-        return back()->with('status', 'Pracovný čas bol úspešne upravený.');
+        return back()->with('status', __('Schedule updated.'));
     }
 
     public function calendarSettings(Request $request): View
@@ -647,7 +739,8 @@ class OwnerDashboardController extends Controller
             'cancellation_limit_hours' => ['required', 'integer', 'min:0', 'max:720'],
             'requires_confirmation' => ['nullable', 'boolean'],
             'is_public' => ['nullable', 'boolean'],
-            'description' => ['nullable', 'string'],
+            'is_multilingual' => ['nullable', 'boolean'],
+            'description' => ['nullable'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'banner' => ['nullable', 'image', 'max:5120'],
         ]);
@@ -659,8 +752,17 @@ class OwnerDashboardController extends Controller
         $profile = Profile::findOrFail($data['profile_id']);
 
         $updateData = [
-            'description' => $data['description'] ?? null,
+            'is_multilingual' => $request->boolean('is_multilingual'),
         ];
+
+        if ($request->has('description')) {
+            $desc = $request->input('description');
+            if (is_array($desc)) {
+                $updateData['description'] = $desc;
+            } else {
+                $updateData['description'] = $profile->is_multilingual ? ['sk' => $desc] : $desc;
+            }
+        }
 
         try {
             if ($request->hasFile('logo')) {
@@ -697,7 +799,7 @@ class OwnerDashboardController extends Controller
             ]
         );
 
-        return back()->with('status', 'Kalendár bol uložený.');
+        return back()->with('status', __('Calendar saved.'));
     }
 
     public function holidays(Request $request): View
@@ -734,7 +836,7 @@ class OwnerDashboardController extends Controller
             'is_closed' => $request->boolean('is_closed', true),
         ]);
 
-        return back()->with('status', 'Sviatok/uzávierka bola pridaná.');
+        return back()->with('status', __('Holiday / closure added.'));
     }
 
     public function updateHoliday(Request $request, Holiday $holiday): RedirectResponse
@@ -763,7 +865,7 @@ class OwnerDashboardController extends Controller
             'is_closed' => $request->boolean('is_closed', true),
         ]);
 
-        return back()->with('status', 'Sviatok bol upravený.');
+        return back()->with('status', __('Holiday updated.'));
     }
 
     public function deleteHoliday(Holiday $holiday): RedirectResponse
@@ -775,7 +877,7 @@ class OwnerDashboardController extends Controller
 
         $holiday->delete();
 
-        return back()->with('status', 'Sviatok bol odstránený.');
+        return back()->with('status', __('Holiday deleted.'));
     }
 
     public function payments(Request $request): View
@@ -790,10 +892,10 @@ class OwnerDashboardController extends Controller
         $startOfMonth = $selectedDate->copy()->startOfMonth();
         $endOfMonth = $selectedDate->copy()->endOfMonth();
 
-        $monthsSlovak = [
-            1 => 'Január', 2 => 'Február', 3 => 'Marec', 4 => 'Apríl',
-            5 => 'Máj', 6 => 'Jún', 7 => 'Júl', 8 => 'August',
-            9 => 'September', 10 => 'Október', 11 => 'November', 12 => 'December'
+        $months = [
+            1 => __('January'), 2 => __('February'), 3 => __('March'), 4 => __('April'),
+            5 => __('May'), 6 => __('June'), 7 => __('July'), 8 => __('August'),
+            9 => __('September'), 10 => __('October'), 11 => __('November'), 12 => __('December')
         ];
 
         // Vybraný mesiac - štatistiky (optimalizované query)
@@ -826,8 +928,8 @@ class OwnerDashboardController extends Controller
                 ->sum('price');
 
             $chartData[] = [
-                'label' => Str::substr($monthsSlovak[$month->month], 0, 3),
-                'full_label' => $monthsSlovak[$month->month] . ' ' . $month->year,
+                'label' => Str::substr($months[$month->month], 0, 3),
+                'full_label' => $months[$month->month] . ' ' . $month->year,
                 'revenue' => (float)$revenue,
             ];
         }
@@ -841,7 +943,7 @@ class OwnerDashboardController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('owner.payments', compact('stats', 'chartData', 'latestPayments', 'selectedMonth', 'selectedYear', 'selectedDate', 'monthsSlovak'));
+        return view('owner.payments', compact('stats', 'chartData', 'latestPayments', 'selectedMonth', 'selectedYear', 'selectedDate', 'months'));
     }
 
     public function billingSettings(Request $request): View
@@ -876,7 +978,7 @@ class OwnerDashboardController extends Controller
         $profile = Profile::findOrFail($data['profile_id']);
         $profile->update($data);
 
-        return back()->with('status', 'Fakturačné údaje boli uložené.');
+        return back()->with('status', __('Billing details saved.'));
     }
 
     public function invoices(Request $request): View

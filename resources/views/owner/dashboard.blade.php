@@ -4,12 +4,12 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between gap-3 mb-2">
         <div>
-            <h1 class="font-display text-3xl text-slate-900">Prehľad prevádzky</h1>
-            <p class="text-sm text-slate-500">Vitajte v dashboarde vášho profilu.</p>
+            <h1 class="font-display text-3xl text-slate-900">{{ __('Profile Overview') }}</h1>
+            <p class="text-sm text-slate-500">{{ __('Welcome to your dashboard') }}</p>
         </div>
         <button onclick="openManualAppointmentModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            <span>Pridať rezerváciu</span>
+            <span>{{ __('Add Appointment') }}</span>
         </button>
     </div>
 
@@ -20,13 +20,13 @@
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"></div>
                 <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div class="space-y-1">
-                        <p class="text-xs uppercase font-bold tracking-widest text-emerald-400">Bezplatná verzia systému</p>
-                        <h2 class="text-2xl font-display font-bold">Využívate BookMe zadarmo</h2>
-                        <p class="text-sm text-slate-300">Skúšobná doba vám končí <span class="font-bold text-white">{{ $profile->trial_ends_at->format('d.m.Y') }}</span>. Potom bude systém spoplatnený sumou 20 € mesačne.</p>
+                        <p class="text-xs uppercase font-bold tracking-widest text-emerald-400">{{ __('Free system version') }}</p>
+                        <h2 class="text-2xl font-display font-bold">{{ __('Using BookMe for free') }}</h2>
+                        <p class="text-sm text-slate-300">{{ __('Trial ends on') }} <span class="font-bold text-white">{{ $profile->trial_ends_at->format('d.m.Y') }}</span>. {{ __('After that, the system will be charged 20 € per month.') }}</p>
                     </div>
                     <div class="flex-shrink-0">
                         <div class="h-24 px-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center justify-center shadow-inner">
-                            <p class="text-[10px] uppercase font-bold text-emerald-400 mb-1 tracking-widest">Zostáva ešte</p>
+                            <p class="text-[10px] uppercase font-bold text-emerald-400 mb-1 tracking-widest">{{ __('Remaining') }}</p>
                             <span class="text-2xl font-bold text-emerald-400 text-center leading-tight">{{ $profile->trial_time_left }}</span>
                         </div>
                     </div>
@@ -36,27 +36,45 @@
             <div class="card bg-gradient-to-r from-rose-500 to-rose-600 border-0 text-white p-6 shadow-lg shadow-rose-200/50">
                 <div class="flex items-center justify-between gap-4">
                     <div class="space-y-1">
-                        <p class="text-xs uppercase font-bold tracking-widest text-rose-100">Predplatné skončilo</p>
-                        <h2 class="text-xl font-display font-semibold">Vaša bezplatná verzia systému vypršala</h2>
-                        <p class="text-sm text-rose-50/80">Pre pokračovanie v používaní systému je potrebné aktivovať platenú verziu.</p>
+                        <p class="text-xs uppercase font-bold tracking-widest text-rose-100">{{ __('Subscription ended') }}</p>
+                        <h2 class="text-xl font-display font-semibold">{{ __('Your free version of the system has expired') }}</h2>
+                        <p class="text-sm text-rose-50/80">{{ __('To continue using the system, you need to activate the paid version.') }}</p>
                     </div>
-                    <button class="px-6 py-2 rounded-xl bg-white text-rose-600 font-bold hover:bg-rose-50 transition shadow-xl">Aktivovať za 20 €</button>
+                    <button class="px-6 py-2 rounded-xl bg-white text-rose-600 font-bold hover:bg-rose-50 transition shadow-xl">{{ __('Activate for 20 €') }}</button>
                 </div>
             </div>
         @endif
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-stretch mb-8">
         <div class="card flex flex-col justify-between p-6 h-full">
             <div class="flex items-center justify-between mb-4">
                 <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dnes</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Today') }}</span>
             </div>
             <div>
                 <p class="text-3xl font-bold text-slate-900">{{ $stats['appointments_today'] }}</p>
-                <p class="text-sm text-slate-500 font-medium">Rezervácií na dnes</p>
+                <p class="text-sm text-slate-500 font-medium">{{ __('Appointments today') }}</p>
+            </div>
+        </div>
+
+        <div class="card flex flex-col justify-between p-6 h-full">
+            <div class="flex items-center justify-between mb-4">
+                <div class="h-10 w-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Today') }}</span>
+            </div>
+            <div>
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-3xl font-bold text-slate-900" id="free-slots-today-count">{{ $stats['free_slots_today'] }}</p>
+                    <button onclick="openFreeSlotsModal()" class="px-2 py-1 rounded-lg bg-sky-100 text-sky-700 text-[10px] font-bold uppercase hover:bg-sky-200 transition">
+                        {{ __('Show') }}
+                    </button>
+                </div>
+                <p class="text-sm text-slate-500 font-medium">{{ __('Free slots') }}</p>
             </div>
         </div>
 
@@ -66,7 +84,7 @@
                     <div class="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kalendár</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Calendar') }}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <button type="button" class="p-1 rounded-md hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600" data-admin-cal-prev>
@@ -81,13 +99,13 @@
 
             <div class="date-calendar !shadow-none !border-0 !p-0">
                 <div class="calendar-grid !gap-1" data-admin-cal-grid>
-                    <div class="calendar-heading">po</div>
-                    <div class="calendar-heading">ut</div>
-                    <div class="calendar-heading">st</div>
-                    <div class="calendar-heading">št</div>
-                    <div class="calendar-heading">pi</div>
-                    <div class="calendar-heading">so</div>
-                    <div class="calendar-heading">ne</div>
+                    <div class="calendar-heading">{{ __('mon') }}</div>
+                    <div class="calendar-heading">{{ __('tue') }}</div>
+                    <div class="calendar-heading">{{ __('wed') }}</div>
+                    <div class="calendar-heading">{{ __('thu') }}</div>
+                    <div class="calendar-heading">{{ __('fri') }}</div>
+                    <div class="calendar-heading">{{ __('sat') }}</div>
+                    <div class="calendar-heading">{{ __('sun') }}</div>
                 </div>
             </div>
             <input type="hidden" id="admin-selected-date" value="{{ date('Y-m-d') }}">
@@ -98,11 +116,11 @@
                 <div class="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tržby v tento deň</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Revenue on this day') }}</span>
             </div>
             <div>
                 <p class="text-3xl font-bold text-slate-900">€<span id="revenue-today-value">{{ number_format($stats['revenue_today'], 2, ',', ' ') }}</span></p>
-                <p class="text-sm text-slate-500 font-medium">Vybavené objednávky</p>
+                <p class="text-sm text-slate-500 font-medium">{{ __('Completed orders') }}</p>
             </div>
         </div>
     </div>
@@ -111,10 +129,10 @@
         <div class="space-y-6">
             <div class="card overflow-hidden !p-0">
                 <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                    <h2 class="font-bold text-slate-900" id="upcoming-title">Termíny na dnes</h2>
+                    <h2 class="font-bold text-slate-900" id="upcoming-title">{{ __('Appointments for today') }}</h2>
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Aktuálne</span>
+                        <span class="text-[10px] font-bold uppercase text-slate-400 tracking-widest">{{ __('Current') }}</span>
                     </div>
                 </div>
                 <div class="divide-y divide-slate-100" id="appointments-list">
@@ -126,23 +144,25 @@
                                 </div>
                                 <div>
                                     <p class="font-bold {{ $appointment->status === 'completed' ? 'text-slate-500' : 'text-slate-900' }} leading-tight">
-                                        {{ $appointment->metadata['service_name_manual'] ?? ($appointment->service?->name ?? 'Manuálna služba') }}
+                                        {{ $appointment->metadata['service_name_manual'] ?? ($appointment->service?->name ?? __('Manual service')) }}
                                     </p>
                                     <p class="text-xs text-slate-500">{{ $appointment->customer_name }} • {{ $appointment->customer_phone }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
-                                    {{ $appointment->status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
-                                       ($appointment->status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                                       ($appointment->status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500')) }}">
-                                    @if($appointment->status === 'completed') Vybavené @elseif($appointment->status === 'confirmed') Potvrdené @elseif($appointment->status === 'pending') Čaká @else {{ $appointment->status }} @endif
-                                </span>
+                                @if($appointment->status !== 'confirmed' || ($appointment->profile->calendarSetting->requires_confirmation ?? true))
+                                    <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight
+                                        {{ $appointment->status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                                           ($appointment->status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                           ($appointment->status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500')) }}">
+                                        @if($appointment->status === 'completed') {{ __('Completed') }} @elseif($appointment->status === 'confirmed') {{ __('Confirmed') }} @elseif($appointment->status === 'pending') {{ __('Pending') }} @else {{ $appointment->status }} @endif
+                                    </span>
+                                @endif
                                 <div class="flex items-center gap-1">
                                     @if($appointment->status === 'pending')
                                         <form method="POST" action="{{ route('owner.appointments.confirm', $appointment) }}">
                                             @csrf
-                                            <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="Potvrdiť">
+                                            <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="{{ __('Confirm') }}">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                             </button>
                                         </form>
@@ -152,8 +172,8 @@
                                         <form method="POST" action="{{ route('owner.appointments.status.update', $appointment) }}">
                                             @csrf
                                             <input type="hidden" name="status" value="completed">
-                                            <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="Označiť ako vybavené">
-                                                Vybavené
+                                            <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="{{ __('Mark as completed') }}">
+                                                {{ __('Completed') }}
                                             </button>
                                         </form>
                                     @endif
@@ -168,18 +188,18 @@
                                         "date" => $appointment->start_at->format("Y-m-d"),
                                         "start_time" => $appointment->start_at->format("H:i"),
                                         "duration_minutes" => $appointment->metadata["duration_minutes"] ?? (int) (($appointment->end_at->timestamp - $appointment->start_at->timestamp) / 60),
-                                        "service_name" => $appointment->metadata["service_name_manual"] ?? ($appointment->service?->name ?? "Manuálna služba"),
+                                        "service_name" => $appointment->metadata["service_name_manual"] ?? ($appointment->service?->name ?? __('Manual service')),
                                         "employee_id" => $appointment->employee_id,
                                         "price" => $appointment->price
-                                    ]) }})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="Presunúť">
-                                        Presunúť
+                                    ]) }})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="{{ __('Reschedule') }}">
+                                        {{ __('Reschedule') }}
                                     </button>
 
-                                    <form method="POST" action="{{ route('owner.appointments.delete', $appointment) }}" onsubmit="return confirm('Naozaj chcete vymazať túto rezerváciu?')">
+                                    <form method="POST" action="{{ route('owner.appointments.delete', $appointment) }}" onsubmit="return confirm('{{ __('Are you sure you want to delete this appointment?') }}')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="Vymazať">
-                                            Vymazať
+                                        <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="{{ __('Delete') }}">
+                                            {{ __('Delete') }}
                                         </button>
                                     </form>
                                 </div>
@@ -187,7 +207,7 @@
                         </div>
                     @empty
                         <div class="p-12 text-center">
-                            <p class="text-sm text-slate-500 italic">Na dnes nie sú naplánované žiadne rezervácie.</p>
+                            <p class="text-sm text-slate-500 italic">{{ __('No appointments scheduled for today.') }}</p>
                         </div>
                     @endforelse
                 </div>
@@ -225,7 +245,7 @@
 
         <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 overflow-hidden">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-display font-semibold text-slate-900">Pridať manuálnu rezerváciu</h3>
+                <h3 class="text-xl font-display font-semibold text-slate-900">{{ __('Add manual appointment') }}</h3>
                 <button onclick="closeManualAppointmentModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -237,10 +257,10 @@
 
                 @if($allProfiles->first()->employees->count() > 1)
                     <div>
-                        <label class="label">Zamestnanec</label>
+                        <label class="label">{{ __('Employee') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="employee_id" class="nice-select" id="manual_employee_select">
-                                <option value="">Bez zamestnanca</option>
+                                <option value="">{{ __('No employee') }}</option>
                                 @foreach($allProfiles->first()->employees as $employee)
                                     <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                                 @endforeach
@@ -253,29 +273,29 @@
 
                 <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
-                        <label class="label">Meno zákazníka</label>
-                        <input type="text" name="customer_name" class="input-control" placeholder="Meno a priezvisko" required>
+                        <label class="label">{{ __('Customer name') }}</label>
+                        <input type="text" name="customer_name" class="input-control" placeholder="{{ __('Name and surname') }}" required>
                     </div>
                     <div>
-                        <label class="label">Telefón</label>
+                        <label class="label">{{ __('Phone') }}</label>
                         <input type="text" name="customer_phone" class="input-control" placeholder="+421 ...">
                     </div>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="label">Názov služby</label>
-                        <input type="text" name="service_name_manual" class="input-control" placeholder="Napr. Pánsky strih" required>
+                        <label class="label">{{ __('Service name') }}</label>
+                        <input type="text" name="service_name_manual" class="input-control" placeholder="{{ __('e.g. Men\'s haircut') }}" required>
                     </div>
                     <div>
-                        <label class="label">Dátum</label>
+                        <label class="label">{{ __('Date') }}</label>
                         <input type="date" name="date" id="manual_date" class="input-control" value="{{ date('Y-m-d') }}" required>
                     </div>
                 </div>
 
                 <div class="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
                     <div>
-                        <label class="label">Čas začiatku</label>
+                        <label class="label">{{ __('Start time') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="start_time" id="manual_start_time" class="nice-select nice-select-time" required>
                                 @for($h = 7; $h <= 21; $h++)
@@ -288,23 +308,23 @@
                         </div>
                     </div>
                     <div>
-                        <label class="label">Dĺžka (min)</label>
+                        <label class="label">{{ __('Duration (min)') }}</label>
                         <input type="number" name="duration_minutes" class="input-control" value="30" min="1" required>
                     </div>
                     <div>
-                        <label class="label">Cena (€)</label>
+                        <label class="label">{{ __('Price (€)') }}</label>
                         <input type="number" step="0.01" name="price" class="input-control" value="0.00" required>
                     </div>
                 </div>
 
                 <div>
-                    <label class="label">Poznámka</label>
-                    <textarea name="notes" rows="2" class="input-control" placeholder="Voliteľná poznámka"></textarea>
+                    <label class="label">{{ __('Note') }}</label>
+                    <textarea name="notes" rows="2" class="input-control" placeholder="{{ __('Optional note') }}"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" onclick="closeManualAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50">Uložiť rezerváciu</button>
+                    <button type="button" onclick="closeManualAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">{{ __('Cancel') }}</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50">{{ __('Save appointment') }}</button>
                 </div>
             </form>
         </div>
@@ -318,7 +338,7 @@
 
         <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 overflow-hidden">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-display font-semibold text-slate-900">Upraviť rezerváciu</h3>
+                <h3 class="text-xl font-display font-semibold text-slate-900">{{ __('Edit appointment') }}</h3>
                 <button onclick="closeEditAppointmentModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -328,29 +348,29 @@
                 @csrf
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="label">Meno zákazníka</label>
+                        <label class="label">{{ __('Customer name') }}</label>
                         <input type="text" name="customer_name" id="edit_customer_name" class="input-control" required>
                     </div>
                     <div>
-                        <label class="label">Telefón</label>
+                        <label class="label">{{ __('Phone') }}</label>
                         <input type="text" name="customer_phone" id="edit_customer_phone" class="input-control">
                     </div>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="label">Názov služby</label>
+                        <label class="label">{{ __('Service name') }}</label>
                         <input type="text" name="service_name_manual" id="edit_service_name" class="input-control" required>
                     </div>
                     <div>
-                        <label class="label">Dátum</label>
+                        <label class="label">{{ __('Date') }}</label>
                         <input type="date" name="date" id="edit_date" class="input-control" required>
                     </div>
                 </div>
 
                 <div class="grid sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="label">Čas začiatku</label>
+                        <label class="label">{{ __('Start time') }}</label>
                         <div class="nice-select-wrapper">
                             <select name="start_time" id="edit_start_time" class="nice-select nice-select-time" required>
                                 @for($h = 7; $h <= 21; $h++)
@@ -363,21 +383,21 @@
                         </div>
                     </div>
                     <div>
-                        <label class="label">Dĺžka (min)</label>
+                        <label class="label">{{ __('Duration (min)') }}</label>
                         <input type="number" name="duration_minutes" id="edit_duration" class="input-control" min="1" required>
                     </div>
                     <div>
-                        <label class="label">Cena (€)</label>
+                        <label class="label">{{ __('Price (€)') }}</label>
                         <input type="number" step="0.01" name="price" id="edit_price" class="input-control" required>
                     </div>
                 </div>
 
                 @if($allProfiles->first()->employees->count() > 1)
                 <div>
-                    <label class="label">Zamestnanec</label>
+                    <label class="label">{{ __('Employee') }}</label>
                     <div class="nice-select-wrapper">
                         <select name="employee_id" id="edit_employee_select" class="nice-select">
-                            <option value="">Bez zamestnanca</option>
+                            <option value="">{{ __('No employee') }}</option>
                             @foreach($allProfiles->first()->employees as $employee)
                                 <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                             @endforeach
@@ -389,13 +409,123 @@
                 @endif
 
                 <div>
-                    <label class="label">Poznámka</label>
-                    <textarea name="notes" id="edit_notes" rows="2" class="input-control" placeholder="Voliteľná poznámka"></textarea>
+                    <label class="label">{{ __('Note') }}</label>
+                    <textarea name="notes" id="edit_notes" rows="2" class="input-control" placeholder="{{ __('Optional note') }}"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
-                    <button type="button" onclick="closeEditAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">Zrušiť</button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg">Uložiť zmeny</button>
+                    <button type="button" onclick="closeEditAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">{{ __('Cancel') }}</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-lg">{{ __('Save changes') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Free Slots Modal -->
+<div id="freeSlotsModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeFreeSlotsModal()"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl p-0 overflow-hidden text-left transition-all sm:my-8">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-900">{{ __('Free slots') }}</h3>
+                <button onclick="closeFreeSlotsModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <div id="free-slots-container" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <!-- Slots will be loaded here via JS -->
+                    <div class="flex items-center justify-center py-12">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeFreeSlotsModal()" class="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-800 transition">
+                    {{ __('Close') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Booking Modal -->
+<div id="quickBookingModal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeQuickBookingModal()"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 overflow-hidden">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">{{ __('Quick booking') }}</h3>
+                    <p class="text-sm text-slate-500" id="quick-booking-time-display"></p>
+                </div>
+                <button onclick="closeQuickBookingModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('owner.appointments.manual.store') }}" class="space-y-4">
+                @csrf
+                <input type="hidden" name="profile_id" id="quick_profile_id">
+                <input type="hidden" name="date" id="quick_date">
+                <input type="hidden" name="start_time" id="quick_start_time">
+                <input type="hidden" name="duration_minutes" id="quick_duration" value="30">
+                <input type="hidden" name="price" id="quick_price" value="0">
+
+                <div id="quick-service-selection" class="space-y-3 mb-6">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Choose a service') }}</label>
+                    <div class="grid grid-cols-1 gap-2" id="quick-services-list">
+                        <!-- Services will be loaded here -->
+                    </div>
+                    <button type="button" onclick="selectManualService()" id="btn-manual-service" class="w-full text-left px-4 py-3 rounded-xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-bold text-slate-700 group-hover:text-emerald-700">{{ __('Manual service') }}</p>
+                                <p class="text-xs text-slate-500">{{ __('Enter name and price manually') }}</p>
+                            </div>
+                            <div class="h-5 w-5 rounded-full border-2 border-slate-200 group-hover:border-emerald-500 flex items-center justify-center">
+                                <div class="h-2-5 w-2-5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                <div id="manual-service-fields" class="hidden space-y-4 border-t border-slate-100 pt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="label">{{ __('Service name') }}</label>
+                            <input type="text" name="service_name_manual" id="quick_service_name" class="input-control" placeholder="{{ __('e.g. Cutting') }}">
+                        </div>
+                        <div>
+                            <label class="label">{{ __('Price (€)') }}</label>
+                            <input type="number" step="0.01" name="price_manual" id="quick_price_manual" class="input-control" value="0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 border-t border-slate-100 pt-4">
+                    <div>
+                        <label class="label">{{ __('Customer name') }}</label>
+                        <input type="text" name="customer_name" class="input-control" placeholder="{{ __('Name and surname') }}" required>
+                    </div>
+                    <div>
+                        <label class="label">{{ __('Phone') }}</label>
+                        <input type="text" name="customer_phone" class="input-control" placeholder="+421 ...">
+                    </div>
+                    <div>
+                        <label class="label">{{ __('Note') }}</label>
+                        <textarea name="notes" rows="2" class="input-control" placeholder="{{ __('Optional note') }}"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closeQuickBookingModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">{{ __('Cancel') }}</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50">{{ __('Create booking') }}</button>
                 </div>
             </form>
         </div>
@@ -406,10 +536,9 @@
     function openManualAppointmentModal() {
         document.getElementById('manualAppointmentModal').classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        if ($.fn.niceSelect) {
+        if (typeof $ !== 'undefined' && $.fn.niceSelect) {
             $('#manualAppointmentModal .nice-select').niceSelect('update');
         }
-        checkBusySlots();
     }
 
     function closeManualAppointmentModal() {
@@ -439,7 +568,7 @@
 
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        if ($.fn.niceSelect) {
+        if (typeof $ !== 'undefined' && $.fn.niceSelect) {
             $('#editAppointmentModal .nice-select').niceSelect('update');
         }
     }
@@ -447,6 +576,155 @@
     function closeEditAppointmentModal() {
         document.getElementById('editAppointmentModal').classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
+    }
+
+    function openFreeSlotsModal() {
+        const date = document.getElementById('admin-selected-date').value;
+        const container = document.getElementById('free-slots-container');
+        document.getElementById('freeSlotsModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        // Reset container to loading state
+        container.innerHTML = `
+            <div class="flex items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+            </div>
+        `;
+
+        axios.get(`/owner/appointments/free-slots?date=${date}`)
+            .then(response => {
+                const slots = response.data.slots;
+                const count = response.data.count;
+
+                // Update count in dashboard too
+                const dashboardCount = document.getElementById('free-slots-today-count');
+                const today = new Date().toISOString().split('T')[0];
+                if (date === today && dashboardCount) {
+                    dashboardCount.innerText = count;
+                }
+
+                if (slots.length === 0) {
+                    container.innerHTML = `
+                        <div class="py-12 text-center">
+                            <p class="text-slate-500 italic">{{ __('No free slots available for this day.') }}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = slots.map(slot => `
+                    <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-sky-200 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="h-12 w-12 rounded-lg bg-sky-100 text-sky-700 flex flex-col items-center justify-center">
+                                <span class="text-sm font-bold leading-none">${slot.time}</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-900">${slot.profile_name}</p>
+                                <p class="text-xs text-slate-500">${new Date(slot.date).toLocaleDateString('sk-SK')}</p>
+                            </div>
+                        </div>
+                        <button onclick='openQuickBookingModal(${JSON.stringify(slot)})' class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm">
+                            {{ __('Quick booking') }}
+                        </button>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error(error);
+                container.innerHTML = `
+                    <div class="py-12 text-center text-rose-600">
+                        {{ __('Failed to load free slots.') }}
+                    </div>
+                `;
+            });
+    }
+
+    function closeFreeSlotsModal() {
+        document.getElementById('freeSlotsModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    let currentSlot = null;
+
+    function openQuickBookingModal(slot) {
+        currentSlot = slot;
+        const modal = document.getElementById('quickBookingModal');
+        const timeDisplay = document.getElementById('quick-booking-time-display');
+        const servicesList = document.getElementById('quick-services-list');
+
+        document.getElementById('quick_profile_id').value = slot.profile_id;
+        document.getElementById('quick_date').value = slot.date;
+        document.getElementById('quick_start_time').value = slot.time;
+
+        const dateFormatted = new Date(slot.date).toLocaleDateString('sk-SK');
+        timeDisplay.innerText = `${dateFormatted} o ${slot.time} - ${slot.profile_name}`;
+
+        // Load services
+        servicesList.innerHTML = slot.services.map(service => {
+            const serviceJson = JSON.stringify(service).replace(/'/g, "&apos;");
+            return `
+                <button type="button" onclick='selectQuickService(${serviceJson}, this)' class="quick-service-btn w-full text-left px-4 py-3 rounded-xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-slate-700 group-hover:text-emerald-700">${service.name}</p>
+                            <p class="text-xs text-slate-500">${service.price} €</p>
+                        </div>
+                        <div class="h-5 w-5 rounded-full border-2 border-slate-200 group-hover:border-emerald-500 flex items-center justify-center">
+                            <div class="h-2-5 w-2-5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                    </div>
+                </button>
+            `;
+        }).join('');
+
+        // Reset manual fields
+        document.getElementById('manual-service-fields').classList.add('hidden');
+        document.getElementById('quick_service_name').required = false;
+        document.getElementById('btn-manual-service').classList.remove('border-emerald-500', 'bg-emerald-50');
+
+        modal.classList.remove('hidden');
+    }
+
+    function selectQuickService(service, element) {
+        document.getElementById('quick_service_name').value = service.name;
+        document.getElementById('quick_price').value = service.price;
+        document.getElementById('quick_price_manual').value = service.price;
+
+        // Visual selection
+        document.querySelectorAll('.quick-service-btn').forEach(btn => {
+            btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+            const indicator = btn.querySelector('.h-2-5');
+            if (indicator) indicator.classList.add('opacity-0');
+        });
+        element.classList.add('border-emerald-500', 'bg-emerald-50');
+        const activeIndicator = element.querySelector('.h-2-5');
+        if (activeIndicator) activeIndicator.classList.remove('opacity-0');
+
+        document.getElementById('manual-service-fields').classList.add('hidden');
+        document.getElementById('quick_service_name').required = false;
+        document.getElementById('btn-manual-service').classList.remove('border-emerald-500', 'bg-emerald-50');
+    }
+
+    function selectManualService() {
+        document.getElementById('quick_service_name').value = '';
+        document.getElementById('quick_price').value = 0;
+        document.getElementById('quick_price_manual').value = '0.00';
+
+        // Visual selection
+        document.querySelectorAll('.quick-service-btn').forEach(btn => {
+            btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+            const indicator = btn.querySelector('.h-2-5');
+            if (indicator) indicator.classList.add('opacity-0');
+        });
+
+        document.getElementById('btn-manual-service').classList.add('border-emerald-500', 'bg-emerald-50');
+        document.getElementById('manual-service-fields').classList.remove('hidden');
+        document.getElementById('quick_service_name').required = true;
+        document.getElementById('quick_service_name').focus();
+    }
+
+    function closeQuickBookingModal() {
+        document.getElementById('quickBookingModal').classList.add('hidden');
     }
 
     function checkBusySlots() {
@@ -470,8 +748,8 @@
                     });
 
                     if (isBusy) {
-                        if (!option.text.includes('(obsadené)')) {
-                            option.text = `${time} (obsadené)`;
+                        if (!option.text.includes('({{ __('busy') }})')) {
+                            option.text = `${time} ({{ __('busy') }})`;
                         }
                         option.classList.add('busy-option');
                     } else {
@@ -483,7 +761,7 @@
                     $(timeSelect).niceSelect('update');
                 }
             })
-            .catch(err => console.error('Chyba pri kontrole obsadenosti', err));
+            .catch(err => console.error('{{ __('Error checking occupancy') }}', err));
     }
 
     $(document).ready(function() {

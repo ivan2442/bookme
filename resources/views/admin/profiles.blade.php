@@ -4,18 +4,18 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
-            <h1 class="font-display text-3xl text-slate-900">Správa prevádzok</h1>
-            <p class="text-sm text-slate-500">Prehľad a správa registrovaných prevádzok v systéme.</p>
+            <h1 class="font-display text-3xl text-slate-900">{{ __('Manage businesses') }}</h1>
+            <p class="text-sm text-slate-500">{{ __('Overview and management of registered businesses in the system.') }}</p>
         </div>
         <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-200">
-            + Pridať prevádzku
+            + {{ __('Add business') }}
         </button>
     </div>
 
 
     <div class="flex flex-wrap gap-2 mb-6">
         <a href="{{ route('admin.profiles') }}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all {{ !$plan ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100' }}">
-            Všetky
+            {{ __('All') }}
         </a>
         <a href="{{ route('admin.profiles', ['plan' => 'premium']) }}" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all {{ $plan === 'premium' ? 'bg-amber-500 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100' }}">
             Premium
@@ -30,9 +30,9 @@
 
     <div class="card space-y-3">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold text-lg text-slate-900">Zoznam prevádzok</h2>
+            <h2 class="font-semibold text-lg text-slate-900">{{ __('Business list') }}</h2>
             <div class="relative flex-1 max-w-xs">
-                <input type="text" id="profile-search" class="input-control !py-2 !text-sm pl-10" placeholder="Hľadať prevádzku...">
+                <input type="text" id="profile-search" class="input-control !py-2 !text-sm pl-10" placeholder="{{ __('Search business...') }}">
                 <svg class="w-4 h-4 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
         </div>
@@ -64,11 +64,11 @@
                             </div>
                             @if($profile->subscription_starts_at)
                                 <div class="mt-2 flex items-center gap-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-tight text-slate-400">Bezplatná verzia:</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-tight text-slate-400">{{ __('Free version') }}:</span>
                                     @if($profile->trial_days_left > 0)
-                                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Zostáva {{ $profile->trial_time_left }}</span>
+                                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">{{ __('Remaining') }} {{ $profile->trial_time_left }}</span>
                                     @else
-                                        <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Skončila ({{ $profile->trial_ends_at->format('d.m.Y') }})</span>
+                                        <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">{{ __('Expired') }} ({{ $profile->trial_ends_at->format('d.m.Y') }})</span>
                                     @endif
                                 </div>
                             @endif
@@ -79,16 +79,16 @@
                             <form action="{{ route('admin.profiles.publish', $profile) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm shadow-emerald-200">
-                                    Zverejniť
+                                    {{ __('Publish') }}
                                 </button>
                             </form>
                         @endif
                         <button type="button"
                                 onclick="openEditModal({{ json_encode($profile) }})"
                                 class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition">
-                                Upraviť
+                                {{ __('Edit') }}
                         </button>
-                        <form action="{{ route('admin.profiles.delete', $profile) }}" method="POST" onsubmit="return confirmDelete(event, 'Naozaj chcete odstrániť túto prevádzku?')">
+                        <form action="{{ route('admin.profiles.delete', $profile) }}" method="POST" onsubmit="return confirmDelete(event, '{{ __('Are you sure you want to delete this business?') }}')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition">
@@ -98,7 +98,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-sm text-slate-500">Žiadne prevádzky.</p>
+                <p class="text-sm text-slate-500">{{ __('No businesses.') }}</p>
             @endforelse
         </div>
     </div>
@@ -114,7 +114,7 @@
         <div class="relative inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-slate-100">
             <div class="bg-white p-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-slate-900" id="modal-title">Pridať prevádzku</h3>
+                    <h3 class="text-xl font-bold text-slate-900" id="modal-title">{{ __('Add business') }}</h3>
                     <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18"/></svg>
                     </button>
@@ -124,32 +124,32 @@
                     @csrf
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="label">Názov prevádzky</label>
+                            <label class="label">{{ __('Business name') }}</label>
                             <input type="text" name="name" class="input-control" value="{{ old('name') }}" required>
                         </div>
                         <div>
-                            <label class="label">Slug</label>
-                            <input type="text" name="slug" class="input-control" value="{{ old('slug') }}" placeholder="automaticky podľa názvu">
+                            <label class="label">{{ __('Slug') }}</label>
+                            <input type="text" name="slug" class="input-control" value="{{ old('slug') }}" placeholder="{{ __('automatic by name') }}">
                         </div>
                     </div>
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="label">E-mail (login majiteľa)</label>
+                            <label class="label">{{ __('Email (owner login)') }}</label>
                             <input type="email" name="email" class="input-control" value="{{ old('email') }}" placeholder="info@prevadzka.sk" required>
                         </div>
                         <div>
-                            <label class="label">Heslo majiteľa</label>
-                            <input type="password" name="password" class="input-control" placeholder="Min. 8 znakov" required>
+                            <label class="label">{{ __('Owner password') }}</label>
+                            <input type="password" name="password" class="input-control" placeholder="{{ __('Min. 8 characters') }}" required>
                         </div>
                     </div>
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="label">Kategória</label>
-                            <input type="text" name="category" class="input-control" value="{{ old('category') }}" placeholder="Kaderníctvo">
+                            <label class="label">{{ __('Category') }}</label>
+                            <input type="text" name="category" class="input-control" value="{{ old('category') }}" placeholder="{{ __('Hairdressing') }}">
                         </div>
                         <div>
-                            <label class="label">Mesto</label>
-                            <input type="text" name="city" class="input-control" value="{{ old('city') }}" placeholder="Bratislava">
+                            <label class="label">{{ __('City') }}</label>
+                            <input type="text" name="city" class="input-control" value="{{ old('city') }}" placeholder="{{ __('City') }}">
                         </div>
                     </div>
                     <div class="grid sm:grid-cols-2 gap-3">
@@ -212,7 +212,7 @@
         <div class="relative inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-slate-100">
             <div class="bg-white p-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-slate-900" id="modal-title">Upraviť prevádzku</h3>
+                    <h3 class="text-xl font-bold text-slate-900" id="modal-title">{{ __('Edit business') }}</h3>
                     <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18"/></svg>
                     </button>
@@ -222,26 +222,26 @@
                     @csrf
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="label">Názov prevádzky</label>
+                            <label class="label">{{ __('Business name') }}</label>
                             <input type="text" name="name" id="edit-name" class="input-control" required>
                         </div>
                         <div>
-                            <label class="label">Slug</label>
+                            <label class="label">{{ __('Slug') }}</label>
                             <input type="text" name="slug" id="edit-slug" class="input-control" required>
                         </div>
                     </div>
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="label">Kategória</label>
+                            <label class="label">{{ __('Category') }}</label>
                             <input type="text" name="category" id="edit-category" class="input-control">
                         </div>
                         <div>
-                            <label class="label">Stav</label>
+                            <label class="label">{{ __('Status') }}</label>
                             <select name="status" id="edit-status" class="input-control" required>
                                 <option value="draft">Draft</option>
-                                <option value="pending">Čakajúca (Pending)</option>
-                                <option value="published">Publikovaná</option>
-                                <option value="inactive">Neaktívna</option>
+                                <option value="pending">{{ __('Pending') }}</option>
+                                <option value="published">{{ __('Published') }}</option>
+                                <option value="inactive">{{ __('Inactive') }}</option>
                             </select>
                         </div>
                     </div>
