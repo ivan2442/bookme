@@ -37,15 +37,15 @@
                 <div class="grid sm:grid-cols-3 gap-3">
                     <div>
                         <label class="label">Dátum</label>
-                        <input type="text" name="date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD">
+                        <input type="text" name="date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD" data-allow-past>
                     </div>
                     <div>
                         <label class="label">Od</label>
-                        <input type="text" name="start_time" class="input-control flatpickr-time" value="{{ old('start_time') }}" placeholder="{{ __('all day') }}">
+                        <input type="text" name="start_time" class="input-control js-flatpickr-time" value="{{ old('start_time') }}" placeholder="{{ __('all day') }}">
                     </div>
                     <div>
                         <label class="label">Do</label>
-                        <input type="text" name="end_time" class="input-control flatpickr-time" value="{{ old('end_time') }}" placeholder="{{ __('all day') }}">
+                        <input type="text" name="end_time" class="input-control js-flatpickr-time" value="{{ old('end_time') }}" placeholder="{{ __('all day') }}">
                     </div>
                 </div>
                 <div class="grid sm:grid-cols-2 gap-3">
@@ -123,15 +123,15 @@
                             <div class="grid grid-cols-3 gap-2">
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Dátum</label>
-                                    <input type="text" name="date" value="{{ $holiday->date->format('Y-m-d') }}" class="input-control !py-1.5 !text-sm" required readonly placeholder="YYYY-MM-DD">
+                                    <input type="text" name="date" value="{{ $holiday->date->format('Y-m-d') }}" class="input-control !py-1.5 !text-sm" required readonly placeholder="YYYY-MM-DD" data-allow-past>
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Od</label>
-                                    <input type="text" name="start_time" value="{{ $holiday->start_time ? substr($holiday->start_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm flatpickr-time" placeholder="{{ __('all day') }}">
+                                    <input type="text" name="start_time" value="{{ $holiday->start_time ? substr($holiday->start_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm js-flatpickr-time" placeholder="{{ __('all day') }}">
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Do</label>
-                                    <input type="text" name="end_time" value="{{ $holiday->end_time ? substr($holiday->end_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm flatpickr-time" placeholder="{{ __('all day') }}">
+                                    <input type="text" name="end_time" value="{{ $holiday->end_time ? substr($holiday->end_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm js-flatpickr-time" placeholder="{{ __('all day') }}">
                                 </div>
                             </div>
                             <div>

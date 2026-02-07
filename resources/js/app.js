@@ -1129,18 +1129,30 @@ function initSelectedDate() {
                 // Pre iOS/Android zabezpečíme, že pole bude readonly pre natívnu klávesnicu,
                 // ale flatpickr ho bude môcť ovládať.
                 instance.element.setAttribute('readonly', 'readonly');
+            },
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const isoDate = formatIsoDate(dayElem.dateObj);
+                const closedDays = (window.adminState ? window.adminState.closedDays : state.closedDays) || [];
+                if (closedDays.includes(isoDate)) {
+                    dayElem.classList.add('is-closed-day');
+                }
             }
         };
 
         const dateInputs = document.querySelectorAll('input[name="date"]:not([type="hidden"]), input[type="date"]');
         dateInputs.forEach(el => {
-            // Ak už je flatpickr inicializovaný, preskočíme
-            if (el._flatpickr) return;
+            // Ak už je flatpickr inicializovaný, alebo ide o interný element kalendára, preskočíme
+            if (el._flatpickr || el.closest('.flatpickr-calendar')) return;
 
             // Ak má element špecifický onchange z dashboardu (napr. quick booking)
             const originalOnchange = el.onchange;
 
             const instanceConfig = { ...config };
+
+            // Zakážeme minulosť pre rezervácie (pokiaľ nie je explicitne povolená cez data-allow-past)
+            if (el.dataset.allowPast === undefined) {
+                instanceConfig.minDate = "today";
+            }
 
             // Špecifická logika pre domovskú stránku a výber dátumu
             if (el.dataset.dateInput !== undefined) {
@@ -1174,9 +1186,9 @@ function initSelectedDate() {
         });
 
         // Time inputs
-        const timeInputs = document.querySelectorAll('input[type="time"], .flatpickr-time');
+        const timeInputs = document.querySelectorAll('input[type="time"], input.js-flatpickr-time');
         timeInputs.forEach(el => {
-            if (el._flatpickr) return;
+            if (el._flatpickr || el.classList.contains('numInput') || el.closest('.flatpickr-calendar')) return;
 
             // Zmena typu na text, aby sme predišli natívnemu picker-u
             if (el.type === 'time') {
@@ -1220,17 +1232,17 @@ function initAdminDashboard() {
 
     if (!adminCalGrid || !adminDateInput) return;
 
-    let adminState = {
+    window.adminState = {
         calendarStart: startOfWeek(new Date()),
         selectedDate: formatIsoDate(new Date()),
         closedDays: []
     };
 
     async function fetchAdminCalendarStatus() {
-        const startIso = formatIsoDate(adminState.calendarStart);
+        const startIso = formatIsoDate(window.adminState.calendarStart);
         try {
             const response = await axios.get(`/owner/appointments/calendar-status?start=${startIso}&days=7`);
-            adminState.closedDays = response.data.closed_days || [];
+            window.adminState.closedDays = response.data.closed_days || [];
             renderAdminCalendar();
         } catch (error) {
             console.error('Chyba pri načítaní stavu kalendára', error);
@@ -1239,7 +1251,7 @@ function initAdminDashboard() {
 
     function renderAdminCalendar() {
         if (!adminCalGrid || !adminCalMonth) return;
-        const start = adminState.calendarStart;
+        const start = window.adminState.calendarStart;
         const locale = window.locale || 'sk-SK';
         const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
         adminCalMonth.textContent = monthFormatter.format(start);
@@ -1251,7 +1263,7 @@ function initAdminDashboard() {
             day.setDate(start.getDate() + i);
             const dayNum = day.getDate();
             const iso = formatIsoDate(day);
-            const isClosed = adminState.closedDays.includes(iso);
+            const isClosed = window.adminState.closedDays.includes(iso);
 
             const item = document.createElement('a');
             item.href = '#';
@@ -1261,13 +1273,13 @@ function initAdminDashboard() {
             }
             item.textContent = dayNum;
 
-            if (adminState.selectedDate === iso) {
+            if (window.adminState.selectedDate === iso) {
                 item.classList.add('active');
             }
 
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-                adminState.selectedDate = iso;
+                window.adminState.selectedDate = iso;
                 adminDateInput.value = iso;
                 fetchAdminAppointments(iso);
                 renderAdminCalendar();

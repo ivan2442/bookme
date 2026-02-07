@@ -134,11 +134,11 @@
                 <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">{{ __('Opens at') }}</label>
-                        <input type="text" name="start_time" class="input-control flatpickr-time" value="09:00" required>
+                        <input type="text" name="start_time" class="input-control js-flatpickr-time" value="09:00" required>
                     </div>
                     <div>
                         <label class="label">{{ __('Closes at') }}</label>
-                        <input type="text" name="end_time" class="input-control flatpickr-time" value="17:00" required>
+                        <input type="text" name="end_time" class="input-control js-flatpickr-time" value="17:00" required>
                     </div>
                 </div>
 
@@ -150,11 +150,11 @@
                     <div id="break_fields_new" class="grid grid-cols-2 gap-4 hidden">
                         <div>
                             <label class="label">{{ __('Break from') }}</label>
-                            <input type="text" name="break_start_time" class="input-control flatpickr-time" value="12:00">
+                            <input type="text" name="break_start_time" class="input-control js-flatpickr-time" value="12:00">
                         </div>
                         <div>
                             <label class="label">{{ __('Break to') }}</label>
-                            <input type="text" name="break_end_time" class="input-control flatpickr-time" value="13:00">
+                            <input type="text" name="break_end_time" class="input-control js-flatpickr-time" value="13:00">
                         </div>
                     </div>
                 </div>
@@ -226,11 +226,11 @@
                 <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">{{ __('Opens at') }}</label>
-                        <input type="text" name="start_time" id="edit_start_time" class="input-control flatpickr-time" required>
+                        <input type="text" name="start_time" id="edit_start_time" class="input-control js-flatpickr-time" required>
                     </div>
                     <div>
                         <label class="label">{{ __('Closes at') }}</label>
-                        <input type="text" name="end_time" id="edit_end_time" class="input-control flatpickr-time" required>
+                        <input type="text" name="end_time" id="edit_end_time" class="input-control js-flatpickr-time" required>
                     </div>
                 </div>
 
@@ -242,11 +242,11 @@
                     <div id="break_fields_edit" class="grid grid-cols-2 gap-3 hidden">
                         <div>
                             <label class="label text-[10px]">{{ __('Break from') }}</label>
-                            <input type="text" name="break_start_time" id="edit_break_start_time" class="input-control !py-1 !text-xs flatpickr-time">
+                            <input type="text" name="break_start_time" id="edit_break_start_time" class="input-control !py-1 !text-xs js-flatpickr-time">
                         </div>
                         <div>
                             <label class="label text-[10px]">{{ __('Break to') }}</label>
-                            <input type="text" name="break_end_time" id="edit_break_end_time" class="input-control !py-1 !text-xs flatpickr-time">
+                            <input type="text" name="break_end_time" id="edit_break_end_time" class="input-control !py-1 !text-xs js-flatpickr-time">
                         </div>
                     </div>
                 </div>

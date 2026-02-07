@@ -399,6 +399,23 @@ body {
     border-color: #fecaca;
 }
 
+/* Flatpickr custom styles */
+.flatpickr-day.is-closed-day {
+    background-color: #fef2f2 !important;
+    color: #ef4444 !important;
+    border-color: #fecaca !important;
+}
+
+.flatpickr-day.is-closed-day:hover {
+    background-color: #fee2e2 !important;
+}
+
+.flatpickr-day.is-closed-day.selected {
+    background-color: #ef4444 !important;
+    color: #fff !important;
+    border-color: #ef4444 !important;
+}
+
 .admin-tab {
     padding: 10px 14px;
     border-radius: 12px;

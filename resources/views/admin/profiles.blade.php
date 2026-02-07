@@ -282,7 +282,7 @@
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div>
                             <label class="label">Dátum spustenia predplatného</label>
-                            <input type="date" name="subscription_starts_at" id="edit-subscription_starts_at" class="input-control">
+                            <input type="date" name="subscription_starts_at" id="edit-subscription_starts_at" class="input-control" data-allow-past>
                         </div>
                         <div>
                             <label class="label">Plán predplatného</label>

@@ -127,7 +127,7 @@
                     </div>
                     <div>
                         <label class="label">Splatnosť</label>
-                        <input type="date" name="due_at" class="input-control" value="{{ date('Y-m-d', strtotime('+14 days')) }}" required>
+                        <input type="date" name="due_at" class="input-control" value="{{ date('Y-m-d', strtotime('+14 days')) }}" required data-allow-past>
                     </div>
                 </div>
                 <div>

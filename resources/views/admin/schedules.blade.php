@@ -46,11 +46,11 @@
                     </div>
                     <div>
                         <label class="label">Od</label>
-                        <input type="text" name="start_time" class="input-control flatpickr-time" value="{{ old('start_time', '09:00') }}" required>
+                        <input type="text" name="start_time" class="input-control js-flatpickr-time" value="{{ old('start_time', '09:00') }}" required>
                     </div>
                     <div>
                         <label class="label">Do</label>
-                        <input type="text" name="end_time" class="input-control flatpickr-time" value="{{ old('end_time', '17:00') }}" required>
+                        <input type="text" name="end_time" class="input-control js-flatpickr-time" value="{{ old('end_time', '17:00') }}" required>
                     </div>
                 </div>
                 <button type="submit" class="px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition shadow-md shadow-emerald-200/70">

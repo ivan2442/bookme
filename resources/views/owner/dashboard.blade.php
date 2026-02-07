@@ -296,7 +296,7 @@
                 <div class="grid sm:grid-cols-3 gap-4">
                     <div>
                         <label class="label">{{ __('Start time') }}</label>
-                        <input type="text" name="start_time" id="edit_start_time" class="input-control flatpickr-time" required>
+                        <input type="text" name="start_time" id="edit_start_time" class="input-control js-flatpickr-time" required>
                     </div>
                     <div>
                         <label class="label">{{ __('Duration (min)') }}</label>
@@ -399,8 +399,7 @@
                     </div>
                     <div>
                         <label class="label">{{ __('Start time') }}</label>
-                        <input type="text" name="start_time" id="quick_start_time" class="input-control flatpickr-time" style="  padding: 5px !important;
-  height: auto !important;max-height: 52px !important;" required>
+                        <input type="text" name="start_time" id="quick_start_time" class="input-control js-flatpickr-time" style="padding: 15px !important;   height: auto !important;   max-height: 52px !important;   text-align: center;  " required>
                     </div>
                 </div>
 
