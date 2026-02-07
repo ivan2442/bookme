@@ -955,7 +955,7 @@ window.addEventListener('scroll', () => {
             // Scrolling up
             headerWrapper.classList.replace('-translate-y-full', 'translate-y-0');
 
-            if (currentScrollY > 20) {
+            if (currentScrollY > 20 || window.innerWidth < 768) {
                 headerWrapper.classList.add('is-scrolled');
                 mainHeader.classList.add('!py-3');
                 mainHeader.classList.remove('md:py-6');

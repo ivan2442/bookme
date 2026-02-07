@@ -71,11 +71,14 @@ body {
 }
 
 @media (max-width: 767px) {
-    #header-wrapper.is-scrolled {
+    #header-wrapper {
         margin: 10px;
         width: calc(100% - 20px);
         border-radius: 24px;
         border: 1px solid rgba(241, 245, 249, 0.5); /* subtilnejší border ladiaci s dizajnom */
+        background: rgba(248, 250, 252, 0.8); /* bg-sand/80 */
+        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
     }
 }
 

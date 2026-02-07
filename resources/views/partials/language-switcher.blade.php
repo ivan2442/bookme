@@ -14,8 +14,8 @@
         </button>
     </div>
 
-    <div class="hidden absolute right-0 mt-2 w-12 rounded-xl bg-white shadow-2xl border border-slate-100 ring-1 ring-black ring-opacity-5 z-50 language-dropdown-menu">
-        <div class="py-1 flex flex-col items-center gap-1" role="menu" aria-orientation="vertical">
+    <div class="hidden absolute right-0 mt-2 w-14 rounded-xl bg-white shadow-2xl border border-slate-100 ring-1 ring-black ring-opacity-5 z-50 language-dropdown-menu">
+        <div class="py-2 flex flex-col items-center gap-3" role="menu" aria-orientation="vertical">
             @foreach($locales as $code => $data)
                 @if($code !== $currentLocale)
                     <a href="?lang={{ $code }}" class="flag-circle hover:bg-slate-50 transition p-0.5" role="menuitem" title="{{ $data['name'] }}">
@@ -29,8 +29,8 @@
 
 <style>
     .flag-circle {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         overflow: hidden;
         display: inline-flex;

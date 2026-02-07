@@ -220,7 +220,7 @@
             </script>
         @endif
         <div id="header-wrapper" class="fixed top-0 left-0 right-0 z-50 translate-y-0">
-            <header id="main-header" class="max-w-6xl mx-auto px-4 py-4 md:py-6 flex items-center justify-between gap-4 transition-all duration-300">
+            <header id="main-header" class="max-w-6xl mx-auto px-4 py-3 md:py-6 flex items-center justify-between gap-4 transition-all duration-300">
                 <a href="/" id="logo" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-200/60 flex items-center justify-center text-slate-900 font-semibold">B</div>
                     <div>
@@ -286,7 +286,7 @@
             </div>
         </div>
 
-        <main class="max-w-6xl mx-auto px-4 pt-15 md:pt-32">
+        <main class="max-w-6xl mx-auto px-4 pt-25 md:pt-32">
             @yield('content')
         </main>
 
