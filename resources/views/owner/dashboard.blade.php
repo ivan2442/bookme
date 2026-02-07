@@ -78,6 +78,19 @@
             </div>
         </div>
 
+        <div class="card flex flex-col justify-between p-6 h-full">
+            <div class="flex items-center justify-between mb-4">
+                <div class="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Revenue on this day') }}</span>
+            </div>
+            <div>
+                <p class="text-3xl font-bold text-slate-900">€<span id="revenue-today-value">{{ number_format($stats['revenue_today'], 2, ',', ' ') }}</span></p>
+                <p class="text-sm text-slate-500 font-medium">{{ __('Completed orders') }}</p>
+            </div>
+        </div>
+
         <div class="card p-6 h-full xl:col-span-2 lg:col-span-2 md:col-span-2">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
@@ -109,19 +122,6 @@
                 </div>
             </div>
             <input type="hidden" id="admin-selected-date" value="{{ date('Y-m-d') }}">
-        </div>
-
-        <div class="card flex flex-col justify-between p-6 h-full">
-            <div class="flex items-center justify-between mb-4">
-                <div class="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Revenue on this day') }}</span>
-            </div>
-            <div>
-                <p class="text-3xl font-bold text-slate-900">€<span id="revenue-today-value">{{ number_format($stats['revenue_today'], 2, ',', ' ') }}</span></p>
-                <p class="text-sm text-slate-500 font-medium">{{ __('Completed orders') }}</p>
-            </div>
         </div>
     </div>
 
@@ -177,6 +177,23 @@
                                             </button>
                                         </form>
                                     @endif
+
+                                    <button onclick='openEditAppointmentModal({{ json_encode([
+                                        "id" => $appointment->id,
+                                        "customer_name" => $appointment->customer_name,
+                                        "customer_email" => $appointment->customer_email,
+                                        "customer_phone" => $appointment->customer_phone,
+                                        "status" => $appointment->status,
+                                        "notes" => $appointment->metadata["notes"] ?? "",
+                                        "date" => $appointment->start_at->format("Y-m-d"),
+                                        "start_time" => $appointment->start_at->format("H:i"),
+                                        "duration_minutes" => $appointment->metadata["duration_minutes"] ?? (int) (($appointment->end_at->timestamp - $appointment->start_at->timestamp) / 60),
+                                        "service_name" => $appointment->metadata["service_name_manual"] ?? ($appointment->service?->name ?? __('Manual service')),
+                                        "employee_id" => $appointment->employee_id,
+                                        "price" => $appointment->price
+                                    ]) }})' class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-100 transition" title="{{ __('Edit') }}">
+                                        {{ __('Edit') }}
+                                    </button>
 
                                     <button onclick='openEditAppointmentModal({{ json_encode([
                                         "id" => $appointment->id,

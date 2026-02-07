@@ -1331,6 +1331,21 @@ function initAdminDashboard() {
                                 price: a.price,
                                 employee_id: a.employee_id,
                                 notes: ''
+                            })})' class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-100 transition" title="${translations["Edit"] || 'Upraviť'}">
+                                ${translations["Edit"] || 'Upraviť'}
+                            </button>
+
+                            <button onclick='openEditAppointmentModal(${JSON.stringify({
+                                id: a.id,
+                                customer_name: a.customer_name,
+                                customer_phone: a.customer_phone,
+                                service_name: a.service_name,
+                                date: a.date_raw,
+                                start_time: a.start_time,
+                                duration_minutes: a.duration_minutes,
+                                price: a.price,
+                                employee_id: a.employee_id,
+                                notes: ''
                             })})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="${translations["Reschedule"] || 'Presunúť'}">
                                 ${translations["Reschedule"] || 'Presunúť'}
                             </button>
