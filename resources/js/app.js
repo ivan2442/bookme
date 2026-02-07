@@ -1315,6 +1315,10 @@ function initAdminDashboard() {
 
         const translations = window.translations || {};
         const revenueElement = document.getElementById('revenue-today-value');
+        const appointmentsStatCount = document.getElementById('appointments-stat-count');
+        const appointmentsStatLabel = document.getElementById('appointments-stat-label');
+        const freeSlotsStatCount = document.getElementById('free-slots-stat-count');
+        const freeSlotsStatLabel = document.getElementById('free-slots-stat-label');
 
         // Loading animation
         appointmentsList.innerHTML = `
@@ -1323,9 +1327,9 @@ function initAdminDashboard() {
             </div>
         `;
 
-        if (revenueElement) {
-            revenueElement.classList.add('opacity-50');
-        }
+        if (revenueElement) revenueElement.classList.add('opacity-50');
+        if (appointmentsStatCount) appointmentsStatCount.classList.add('opacity-50');
+        if (freeSlotsStatCount) freeSlotsStatCount.classList.add('opacity-50');
 
         // Predbežný vizuálny feedback
         const d = new Date(date);
@@ -1339,9 +1343,24 @@ function initAdminDashboard() {
             translations["Saturday"] || 'Sobota'
         ];
 
-        const formattedTitle = (d.toDateString() === new Date().toDateString())
-            ? (translations["Appointments for today"] || 'Termíny na dnes')
-            : `${translations["Appointments for"] || 'Termíny na'} ${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${dayNames[d.getDay()]}`;
+        const isToday = d.toDateString() === new Date().toDateString();
+        const dayName = dayNames[d.getDay()];
+
+        // Aktualizácia štítkov v štatistikách
+        if (appointmentsStatLabel) {
+            appointmentsStatLabel.textContent = isToday
+                ? (translations["Appointments today"] || 'Rezervácií na dnes')
+                : (translations["Appointments for"] || 'Rezervácií na') + ' ' + dayName;
+        }
+        if (freeSlotsStatLabel) {
+            freeSlotsStatLabel.textContent = isToday
+                ? (translations["Free slots for today"] || 'Voľné termíny na dnes')
+                : (translations["Free slots for"] || 'Voľné termíny na') + ' ' + dayName;
+        }
+
+        const formattedTitle = isToday
+            ? (translations["Appointments for today"] || 'Rezervácií na dnes')
+            : `${translations["Appointments for"] || 'Rezervácií na'} ${dayName} ${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
 
         if (upcomingTitle) upcomingTitle.textContent = formattedTitle;
 
@@ -1353,6 +1372,14 @@ function initAdminDashboard() {
             if (revenueElement) {
                 revenueElement.textContent = data.revenue_formatted;
                 revenueElement.classList.remove('opacity-50');
+            }
+            if (appointmentsStatCount) {
+                appointmentsStatCount.textContent = data.appointments_count;
+                appointmentsStatCount.classList.remove('opacity-50');
+            }
+            if (freeSlotsStatCount) {
+                freeSlotsStatCount.textContent = data.free_slots_count;
+                freeSlotsStatCount.classList.remove('opacity-50');
             }
 
             if (appointments.length === 0) {

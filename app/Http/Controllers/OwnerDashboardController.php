@@ -96,7 +96,7 @@ class OwnerDashboardController extends Controller
     public function getAppointmentsForDay(Request $request): JsonResponse
     {
         $user = $request->user();
-        $allProfiles = Profile::where('owner_id', $user->id)->get();
+        $allProfiles = Profile::with(['employees', 'calendarSetting', 'services'])->where('owner_id', $user->id)->get();
         $profileIds = $allProfiles->pluck('id');
         $date = $request->date;
         $dayStart = Carbon::parse($date)->startOfDay();
@@ -106,6 +106,18 @@ class OwnerDashboardController extends Controller
             ->whereBetween('start_at', [$dayStart, $dayEnd]);
 
         $revenue = (clone $query)->where('status', 'completed')->sum('price');
+
+        // Calculate free slots for this day
+        $freeSlotsCount = 0;
+        foreach ($allProfiles as $profile) {
+            $slots = $this->availability->slots(
+                $profile,
+                30, // Default duration 30 min for counting free slots
+                Carbon::parse($date),
+                1
+            );
+            $freeSlotsCount += collect($slots['slots'])->where('status', 'available')->count();
+        }
 
         $appointments = (clone $query)
             ->with(['profile.calendarSetting', 'service', 'employee'])
@@ -146,6 +158,8 @@ class OwnerDashboardController extends Controller
 
         return response()->json([
             'appointments' => $appointments,
+            'appointments_count' => $appointments->count(),
+            'free_slots_count' => $freeSlotsCount,
             'revenue' => (float) $revenue,
             'revenue_formatted' => number_format($revenue, 2, ',', ' ') . ' €'
         ]);
@@ -216,6 +230,7 @@ class OwnerDashboardController extends Controller
         $user = $request->user();
         $allProfiles = Profile::with(['employees', 'calendarSetting', 'services'])->where('owner_id', $user->id)->get();
         $date = $request->date ?: Carbon::today()->toDateString();
+        $days = (int) $request->input('days', 1);
         $startDate = Carbon::parse($date);
 
         $allSlots = [];
@@ -225,7 +240,7 @@ class OwnerDashboardController extends Controller
                 $profile,
                 30, // Default duration
                 $startDate,
-                1
+                $days
             );
 
             foreach ($result['slots'] as $slot) {
@@ -256,7 +271,8 @@ class OwnerDashboardController extends Controller
 
         return response()->json([
             'slots' => $allSlots,
-            'count' => count($allSlots),
+            'count' => count(collect($allSlots)->where('date', $startDate->toDateString())),
+            'total_count' => count($allSlots),
         ]);
     }
 

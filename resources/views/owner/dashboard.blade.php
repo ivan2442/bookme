@@ -55,8 +55,8 @@
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('Today') }}</span>
             </div>
             <div>
-                <p class="text-3xl font-bold text-slate-900">{{ $stats['appointments_today'] }}</p>
-                <p class="text-sm text-slate-500 font-medium">{{ __('Appointments today') }}</p>
+                <p class="text-3xl font-bold text-slate-900" id="appointments-stat-count">{{ $stats['appointments_today'] }}</p>
+                <p class="text-sm text-slate-500 font-medium" id="appointments-stat-label">{{ __('Appointments today') }}</p>
             </div>
         </div>
 
@@ -69,12 +69,12 @@
             </div>
             <div>
                 <div class="flex items-center justify-between gap-2">
-                    <p class="text-3xl font-bold text-slate-900" id="free-slots-today-count">{{ $stats['free_slots_today'] }}</p>
+                    <p class="text-3xl font-bold text-slate-900" id="free-slots-stat-count">{{ $stats['free_slots_today'] }}</p>
                     <button onclick="openFreeSlotsModal()" class="px-2 py-1 rounded-lg bg-sky-100 text-sky-700 text-[10px] font-bold uppercase hover:bg-sky-200 transition">
                         {{ __('Show') }}
                     </button>
                 </div>
-                <p class="text-sm text-slate-500 font-medium">{{ __('Free slots') }}</p>
+                <p class="text-sm text-slate-500 font-medium" id="free-slots-stat-label">{{ __('Free slots') }}</p>
             </div>
         </div>
 
@@ -531,10 +531,10 @@
             </div>
         `;
 
-        axios.get(`/owner/appointments/free-slots?date=${date}`)
+        axios.get(`/owner/appointments/free-slots?date=${date}&days=7`)
             .then(response => {
                 const slots = response.data.slots;
-                const count = response.data.count;
+                const count = response.data.count; // Počet pre vybraný deň
 
                 // Update count in dashboard too
                 const dashboardCount = document.getElementById('free-slots-today-count');
@@ -552,22 +552,65 @@
                     return;
                 }
 
-                container.innerHTML = slots.map(slot => `
-                    <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-sky-200 transition-all group">
-                        <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-lg bg-sky-100 text-sky-700 flex flex-col items-center justify-center">
-                                <span class="text-sm font-bold leading-none">${slot.time}</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-900">${slot.profile_name}</p>
-                                <p class="text-xs text-slate-500">${new Date(slot.date).toLocaleDateString('sk-SK')}</p>
-                            </div>
+                // Rozdelíme sloty na dnes (vybraný deň) a budúce
+                const slotsToday = slots.filter(s => s.date === date);
+                const slotsUpcoming = slots.filter(s => s.date !== date);
+
+                let html = '';
+
+                if (slotsToday.length > 0) {
+                    html += `<div class="grid grid-cols-1 gap-3">`;
+                    html += slotsToday.map(slot => renderSlotItem(slot)).join('');
+                    html += `</div>`;
+                } else {
+                    html += `
+                        <div class="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 mb-6">
+                            <p class="text-slate-500 italic text-sm">{{ __('No free slots available for this day.') }}</p>
                         </div>
-                        <button onclick='openQuickBookingModal(${JSON.stringify(slot)})' class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm">
-                            {{ __('Quick booking') }}
-                        </button>
-                    </div>
-                `).join('');
+                    `;
+                }
+
+                if (slotsUpcoming.length > 0) {
+                    html += `<div class="mt-8 space-y-6">`;
+                    html += `<h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-2">${window.translations['Upcoming available times'] || 'Najbližšie voľné termíny'}</h4>`;
+
+                    // Zoskupíme podľa dátumu
+                    const grouped = {};
+                    slotsUpcoming.forEach(s => {
+                        if (!grouped[s.date]) grouped[s.date] = [];
+                        grouped[s.date].push(s);
+                    });
+
+                    Object.keys(grouped).forEach(d => {
+                        const dateObj = new Date(d);
+                        const dayNames = [
+                            window.translations['Sunday'] || 'Nedeľa',
+                            window.translations['Monday'] || 'Pondelok',
+                            window.translations['Tuesday'] || 'Utorok',
+                            window.translations['Wednesday'] || 'Streda',
+                            window.translations['Thursday'] || 'Štvrtok',
+                            window.translations['Friday'] || 'Piatok',
+                            window.translations['Saturday'] || 'Sobota'
+                        ];
+                        const dayName = dayNames[dateObj.getDay()];
+                        const dateFormatted = dateObj.toLocaleDateString('sk-SK');
+
+                        html += `
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-slate-700">${dayName}</span>
+                                    <span class="text-xs text-slate-400">${dateFormatted}</span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-2">
+                                    ${grouped[d].map(slot => renderSlotItem(slot)).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+
+                container.innerHTML = html;
             })
             .catch(error => {
                 console.error(error);
@@ -577,6 +620,25 @@
                     </div>
                 `;
             });
+    }
+
+    function renderSlotItem(slot) {
+        return `
+            <div class="flex items-center justify-between p-4 rounded-xl bg-white border border-slate-100 hover:border-sky-200 transition-all group shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-lg bg-sky-50 text-sky-700 flex flex-col items-center justify-center border border-sky-100">
+                        <span class="text-sm font-bold leading-none">${slot.time}</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-900 leading-tight">${slot.profile_name}</p>
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-tight">${new Date(slot.date).toLocaleDateString('sk-SK')}</p>
+                    </div>
+                </div>
+                <button onclick='openQuickBookingModal(${JSON.stringify(slot)})' class="px-4 py-2 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-emerald-600 transition-all shadow-md">
+                    {{ __('Quick booking') }}
+                </button>
+            </div>
+        `;
     }
 
     function closeFreeSlotsModal() {

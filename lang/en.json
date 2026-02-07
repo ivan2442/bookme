@@ -79,6 +79,9 @@
     "Revenue on this day": "Revenue on this day",
     "Completed orders": "Completed orders",
     "Appointments for today": "Appointments for today",
+    "Appointments for": "Appointments for",
+    "Free slots for today": "Free slots for today",
+    "Free slots for": "Free slots for",
     "Current": "Current",
     "Manual service": "Manual service",
     "Completed": "Completed",
@@ -486,6 +489,7 @@
     "Choose date": "Choose date",
     "Available times": "Available times",
     "Loading free slots...": "Loading free slots...",
+    "Upcoming available times": "Upcoming available times",
     "BookMe": "BookMe",
     "Bookings that fit into the day": "Bookings that fit into the day",
     "BookMe — online reservations without phone calls.": "BookMe — online reservations without phone calls."
