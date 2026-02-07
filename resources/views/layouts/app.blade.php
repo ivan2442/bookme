@@ -219,7 +219,7 @@
                 }
             </script>
         @endif
-        <div id="header-wrapper" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 translate-y-0">
+        <div id="header-wrapper" class="fixed top-0 left-0 right-0 z-50 translate-y-0">
             <header id="main-header" class="max-w-6xl mx-auto px-4 py-4 md:py-6 flex items-center justify-between gap-4 transition-all duration-300">
                 <a href="/" id="logo" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-200/60 flex items-center justify-center text-slate-900 font-semibold">B</div>
@@ -229,7 +229,6 @@
                     </div>
                 </a>
                 <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
-                    @include('partials.language-switcher')
                     <a class="hover:text-slate-900 transition" href="/#search">{{ __('Search business') }}</a>
                     <a class="hover:text-slate-900 transition" href="{{ route('for-businesses') }}">{{ __('For businesses') }}</a>
                     {{-- <a class="hover:text-slate-900 transition" href="{{ route('articles.index') }}">Blog</a> --}}
@@ -246,13 +245,15 @@
                     @else
                         <a class="hover:text-slate-900 transition" href="{{ route('auth.login') }}">{{ __('Login') }}</a>
                     @endauth
+                    @include('partials.language-switcher')
                 </nav>
                 <div class="hidden sm:flex gap-3 items-center">
                     <a href="#booking" class="px-6 py-2.5 text-sm font-bold rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-200/50 border border-emerald-400 hover:bg-emerald-600 hover:shadow-emerald-300/60 transition-all transform hover:scale-105">{{ __('Start booking') }}</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center">
+                <div class="md:hidden flex items-center gap-3">
+                    @include('partials.language-switcher')
                     <button id="mobile-menu-button" type="button" class="text-slate-700 hover:text-slate-900 focus:outline-none">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path id="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -263,9 +264,6 @@
 
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border border-slate-100 px-4 py-4 space-y-2 shadow-2xl mx-4">
-                <div class="flex justify-center pb-2 mb-2 border-b border-slate-100">
-                    @include('partials.language-switcher')
-                </div>
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="/#search">{{ __('Search business') }}</a>
                 <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('for-businesses') }}">{{ __('For businesses') }}</a>
                 {{-- <a class="block py-2 text-base font-medium text-slate-700 hover:text-emerald-600" href="{{ route('articles.index') }}">Blog</a> --}}
@@ -288,7 +286,7 @@
             </div>
         </div>
 
-        <main class="max-w-6xl mx-auto px-4 pt-28 md:pt-32">
+        <main class="max-w-6xl mx-auto px-4 pt-15 md:pt-32">
             @yield('content')
         </main>
 

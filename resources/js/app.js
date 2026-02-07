@@ -951,7 +951,6 @@ window.addEventListener('scroll', () => {
         if (currentScrollY > lastScrollY && currentScrollY > 200) {
             // Scrolling down
             headerWrapper.classList.replace('translate-y-0', '-translate-y-full');
-            headerWrapper.classList.remove('is-scrolled');
         } else {
             // Scrolling up
             headerWrapper.classList.replace('-translate-y-full', 'translate-y-0');
