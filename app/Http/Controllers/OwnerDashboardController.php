@@ -344,6 +344,18 @@ class OwnerDashboardController extends Controller
         return back()->with('status', __('Service updated.'));
     }
 
+    public function deleteService(Service $service): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds(request());
+        if (!in_array($service->profile_id, $profileIds)) {
+            abort(403);
+        }
+
+        $service->delete();
+
+        return back()->with('status', __('Service removed.'));
+    }
+
     public function storeVariant(Request $request, Service $service): RedirectResponse
     {
         $profileIds = $this->getOwnerProfileIds($request);

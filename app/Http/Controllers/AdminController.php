@@ -108,7 +108,7 @@ class AdminController extends Controller
             $this->syncEmployeesToServiceVariants($service, $data['employee_ids']);
         }
 
-        return back()->with('status', 'Služba bola vytvorená.');
+        return back()->with('status', __('Service created.'));
     }
 
     public function storeVariant(Request $request, Service $service): RedirectResponse
@@ -185,7 +185,14 @@ class AdminController extends Controller
             $this->syncEmployeesToServiceVariants($service, $data['employee_ids']);
         }
 
-        return back()->with('status', 'Služba bola upravená.');
+        return back()->with('status', __('Service updated.'));
+    }
+
+    public function deleteService(Service $service): RedirectResponse
+    {
+        $service->delete();
+
+        return back()->with('status', __('Service removed.'));
     }
 
     public function updateVariant(Request $request, Service $service, ServiceVariant $variant): RedirectResponse

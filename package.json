@@ -16,7 +16,6 @@
     },
     "dependencies": {
         "jquery": "^4.0.0",
-        "lightpick": "^1.6.2",
         "moment": "^2.30.1"
     }
 }

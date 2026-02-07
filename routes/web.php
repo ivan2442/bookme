@@ -22,8 +22,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/services', [AdminController::class, 'services'])->name('services');
     Route::post('/services', [AdminController::class, 'storeService'])->name('services.store');
-    Route::post('/services/{service}/variants', [AdminController::class, 'storeVariant'])->name('services.variants.store');
     Route::post('/services/{service}', [AdminController::class, 'updateService'])->name('services.update');
+    Route::delete('/services/{service}', [AdminController::class, 'deleteService'])->name('services.delete');
+    Route::post('/services/{service}/variants', [AdminController::class, 'storeVariant'])->name('services.variants.store');
     Route::post('/services/{service}/variants/{variant}', [AdminController::class, 'updateVariant'])->name('services.variants.update');
     Route::delete('/services/{service}/variants/{variant}', [AdminController::class, 'deleteVariant'])->name('services.variants.delete');
 
@@ -75,6 +76,7 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     Route::get('/services', [OwnerDashboardController::class, 'services'])->name('services');
     Route::post('/services', [OwnerDashboardController::class, 'storeService'])->name('services.store');
     Route::post('/services/{service}', [OwnerDashboardController::class, 'updateService'])->name('services.update');
+    Route::delete('/services/{service}', [OwnerDashboardController::class, 'deleteService'])->name('services.delete');
     Route::post('/services/{service}/variants', [OwnerDashboardController::class, 'storeVariant'])->name('services.variants.store');
     Route::post('/services/{service}/variants/{variant}', [OwnerDashboardController::class, 'updateVariant'])->name('services.variants.update');
     Route::delete('/services/{service}/variants/{variant}', [OwnerDashboardController::class, 'deleteVariant'])->name('services.variants.delete');

@@ -255,98 +255,6 @@
     </div>
 </div>
 
-<!-- Manual Appointment Modal -->
-<div id="manualAppointmentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeManualAppointmentModal()"></div>
-
-        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 overflow-hidden">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-display font-semibold text-slate-900">{{ __('Add manual appointment') }}</h3>
-                <button onclick="closeManualAppointmentModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-
-            <form method="POST" action="{{ route('owner.appointments.manual.store') }}" class="space-y-4">
-                @csrf
-                <input type="hidden" name="profile_id" id="manual_profile_id" value="{{ $allProfiles->first()->id }}">
-
-                @if($allProfiles->first()->employees->count() > 1)
-                    <div>
-                        <label class="label">{{ __('Employee') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="employee_id" class="nice-select" id="manual_employee_select">
-                                <option value="">{{ __('No employee') }}</option>
-                                @foreach($allProfiles->first()->employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                @elseif($allProfiles->first()->employees->count() === 1)
-                    <input type="hidden" name="employee_id" value="{{ $allProfiles->first()->employees->first()->id }}">
-                @endif
-
-                <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-50 pt-4">
-                    <div>
-                        <label class="label">{{ __('Customer name') }}</label>
-                        <input type="text" name="customer_name" class="input-control" placeholder="{{ __('Name and surname') }}" required>
-                    </div>
-                    <div>
-                        <label class="label">{{ __('Phone') }}</label>
-                        <input type="text" name="customer_phone" class="input-control" placeholder="+421 ...">
-                    </div>
-                </div>
-
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="label">{{ __('Service name') }}</label>
-                        <input type="text" name="service_name_manual" class="input-control" placeholder="{{ __('e.g. Men\'s haircut') }}" required>
-                    </div>
-                    <div>
-                        <label class="label">{{ __('Date') }}</label>
-                        <input type="date" name="date" id="manual_date" class="input-control" value="{{ date('Y-m-d') }}" required>
-                    </div>
-                </div>
-
-                <div class="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
-                    <div>
-                        <label class="label">{{ __('Start time') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="start_time" id="manual_start_time" class="nice-select nice-select-time" required>
-                                @for($h = 7; $h <= 21; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}" {{ $time == '09:00' ? 'selected' : '' }}>{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="label">{{ __('Duration (min)') }}</label>
-                        <input type="number" name="duration_minutes" class="input-control" value="30" min="1" required>
-                    </div>
-                    <div>
-                        <label class="label">{{ __('Price (€)') }}</label>
-                        <input type="number" step="0.01" name="price" class="input-control" value="0.00" required>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="label">{{ __('Note') }}</label>
-                    <textarea name="notes" rows="2" class="input-control" placeholder="{{ __('Optional note') }}"></textarea>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" onclick="closeManualAppointmentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">{{ __('Cancel') }}</button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50">{{ __('Save appointment') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Edit Appointment Modal -->
 <div id="editAppointmentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
@@ -388,16 +296,7 @@
                 <div class="grid sm:grid-cols-3 gap-4">
                     <div>
                         <label class="label">{{ __('Start time') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="start_time" id="edit_start_time" class="nice-select nice-select-time" required>
-                                @for($h = 7; $h <= 21; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}">{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="start_time" id="edit_start_time" class="input-control flatpickr-time" required>
                     </div>
                     <div>
                         <label class="label">{{ __('Duration (min)') }}</label>
@@ -490,9 +389,20 @@
                 @csrf
                 <input type="hidden" name="profile_id" id="quick_profile_id">
                 <input type="hidden" name="date" id="quick_date">
-                <input type="hidden" name="start_time" id="quick_start_time">
                 <input type="hidden" name="duration_minutes" id="quick_duration" value="30">
                 <input type="hidden" name="price" id="quick_price" value="0">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">{{ __('Date') }}</label>
+                        <input type="date" name="date_display" id="quick_date_display" class="input-control" onchange="document.getElementById('quick_date').value = this.value">
+                    </div>
+                    <div>
+                        <label class="label">{{ __('Start time') }}</label>
+                        <input type="text" name="start_time" id="quick_start_time" class="input-control flatpickr-time" style="  padding: 5px !important;
+  height: auto !important;max-height: 52px !important;" required>
+                    </div>
+                </div>
 
                 <div id="quick-service-selection" class="space-y-3 mb-6">
                     <label class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Choose a service') }}</label>
@@ -551,16 +461,31 @@
 
 <script>
     function openManualAppointmentModal() {
-        document.getElementById('manualAppointmentModal').classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        if (typeof $ !== 'undefined' && $.fn.niceSelect) {
-            $('#manualAppointmentModal .nice-select').niceSelect('update');
-        }
+        const profile = @json($allProfiles->first());
+        const services = @json($allProfiles->first()->services);
+        const selectedDate = document.getElementById('admin-selected-date')?.value || new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const hour = now.getHours();
+        const minute = now.getMinutes() < 30 ? '30' : '00';
+        const defaultTime = `${String(now.getMinutes() < 30 ? hour : hour + 1).padStart(2, '0')}:${minute}`;
+
+        const slot = {
+            profile_id: profile.id,
+            profile_name: profile.name,
+            date: selectedDate,
+            time: defaultTime,
+            services: services.map(s => ({
+                id: s.id,
+                name: s.name,
+                price: s.base_price
+            }))
+        };
+
+        openQuickBookingModal(slot);
     }
 
     function closeManualAppointmentModal() {
-        document.getElementById('manualAppointmentModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
+        // Starý modal už nepoužívame
     }
 
     function openEditAppointmentModal(appointment) {
@@ -576,7 +501,6 @@
         document.getElementById('edit_start_time').value = appointment.start_time || '';
         document.getElementById('edit_duration').value = appointment.duration_minutes || '';
         document.getElementById('edit_price').value = appointment.price || '';
-        document.getElementById('edit_notes').value = appointment.notes || '';
 
         const employeeSelect = document.getElementById('edit_employee_select');
         if (employeeSelect) {
@@ -585,9 +509,7 @@
 
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        if (typeof $ !== 'undefined' && $.fn.niceSelect) {
-            $('#editAppointmentModal .nice-select').niceSelect('update');
-        }
+        if (window.reinitFlatpickr) window.reinitFlatpickr();
     }
 
     function closeEditAppointmentModal() {
@@ -671,28 +593,33 @@
 
         document.getElementById('quick_profile_id').value = slot.profile_id;
         document.getElementById('quick_date').value = slot.date;
+        document.getElementById('quick_date_display').value = slot.date;
         document.getElementById('quick_start_time').value = slot.time;
 
         const dateFormatted = new Date(slot.date).toLocaleDateString('sk-SK');
         timeDisplay.innerText = `${dateFormatted} o ${slot.time} - ${slot.profile_name}`;
 
         // Load services
-        servicesList.innerHTML = slot.services.map(service => {
-            const serviceJson = JSON.stringify(service).replace(/'/g, "&apos;");
-            return `
-                <button type="button" onclick='selectQuickService(${serviceJson}, this)' class="quick-service-btn w-full text-left px-4 py-3 rounded-xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-bold text-slate-700 group-hover:text-emerald-700">${service.name}</p>
-                            <p class="text-xs text-slate-500">${service.price} €</p>
+        if (slot.services && slot.services.length > 0) {
+            servicesList.innerHTML = slot.services.map(service => {
+                const serviceJson = JSON.stringify(service).replace(/'/g, "&apos;");
+                return `
+                    <button type="button" onclick='selectQuickService(${serviceJson}, this)' class="quick-service-btn w-full text-left px-4 py-3 rounded-xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-bold text-slate-700 group-hover:text-emerald-700">${service.name}</p>
+                                <p class="text-xs text-slate-500">${service.price} €</p>
+                            </div>
+                            <div class="h-5 w-5 rounded-full border-2 border-slate-200 group-hover:border-emerald-500 flex items-center justify-center">
+                                <div class="h-2-5 w-2-5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            </div>
                         </div>
-                        <div class="h-5 w-5 rounded-full border-2 border-slate-200 group-hover:border-emerald-500 flex items-center justify-center">
-                            <div class="h-2-5 w-2-5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
-                    </div>
-                </button>
-            `;
-        }).join('');
+                    </button>
+                `;
+            }).join('');
+        } else {
+            servicesList.innerHTML = `<p class="text-sm text-slate-500 italic py-2">{{ __('No services found for this business.') }}</p>`;
+        }
 
         // Reset manual fields
         document.getElementById('manual-service-fields').classList.add('hidden');
@@ -700,6 +627,8 @@
         document.getElementById('btn-manual-service').classList.remove('border-emerald-500', 'bg-emerald-50');
 
         modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        if (window.reinitFlatpickr) window.reinitFlatpickr();
     }
 
     function selectQuickService(service, element) {
@@ -742,53 +671,13 @@
 
     function closeQuickBookingModal() {
         document.getElementById('quickBookingModal').classList.add('hidden');
-    }
-
-    function checkBusySlots() {
-        const date = document.getElementById('manual_date').value;
-        const employeeId = document.getElementById('manual_employee_select')?.value || '';
-        const profileId = document.getElementById('manual_profile_id').value;
-        const timeSelect = document.getElementById('manual_start_time');
-
-        if (!date) return;
-
-        axios.get('/owner/appointments/day-full', { params: { date, employee_id: employeeId, profile_id: profileId } })
-            .then(response => {
-                const appointments = response.data;
-
-                Array.from(timeSelect.options).forEach(option => {
-                    const time = option.value;
-                    const isBusy = appointments.some(app => {
-                        const appStart = new Date(app.start_at).toTimeString().slice(0, 5);
-                        const appEnd = new Date(app.end_at).toTimeString().slice(0, 5);
-                        return time >= appStart && time < appEnd;
-                    });
-
-                    if (isBusy) {
-                        if (!option.text.includes('({{ __('busy') }})')) {
-                            option.text = `${time} ({{ __('busy') }})`;
-                        }
-                        option.classList.add('busy-option');
-                    } else {
-                        option.text = time;
-                        option.classList.remove('busy-option');
-                    }
-                });
-                if ($.fn.niceSelect) {
-                    $(timeSelect).niceSelect('update');
-                }
-            })
-            .catch(err => console.error('{{ __('Error checking occupancy') }}', err));
+        document.body.classList.remove('overflow-hidden');
     }
 
     $(document).ready(function() {
         if ($.fn.niceSelect) {
             $('.nice-select').niceSelect();
         }
-
-        $('#manual_date, #manual_employee_select').on('change', function() {
-            checkBusySlots();
-        });
     });
 </script>
 @endsection

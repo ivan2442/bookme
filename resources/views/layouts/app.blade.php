@@ -109,6 +109,9 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/sk.js"></script>
     <!-- Nice Select -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -159,26 +162,6 @@
         }
         .nice-select-wrapper:has(.nice-select.open) {
             z-index: 50;
-        }
-        .nice-select-time {
-            text-align: center !important;
-            justify-content: center !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-        .nice-select-time .current {
-            padding-right: 0 !important;
-            text-align: center !important;
-        }
-        .nice-select-time:after {
-            display: none !important;
-        }
-        .nice-select-time .option {
-            line-height: 24px !important;
-            min-height: 24px !important;
-            padding-top: 4px !important;
-            padding-bottom: 4px !important;
-            text-align: center !important;
         }
         .nice-select .option.busy-option {
             color: #94a3b8 !important;

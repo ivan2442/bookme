@@ -1,8 +1,5 @@
 import './bootstrap';
 import moment from 'moment';
-import Lightpick from 'lightpick';
-import 'lightpick/css/lightpick.css';
-
 
 const cityInput = document.getElementById('filter-city');
 const categorySelect = document.getElementById('filter-category');
@@ -1119,40 +1116,91 @@ function initSelectedDate() {
         window.open(url, '_blank');
     };
 
-    // Lightpick initialization
-    const dateInputs = document.querySelectorAll('input[name="date"]:not([type="hidden"])');
-    const translations = window.translations || {};
-    dateInputs.forEach(el => {
-        new Lightpick({
-            field: el,
-            format: 'YYYY-MM-DD',
-            lang: window.locale || 'sk',
-            locale: {
-                buttons: {
-                    prev: '←',
-                    next: '→',
-                    close: '×',
-                    reset: translations["Reset"] || 'Vynulovať',
-                },
-                tooltip: {
-                    one: translations["day"] || 'deň',
-                    few: translations["days_2_4"] || 'dni',
-                    many: translations["days_5_more"] || 'dní',
-                },
-                pluralize: function(i, locale) {
-                    if (i === 1) return locale.tooltip.one;
-                    if (i >= 2 && i <= 4) return locale.tooltip.few;
-                    return locale.tooltip.many;
-                },
-            },
-            onSelect: function(date) {
-                if (el.dataset.dateInput !== undefined) {
-                    // Ak je to hlavný kalendár na home page
-                    setSelectedDate(date.toDate());
-                }
+    // Flatpickr initialization
+    function initFlatpickr() {
+        if (typeof flatpickr === 'undefined') return;
+
+        const config = {
+            dateFormat: "Y-m-d",
+            locale: window.locale || "sk",
+            disableMobile: true, // Zablokuje natívny kalendár na mobiloch
+            allowInput: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                // Pre iOS/Android zabezpečíme, že pole bude readonly pre natívnu klávesnicu,
+                // ale flatpickr ho bude môcť ovládať.
+                instance.element.setAttribute('readonly', 'readonly');
             }
+        };
+
+        const dateInputs = document.querySelectorAll('input[name="date"]:not([type="hidden"]), input[type="date"]');
+        dateInputs.forEach(el => {
+            // Ak už je flatpickr inicializovaný, preskočíme
+            if (el._flatpickr) return;
+
+            // Ak má element špecifický onchange z dashboardu (napr. quick booking)
+            const originalOnchange = el.onchange;
+
+            const instanceConfig = { ...config };
+
+            // Špecifická logika pre domovskú stránku a výber dátumu
+            if (el.dataset.dateInput !== undefined) {
+                instanceConfig.onSelect = function(selectedDates) {
+                    if (selectedDates.length > 0) {
+                        setSelectedDate(selectedDates[0]);
+                    }
+                };
+                // Flatpickr používa onChange namiesto onSelect
+                instanceConfig.onChange = function(selectedDates) {
+                    if (selectedDates.length > 0) {
+                        setSelectedDate(selectedDates[0]);
+                    }
+                };
+            }
+
+            if (originalOnchange) {
+                const prevOnChange = instanceConfig.onChange;
+                instanceConfig.onChange = function(selectedDates, dateStr, instance) {
+                    if (prevOnChange) prevOnChange(selectedDates, dateStr, instance);
+                    el.dispatchEvent(new Event('change'));
+                };
+            }
+
+            // Zmena typu z date na text, aby sme predišli natívnemu kalendáru
+            if (el.type === 'date') {
+                el.type = 'text';
+            }
+
+            flatpickr(el, instanceConfig);
         });
-    });
+
+        // Time inputs
+        const timeInputs = document.querySelectorAll('input[type="time"], .flatpickr-time');
+        timeInputs.forEach(el => {
+            if (el._flatpickr) return;
+
+            // Zmena typu na text, aby sme predišli natívnemu picker-u
+            if (el.type === 'time') {
+                el.type = 'text';
+            }
+
+            flatpickr(el, {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                locale: window.locale || "sk",
+                disableMobile: true,
+                onReady: function(selectedDates, dateStr, instance) {
+                    instance.element.setAttribute('readonly', 'readonly');
+                }
+            });
+        });
+    }
+
+    initFlatpickr();
+
+    // Re-inicializácia po dynamických zmenách ak sú potrebné
+    window.reinitFlatpickr = initFlatpickr;
 }
 
 // ...existing initializers

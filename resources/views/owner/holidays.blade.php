@@ -74,31 +74,11 @@
                             <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Od</label>
-                                    <div class="nice-select-wrapper">
-                                        <select name="start_time" class="nice-select nice-select-time">
-                                            <option value="">Celý deň</option>
-                                            @for($h = 0; $h <= 23; $h++)
-                                                @foreach(['00', '30'] as $m)
-                                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                                    <option value="{{ $time }}" @selected($holiday->start_time && substr($holiday->start_time, 0, 5) == $time)>{{ $time }}</option>
-                                                @endforeach
-                                            @endfor
-                                        </select>
-                                    </div>
+                                    <input type="text" name="start_time" value="{{ $holiday->start_time ? substr($holiday->start_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm flatpickr-time" placeholder="{{ __('all day') }}">
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Do</label>
-                                    <div class="nice-select-wrapper">
-                                        <select name="end_time" class="nice-select nice-select-time">
-                                            <option value="">Celý deň</option>
-                                            @for($h = 0; $h <= 23; $h++)
-                                                @foreach(['00', '30'] as $m)
-                                                    @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                                    <option value="{{ $time }}" @selected($holiday->end_time && substr($holiday->end_time, 0, 5) == $time)>{{ $time }}</option>
-                                                @endforeach
-                                            @endfor
-                                        </select>
-                                    </div>
+                                    <input type="text" name="end_time" value="{{ $holiday->end_time ? substr($holiday->end_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm flatpickr-time" placeholder="{{ __('all day') }}">
                                 </div>
                             </div>
                             <div>
@@ -190,31 +170,11 @@
                     </div>
                     <div>
                         <label class="label">{{ __('From') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="start_time" class="nice-select nice-select-time">
-                                <option value="">{{ __('all day') }}</option>
-                                @for($h = 0; $h <= 23; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}" @selected(old('start_time') == $time)>{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="start_time" class="input-control flatpickr-time" value="{{ old('start_time') }}" placeholder="{{ __('all day') }}">
                     </div>
                     <div>
                         <label class="label">{{ __('To') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="end_time" class="nice-select nice-select-time">
-                                <option value="">{{ __('all day') }}</option>
-                                @for($h = 0; $h <= 23; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}" @selected(old('end_time') == $time)>{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="end_time" class="input-control flatpickr-time" value="{{ old('end_time') }}" placeholder="{{ __('all day') }}">
                     </div>
                 </div>
 
@@ -240,32 +200,11 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof flatpickr !== 'undefined') {
-            flatpickr("#add_holiday_date", {
-                dateFormat: "Y-m-d",
-                locale: "sk",
-                minDate: "today"
-            });
-        }
-    });
-
-    $(document).ready(function() {
-        if ($.fn.niceSelect) {
-            $('.nice-select').niceSelect();
-        }
-    });
-
     function openAddHolidayModal() {
         document.getElementById('addHolidayModal').classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        if ($.fn.niceSelect) {
-            $('#addHolidayModal .nice-select').niceSelect('update');
-        }
+        if (window.reinitFlatpickr) window.reinitFlatpickr();
     }
 
     function closeAddHolidayModal() {
@@ -278,8 +217,8 @@
         const edit = document.getElementById(`holiday-edit-${id}`);
         view.classList.toggle('hidden');
         edit.classList.toggle('hidden');
-        if (!edit.classList.contains('hidden') && $.fn.niceSelect) {
-            $(`#holiday-edit-${id} .nice-select`).niceSelect('update');
+        if (!edit.classList.contains('hidden')) {
+            if (window.reinitFlatpickr) window.reinitFlatpickr();
         }
     }
 </script>

@@ -41,11 +41,11 @@
                     </div>
                     <div>
                         <label class="label">Od</label>
-                        <input type="time" name="start_time" class="input-control" value="{{ old('start_time') }}">
+                        <input type="text" name="start_time" class="input-control flatpickr-time" value="{{ old('start_time') }}" placeholder="{{ __('all day') }}">
                     </div>
                     <div>
                         <label class="label">Do</label>
-                        <input type="time" name="end_time" class="input-control" value="{{ old('end_time') }}">
+                        <input type="text" name="end_time" class="input-control flatpickr-time" value="{{ old('end_time') }}" placeholder="{{ __('all day') }}">
                     </div>
                 </div>
                 <div class="grid sm:grid-cols-2 gap-3">
@@ -127,11 +127,11 @@
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Od</label>
-                                    <input type="time" name="start_time" value="{{ $holiday->start_time ? substr($holiday->start_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm">
+                                    <input type="text" name="start_time" value="{{ $holiday->start_time ? substr($holiday->start_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm flatpickr-time" placeholder="{{ __('all day') }}">
                                 </div>
                                 <div>
                                     <label class="text-[10px] uppercase font-bold text-slate-500">Do</label>
-                                    <input type="time" name="end_time" value="{{ $holiday->end_time ? substr($holiday->end_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm">
+                                    <input type="text" name="end_time" value="{{ $holiday->end_time ? substr($holiday->end_time, 0, 5) : '' }}" class="input-control !py-1.5 !text-sm flatpickr-time" placeholder="{{ __('all day') }}">
                                 </div>
                             </div>
                             <div>
@@ -160,6 +160,7 @@
         </div>
     </div>
 </div>
+
 <script>
     function toggleEdit(id) {
         const view = document.getElementById(`holiday-view-${id}`);
@@ -170,6 +171,7 @@
         } else {
             view.classList.add('hidden');
             edit.classList.remove('hidden');
+            if (window.reinitFlatpickr) window.reinitFlatpickr();
         }
     }
 </script>

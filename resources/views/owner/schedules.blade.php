@@ -134,29 +134,11 @@
                 <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">{{ __('Opens at') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="start_time" class="nice-select nice-select-time" required>
-                                @for($h = 0; $h <= 23; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}" {{ $time == '09:00' ? 'selected' : '' }}>{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="start_time" class="input-control flatpickr-time" value="09:00" required>
                     </div>
                     <div>
                         <label class="label">{{ __('Closes at') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="end_time" class="nice-select nice-select-time" required>
-                                @for($h = 0; $h <= 23; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}" {{ $time == '17:00' ? 'selected' : '' }}>{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="end_time" class="input-control flatpickr-time" value="17:00" required>
                     </div>
                 </div>
 
@@ -168,29 +150,11 @@
                     <div id="break_fields_new" class="grid grid-cols-2 gap-4 hidden">
                         <div>
                             <label class="label">{{ __('Break from') }}</label>
-                            <div class="nice-select-wrapper">
-                                <select name="break_start_time" class="nice-select nice-select-time">
-                                    @for($h = 0; $h <= 23; $h++)
-                                        @foreach(['00', '30'] as $m)
-                                            @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                            <option value="{{ $time }}" {{ $time == '12:00' ? 'selected' : '' }}>{{ $time }}</option>
-                                        @endforeach
-                                    @endfor
-                                </select>
-                            </div>
+                            <input type="text" name="break_start_time" class="input-control flatpickr-time" value="12:00">
                         </div>
                         <div>
                             <label class="label">{{ __('Break to') }}</label>
-                            <div class="nice-select-wrapper">
-                                <select name="break_end_time" class="nice-select nice-select-time">
-                                    @for($h = 0; $h <= 23; $h++)
-                                        @foreach(['00', '30'] as $m)
-                                            @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                            <option value="{{ $time }}" {{ $time == '13:00' ? 'selected' : '' }}>{{ $time }}</option>
-                                        @endforeach
-                                    @endfor
-                                </select>
-                            </div>
+                            <input type="text" name="break_end_time" class="input-control flatpickr-time" value="13:00">
                         </div>
                     </div>
                 </div>
@@ -262,29 +226,11 @@
                 <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                     <div>
                         <label class="label">{{ __('Opens at') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="start_time" id="edit_start_time" class="nice-select nice-select-time" required>
-                                @for($h = 0; $h <= 23; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}">{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="start_time" id="edit_start_time" class="input-control flatpickr-time" required>
                     </div>
                     <div>
                         <label class="label">{{ __('Closes at') }}</label>
-                        <div class="nice-select-wrapper">
-                            <select name="end_time" id="edit_end_time" class="nice-select nice-select-time" required>
-                                @for($h = 0; $h <= 23; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}">{{ $time }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
+                        <input type="text" name="end_time" id="edit_end_time" class="input-control flatpickr-time" required>
                     </div>
                 </div>
 
@@ -296,29 +242,11 @@
                     <div id="break_fields_edit" class="grid grid-cols-2 gap-3 hidden">
                         <div>
                             <label class="label text-[10px]">{{ __('Break from') }}</label>
-                            <div class="nice-select-wrapper">
-                                <select name="break_start_time" id="edit_break_start_time" class="nice-select nice-select-time">
-                                    @for($h = 0; $h <= 23; $h++)
-                                        @foreach(['00', '30'] as $m)
-                                            @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                            <option value="{{ $time }}">{{ $time }}</option>
-                                        @endforeach
-                                    @endfor
-                                </select>
-                            </div>
+                            <input type="text" name="break_start_time" id="edit_break_start_time" class="input-control !py-1 !text-xs flatpickr-time">
                         </div>
                         <div>
                             <label class="label text-[10px]">{{ __('Break to') }}</label>
-                            <div class="nice-select-wrapper">
-                                <select name="break_end_time" id="edit_break_end_time" class="nice-select nice-select-time">
-                                    @for($h = 0; $h <= 23; $h++)
-                                        @foreach(['00', '30'] as $m)
-                                            @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                            <option value="{{ $time }}">{{ $time }}</option>
-                                        @endforeach
-                                    @endfor
-                                </select>
-                            </div>
+                            <input type="text" name="break_end_time" id="edit_break_end_time" class="input-control !py-1 !text-xs flatpickr-time">
                         </div>
                     </div>
                 </div>
@@ -346,9 +274,7 @@
     function openAddScheduleModal() {
         document.getElementById('addScheduleModal').classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        if ($.fn.niceSelect) {
-            $('#addScheduleModal .nice-select').niceSelect('update');
-        }
+        if (window.reinitFlatpickr) window.reinitFlatpickr();
     }
 
     function closeAddScheduleModal() {
@@ -410,9 +336,7 @@
 
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        if ($.fn.niceSelect) {
-            $('#editScheduleModal .nice-select').niceSelect('update');
-        }
+        if (window.reinitFlatpickr) window.reinitFlatpickr();
     }
 
     function closeEditModal() {
