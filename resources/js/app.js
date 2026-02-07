@@ -131,8 +131,9 @@ queryInput?.addEventListener('input', applyFilters);
 
 function renderShops() {
     if (!shopList) return;
+    const translations = window.translations || {};
     if (!state.shops.length) {
-        shopList.innerHTML = '<p class="text-sm text-slate-500">Žiadne prevádzky nenájdené.</p>';
+        shopList.innerHTML = `<p class="text-sm text-slate-500">${translations["No businesses found."] || 'Žiadne prevádzky nenájdené.'}</p>`;
         return;
     }
 
@@ -216,8 +217,9 @@ function renderShops() {
 
 function populateCategorySelect() {
     if (!categorySelect) return;
+    const translations = window.translations || {};
     const categories = Array.from(new Set(state.shops.map((shop) => shop.category).filter(Boolean)));
-    categorySelect.innerHTML = '<option value="">Všetky</option>';
+    categorySelect.innerHTML = `<option value="">${translations["All categories"] || 'Všetky'}</option>`;
     categories.forEach((category) => {
         const opt = document.createElement('option');
         opt.value = category;
@@ -228,6 +230,7 @@ function populateCategorySelect() {
 
 function renderServices(shopId = null) {
     if (!servicesList) return;
+    const translations = window.translations || {};
 
     let servicesToRender = state.services;
     if (shopId) {
@@ -235,7 +238,7 @@ function renderServices(shopId = null) {
     }
 
     if (!servicesToRender.length) {
-        servicesList.innerHTML = '<p class="text-sm text-slate-500">Žiadne služby nenájdené pre túto prevádzku.</p>';
+        servicesList.innerHTML = `<p class="text-sm text-slate-500">${translations["No services found for this business."] || 'Žiadne služby nenájdené pre túto prevádzku.'}</p>`;
         return;
     }
 
@@ -400,6 +403,7 @@ function assignEmployeeForService(serviceId) {
 }
 
 async function fetchShops() {
+    const translations = window.translations || {};
     try {
         const response = await axios.get('/api/shops', { params: { per_page: 50 } });
         const data = response.data?.data ?? response.data ?? [];
@@ -452,7 +456,7 @@ async function fetchShops() {
     } catch (error) {
         console.error('Nepodarilo sa načítať prevádzky', error);
         if (shopList) {
-            shopList.innerHTML = '<p class="text-sm text-red-500">Nepodarilo sa načítať prevádzky.</p>';
+            shopList.innerHTML = `<p class="text-sm text-red-500">${translations["Failed to load businesses."] || 'Nepodarilo sa načítať prevádzky.'}</p>`;
         }
     }
 }

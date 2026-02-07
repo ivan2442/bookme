@@ -373,7 +373,8 @@
 
     async function fetchModalAvailability() {
         const grid = document.getElementById('modal-time-grid');
-        grid.innerHTML = '<p class="text-sm text-slate-400 italic">Načítavam...</p>';
+        const translations = window.translations || {};
+        grid.innerHTML = `<p class="text-sm text-slate-400 italic">${translations["Loading..."] || 'Načítavam...'}</p>`;
 
         try {
             const response = await axios.post('/api/availability', {
@@ -385,7 +386,7 @@
 
             const slots = response.data.slots || [];
             if (slots.length === 0) {
-                grid.innerHTML = '<p class="text-sm text-slate-500 italic">Žiadne voľné termíny na tento deň.</p>';
+                grid.innerHTML = `<p class="text-sm text-slate-500 italic">${translations["No free slots for this day."] || 'Žiadne voľné termíny na tento deň.'}</p>`;
                 return;
             }
 
@@ -398,7 +399,7 @@
                 btn.className = 'w-full p-3 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all flex items-center justify-between group';
                 btn.innerHTML = `
                     <span class="font-bold text-slate-900">${time}</span>
-                    <span class="text-[10px] font-bold uppercase text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">Vybrať</span>
+                    <span class="text-[10px] font-bold uppercase text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">${translations["Select"] || 'Vybrať'}</span>
                 `;
 
                 btn.onclick = () => {
@@ -435,17 +436,18 @@
 
     document.getElementById('modal-booking-form').onsubmit = async (e) => {
         e.preventDefault();
+        const translations = window.translations || {};
         const out = document.getElementById('modal-booking-output');
         const form = e.target;
         const startAt = document.getElementById('modal_start_at').value;
 
         if (!startAt) {
-            Swal.fire('Chyba', 'Vyberte si prosím čas termínu.', 'error');
+            Swal.fire(translations["Error"] || 'Chyba', translations["Please select a time for your appointment."] || 'Vyberte si prosím čas termínu.', 'error');
             return;
         }
 
         out.classList.remove('hidden', 'text-red-500', 'text-emerald-600');
-        out.textContent = 'Odosielam rezerváciu...';
+        out.textContent = translations["Booking in progress..."] || 'Odosielam rezerváciu...';
 
         try {
             const formData = new FormData(form);
@@ -457,11 +459,11 @@
 
             const response = await axios.post('/api/appointments', payload);
             out.classList.add('text-emerald-600');
-            out.textContent = 'Rezervácia bola úspešná!';
+            out.textContent = translations["Booking successful!"] || 'Rezervácia bola úspešná!';
 
             Swal.fire({
-                title: 'Rezervácia úspešná!',
-                text: 'Váš termín bol potvrdený. Informácie sme vám zaslali e-mailom.',
+                title: translations["Booking successful!"] || 'Rezervácia úspešná!',
+                text: translations["Your appointment has been confirmed. We sent information to your email."] || 'Váš termín bol potvrdený. Informácie sme vám zaslali e-mailom.',
                 icon: 'success',
                 confirmButtonColor: '#10b981'
             }).then(() => {

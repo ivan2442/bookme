@@ -30,6 +30,15 @@ trait HasTranslations
         return property_exists($this, 'translatable') ? $this->translatable : [];
     }
 
+    public function attributesToArray()
+    {
+        $attributes = parent::attributesToArray();
+        foreach ($this->getTranslatableAttributes() as $field) {
+            $attributes[$field] = $this->getAttribute($field);
+        }
+        return $attributes;
+    }
+
     public function getTranslations($key)
     {
         return parent::getAttribute($key) ?: [];

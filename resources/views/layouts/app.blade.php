@@ -43,7 +43,24 @@
             "Thursday": "{{ __('Thursday') }}",
             "Friday": "{{ __('Friday') }}",
             "Saturday": "{{ __('Saturday') }}",
-            "Sunday": "{{ __('Sunday') }}"
+            "Sunday": "{{ __('Sunday') }}",
+            "Loading businesses...": "{{ __('Loading businesses...') }}",
+            "No businesses found.": "{{ __('No businesses found.') }}",
+            "Failed to load businesses.": "{{ __('Failed to load businesses.') }}",
+            "Loading services...": "{{ __('Loading services...') }}",
+            "No services found for this business.": "{{ __('No services found for this business.') }}",
+            "Choose business": "{{ __('Choose business') }}",
+            "Choose service": "{{ __('Choose service') }}",
+            "Choose variant": "{{ __('Choose variant') }}",
+            "Choose date and variant.": "{{ __('Choose date and variant.') }}",
+            "Loading...": "{{ __('Loading...') }}",
+            "No free slots for this day.": "{{ __('No free slots for this day.') }}",
+            "Select": "{{ __('Select') }}",
+            "Booking in progress...": "{{ __('Booking in progress...') }}",
+            "Booking successful!": "{{ __('Booking successful!') }}",
+            "Your appointment has been confirmed. We sent information to your email.": "{{ __('Your appointment has been confirmed. We sent information to your email.') }}",
+            "Error": "{{ __('Error') }}",
+            "Please select a time for your appointment.": "{{ __('Please select a time for your appointment.') }}"
         };
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
