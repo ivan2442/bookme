@@ -48,6 +48,7 @@ class Profile extends Model
         'billing_ic_dph',
         'billing_iban',
         'billing_swift',
+        'available_apis',
     ];
 
     protected $appends = [
@@ -68,6 +69,7 @@ class Profile extends Model
         'category' => 'array',
         'description' => 'array',
         'settings' => 'array',
+        'available_apis' => 'array',
         'subscription_starts_at' => 'datetime',
         'is_multilingual' => 'boolean',
     ];
@@ -120,6 +122,15 @@ class Profile extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function isApiAvailable(string $api): bool
+    {
+        if (!$this->available_apis || !is_array($this->available_apis)) {
+            return false;
+        }
+
+        return in_array($api, $this->available_apis);
     }
 
     public function getTrialEndsAtAttribute()

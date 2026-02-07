@@ -61,7 +61,7 @@ class AvailabilityController extends Controller
         $settings = $profile->calendarSetting;
         $minNotice = $settings?->min_notice_minutes ?? 60;
 
-        if ($service->is_pakavoz_enabled && $service->pakavoz_api_key) {
+        if ($profile->isApiAvailable('pakavoz') && $service->is_pakavoz_enabled && $service->pakavoz_api_key) {
             $slots = [];
             $closedDays = [];
             $dailyWindows = $this->availability->getWorkingWindows($profile, $startDate, $days, $validated['employee_id'] ?? null);

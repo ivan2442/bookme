@@ -277,6 +277,11 @@ class OwnerDashboardController extends Controller
         }
 
         $profile = Profile::find($data['profile_id']);
+        if (!$profile->isApiAvailable('pakavoz')) {
+            $data['is_pakavoz_enabled'] = false;
+            $data['pakavoz_api_key'] = null;
+        }
+
         $name = $data['name'];
         $slugSource = is_array($name) ? ($name['sk'] ?? reset($name)) : $name;
 
@@ -305,6 +310,11 @@ class OwnerDashboardController extends Controller
         $profileIds = $this->getOwnerProfileIds($request);
         if (!in_array($service->profile_id, $profileIds)) {
             abort(403);
+        }
+
+        $profile = Profile::find($service->profile_id);
+        if (!$profile->isApiAvailable('pakavoz')) {
+            $request->merge(['is_pakavoz_enabled' => false, 'pakavoz_api_key' => null]);
         }
 
         $data = $request->validate([

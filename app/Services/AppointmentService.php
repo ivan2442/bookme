@@ -68,7 +68,7 @@ class AppointmentService
         $employeeId = $data['employee_id'] ?? null;
         $requiresConfirmation = (bool) ($settings?->requires_confirmation ?? false);
 
-        if ($service->is_pakavoz_enabled) {
+        if ($profile->isApiAvailable('pakavoz') && $service->is_pakavoz_enabled) {
             $errors = [];
             if (empty($data['evc'])) {
                 $errors['evc'] = 'Evidenčné číslo vozidla (EČV) je povinné pre túto službu.';
@@ -160,7 +160,7 @@ class AppointmentService
                 ],
             ]);
 
-            if ($service->is_pakavoz_enabled && $service->pakavoz_api_key) {
+            if ($profile->isApiAvailable('pakavoz') && $service->is_pakavoz_enabled && $service->pakavoz_api_key) {
                 $pakavozResult = $this->pakavoz->createReservation($service->pakavoz_api_key, [
                     'name' => $data['customer_name'],
                     'phone' => $data['customer_phone'],

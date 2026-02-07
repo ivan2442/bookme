@@ -63,6 +63,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     Route::get('/billing-settings', [AdminController::class, 'billingSettings'])->name('billing.settings');
     Route::post('/billing-settings', [AdminController::class, 'storeBillingSettings'])->name('billing.settings.store');
+
+    Route::get('/api-settings', [AdminController::class, 'apiSettings'])->name('api.settings');
+    Route::post('/api-settings', [AdminController::class, 'updateApiSettings'])->name('api.settings.update');
 });
 
 Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {

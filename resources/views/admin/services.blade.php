@@ -64,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="border-t border-slate-200 pt-3 space-y-2">
+                <div class="border-t border-slate-200 pt-3 space-y-2 hidden" id="pakavoz_section_add_admin">
                     <h3 class="font-semibold text-slate-900">Pakavoz Integrácia</h3>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" name="is_pakavoz_enabled" value="1" id="admin_add_pakavoz_enabled" onchange="togglePakavozKeyAdmin('add')">
@@ -103,6 +103,7 @@
                                     <input type="checkbox" name="is_active" value="1" @checked($service->is_active) class="h-4 w-4">
                                     Aktívna
                                 </label>
+                                @if($service->profile->isApiAvailable('pakavoz'))
                                 <div class="border-t border-slate-100 pt-2 mt-1 space-y-2">
                                     <div class="flex items-center gap-2">
                                         <input type="checkbox" name="is_pakavoz_enabled" value="1" @checked($service->is_pakavoz_enabled) id="admin_pakavoz_enabled_{{ $service->id }}" onchange="togglePakavozKeyAdmin('{{ $service->id }}')">
@@ -112,6 +113,7 @@
                                         <input type="text" name="pakavoz_api_key" class="input-control !py-1 !text-xs" value="{{ $service->pakavoz_api_key }}" placeholder="Pakavoz API Kľúč">
                                     </div>
                                 </div>
+                                @endif
                                 <div class="flex flex-col gap-2">
                                     <div>
                                         <label class="label">Zamestnanci tejto služby</label>
@@ -199,6 +201,24 @@
 </div>
 
 <script>
+    const pakavozProfiles = @json($profiles->filter(fn($p) => $p->isApiAvailable('pakavoz'))->pluck('id')->values());
+
+    $(document).ready(function() {
+        $('select[name="profile_id"]').on('change', function() {
+            const profileId = parseInt($(this).val());
+            const isPakavoz = pakavozProfiles.includes(profileId);
+
+            if (isPakavoz) {
+                $('#pakavoz_section_add_admin').removeClass('hidden');
+            } else {
+                $('#pakavoz_section_add_admin').addClass('hidden');
+            }
+        });
+
+        // Trigger on load
+        $('select[name="profile_id"]').trigger('change');
+    });
+
     function togglePakavozKeyAdmin(id) {
         const checkbox = id === 'add' ? document.getElementById('admin_add_pakavoz_enabled') : document.getElementById('admin_pakavoz_enabled_' + id);
         const container = document.getElementById('admin_pakavoz_key_container_' + id);

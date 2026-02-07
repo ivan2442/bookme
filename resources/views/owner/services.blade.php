@@ -83,6 +83,7 @@
                                         @endforeach
                                     </div>
                                 </div>
+                                @if($service->profile->isApiAvailable('pakavoz'))
                                 <div class="grid grid-cols-2 gap-2 border-t border-slate-50 pt-2 mt-2">
                                     <div class="flex items-center gap-2">
                                         <input type="checkbox" name="is_pakavoz_enabled" value="1" @checked($service->is_pakavoz_enabled) id="pakavoz_enabled_{{ $service->id }}" onchange="togglePakavozKey('{{ $service->id }}')">
@@ -93,6 +94,7 @@
                                         <input type="text" name="pakavoz_api_key" class="input-control !py-1.5 !text-sm" value="{{ $service->pakavoz_api_key }}" placeholder="pakavoz_secure_token_...">
                                     </div>
                                 </div>
+                                @endif
                                 <button class="w-full px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">{{ __('Save changes') }}</button>
                             </form>
                         </details>
@@ -196,7 +198,7 @@
                     </div>
                 </div>
 
-                <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-50 pt-4">
+                <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-50 pt-4 hidden" id="pakavoz_section_add">
                     <div class="flex items-center gap-2">
                         <input type="checkbox" name="is_pakavoz_enabled" value="1" id="add_pakavoz_enabled" onchange="togglePakavozKey('add')">
                         <label for="add_pakavoz_enabled" class="label !mb-0">{{ __('Activate Pakavoz API') }}</label>
@@ -218,6 +220,7 @@
 
 <script>
     const multilingualProfiles = @json($profiles->where('is_multilingual', true)->pluck('id')->values());
+    const pakavozProfiles = @json($profiles->filter(fn($p) => $p->isApiAvailable('pakavoz'))->pluck('id')->values());
 
     $(document).ready(function() {
         if ($.fn.niceSelect) {
@@ -227,6 +230,7 @@
         $('select[name="profile_id"]').on('change', function() {
             const profileId = parseInt($(this).val());
             const isMultilingual = multilingualProfiles.includes(profileId);
+            const isPakavoz = pakavozProfiles.includes(profileId);
 
             if (isMultilingual) {
                 $('#service_name_container').addClass('hidden');
@@ -238,6 +242,12 @@
                 $('#add_service_name_single').attr('required', 'required');
                 $('#service_name_multilingual').addClass('hidden');
                 $('#service_name_multilingual input[name="name[sk]"]').removeAttr('required');
+            }
+
+            if (isPakavoz) {
+                $('#pakavoz_section_add').removeClass('hidden');
+            } else {
+                $('#pakavoz_section_add').addClass('hidden');
             }
         });
 

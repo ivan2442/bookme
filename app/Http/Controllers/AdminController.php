@@ -53,6 +53,11 @@ class AdminController extends Controller
 
     public function storeService(Request $request): RedirectResponse
     {
+        $profile = Profile::find($request->input('profile_id'));
+        if ($profile && !$profile->isApiAvailable('pakavoz')) {
+            $request->merge(['is_pakavoz_enabled' => false, 'pakavoz_api_key' => null]);
+        }
+
         $data = $request->validate([
             'profile_id' => ['required', 'exists:profiles,id'],
             'name' => ['required', 'string', 'max:255'],
@@ -145,6 +150,11 @@ class AdminController extends Controller
 
     public function updateService(Request $request, Service $service): RedirectResponse
     {
+        $profile = Profile::find($service->profile_id);
+        if ($profile && !$profile->isApiAvailable('pakavoz')) {
+            $request->merge(['is_pakavoz_enabled' => false, 'pakavoz_api_key' => null]);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
@@ -765,5 +775,29 @@ class AdminController extends Controller
         }
 
         return back()->with('status', 'Nastavenia boli uložené.');
+    }
+
+    public function apiSettings(): View
+    {
+        $profiles = Profile::orderBy('name')->get();
+        return view('admin.api', compact('profiles'));
+    }
+
+    public function updateApiSettings(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'apis' => ['nullable', 'array'],
+        ]);
+
+        $profiles = Profile::all();
+
+        foreach ($profiles as $profile) {
+            $allowedApis = $request->input("apis.{$profile->id}", []);
+            $profile->update([
+                'available_apis' => $allowedApis
+            ]);
+        }
+
+        return back()->with('status', 'Nastavenia API boli úspešne aktualizované.');
     }
 }
