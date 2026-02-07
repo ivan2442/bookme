@@ -86,7 +86,8 @@ let state = {
 };
 
 function formatRelativeSlot(isoDate) {
-    if (!isoDate) return 'čoskoro';
+    const translations = window.translations || {};
+    if (!isoDate) return translations["soon"] || 'čoskoro';
     const date = new Date(isoDate);
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -97,9 +98,9 @@ function formatRelativeSlot(isoDate) {
     const time = timeFormatter.format(date);
 
     if (target.getTime() === today.getTime()) {
-        return `dnes ${time}`;
+        return `${translations["today"] || 'dnes'} ${time}`;
     } else if (target.getTime() === tomorrow.getTime()) {
-        return `zajtra ${time}`;
+        return `${translations["tomorrow"] || 'zajtra'} ${time}`;
     } else {
         const d = date.getDate().toString().padStart(2, '0');
         const m = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -359,8 +360,9 @@ function populateVariants(serviceId) {
     // Update Pakavoz fields visibility
     updatePakavozFieldsVisibility(serviceId);
 
+    const translations = window.translations || {};
     const variants = state.variantsByService[serviceId] || [];
-    variantSelect.innerHTML = '<option value="">Žiadny (použiť základ služby)</option>';
+    variantSelect.innerHTML = `<option value="">${translations["None (use service base)"] || 'Žiadny (použiť základ služby)'}</option>`;
     variants.forEach((variant) => {
         const opt = document.createElement('option');
         opt.value = variant.id;
@@ -488,8 +490,9 @@ async function fetchWeekAvailability() {
 }
 
 async function fetchAvailability(autoSelectNearest = false) {
+    const translations = window.translations || {};
     if (!shopSelect?.value || !serviceSelect?.value) {
-        resetSlots('Vyber prevádzku a službu.');
+        resetSlots(translations["Choose business and service."] || 'Vyber prevádzku a službu.');
         return;
     }
 
@@ -536,8 +539,9 @@ async function fetchAvailability(autoSelectNearest = false) {
         renderCalendar();
         renderSlots(filteredSlots);
     } catch (error) {
+        const translations = window.translations || {};
         console.error('Chyba pri načítaní dostupnosti', error);
-        resetSlots('Nepodarilo sa načítať dostupnosť.');
+        resetSlots(translations["Failed to load availability."] || 'Nepodarilo sa načítať dostupnosť.');
     }
 }
 
@@ -551,20 +555,21 @@ let lockTimeout = null;
     let refreshTimeout = null;
 
     const startLockTimer = () => {
+        const translations = window.translations || {};
         if (lockTimeout) clearTimeout(lockTimeout);
         if (refreshTimeout) clearTimeout(refreshTimeout);
 
         // 4 minutes and 50 seconds = 290000 ms (10 seconds before 5 minutes)
         lockTimeout = setTimeout(() => {
             Swal.fire({
-                title: 'Pokračovať v rezervácii?',
-                text: 'Z dôvodu neaktivity bude vaša rozpracovaná rezervácia čoskoro zrušená.',
+                title: translations["Continue booking?"] || 'Pokračovať v rezervácii?',
+                text: translations["Due to inactivity, your pending reservation will be cancelled soon."] || 'Z dôvodu neaktivity bude vaša rozpracovaná rezervácia čoskoro zrušená.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#10b981',
                 cancelButtonColor: '#f43f5e',
-                confirmButtonText: 'Pokračovať',
-                cancelButtonText: 'Zrušiť',
+                confirmButtonText: translations["Continue"] || 'Pokračovať',
+                cancelButtonText: translations["Cancel"] || 'Zrušiť',
                 timer: 10000,
                 timerProgressBar: true,
             }).then((result) => {
@@ -587,8 +592,9 @@ let lockTimeout = null;
 
     function renderSlots(slots) {
         if (!timeGrid) return;
+        const translations = window.translations || {};
         if (!slots.length) {
-            resetSlots('Žiadne voľné termíny pre vybraný deň.');
+            resetSlots(translations["No free slots for selected day."] || 'Žiadne voľné termíny pre vybraný deň.');
             return;
         }
         timeGrid.innerHTML = '';
@@ -638,22 +644,23 @@ let lockTimeout = null;
                 const statusP = document.createElement('p');
                 statusP.className = 'text-[10px] text-emerald-600 truncate';
 
+                const translations = window.translations || {};
                 if (isLocking) {
                     button.disabled = true;
                     button.dataset.status = 'busy';
                     button.classList.add('opacity-70', 'cursor-not-allowed');
                     statusP.classList.replace('text-emerald-600', 'text-orange-500');
-                    statusP.textContent = 'obsadzuje sa';
-                    button.title = 'Niekto iný práve vypĺňa rezerváciu';
+                    statusP.textContent = translations["locking"] || 'obsadzuje sa';
+                    button.title = translations["Someone else is currently filling out a reservation"] || 'Niekto iný práve vypĺňa rezerváciu';
                 } else if (!isAvailable) {
                     button.disabled = true;
                     button.dataset.status = 'busy';
                     button.classList.add('opacity-60', 'cursor-not-allowed');
                     statusP.classList.replace('text-emerald-600', 'text-slate-500');
-                    statusP.textContent = 'obsadené';
-                    button.title = 'Obsadené';
+                    statusP.textContent = translations["busy"] || 'obsadené';
+                    button.title = translations["busy"] || 'Obsadené';
                 } else {
-                    statusP.textContent = 'voľný';
+                    statusP.textContent = translations["free"] || 'voľný';
                     button.addEventListener('click', () => {
                         timeGrid.querySelectorAll('.slot-card').forEach((b) => {
                             b.classList.remove('is-active', 'ring-2', 'ring-emerald-500', 'border-emerald-500', 'bg-emerald-50');
@@ -714,10 +721,10 @@ let lockTimeout = null;
         };
 
         if (morning.length) {
-            renderGroup('Dopoludnie', morning);
+            renderGroup(translations["Morning"] || 'Dopoludnie', morning);
         }
         if (afternoon.length) {
-            renderGroup('Popoludnie', afternoon);
+            renderGroup(translations["Afternoon"] || 'Popoludnie', afternoon);
         }
     }
 
@@ -737,12 +744,13 @@ bookingForm?.addEventListener('submit', (event) => {
         payload.lock_token = state.lockToken;
     }
 
+    const translations = window.translations || {};
     if (!payload.start_at) {
-        bookingOutput.textContent = 'Vyber čas, aby sme zamkli slot.';
+        bookingOutput.textContent = translations["Select time to lock slot."] || 'Vyber čas, aby sme zamkli slot.';
         return;
     }
 
-    bookingOutput.textContent = `Overujem slot...`;
+    bookingOutput.textContent = translations["Checking slot..."] || `Overujem slot...`;
 
     const selectedVariant = state.variantMap[payload.service_variant_id];
     const selectedService =
@@ -762,39 +770,41 @@ bookingForm?.addEventListener('submit', (event) => {
     axios
         .post('/api/appointments', payload)
         .then((response) => {
+            const translations = window.translations || {};
             const appointment = response.data;
-            const successMessage = `Termín potvrdený: ${appointment.service?.name ?? 'Služba'} ${dateTimeFormatter.format(
+            const successMessage = `${translations["Appointment confirmed:"] || 'Termín potvrdený:'} ${appointment.service?.name ?? 'Služba'} ${dateTimeFormatter.format(
                 new Date(appointment.start_at),
-            )} ${endTimeReadable ? `(${endTimeReadable})` : ''}, cena €${Number(price).toFixed(2)}.`;
+            )} ${endTimeReadable ? `(${endTimeReadable})` : ''}, ${translations["price"] || 'cena'} €${Number(price).toFixed(2)}.`;
 
             bookingOutput.textContent = successMessage;
 
             if (typeof Swal !== 'undefined') {
+                const translations = window.translations || {};
                 const title = appointment.service?.name ?? 'Služba';
                 const start = appointment.start_at;
                 const shopName = state.shops.find(s => String(s.id) === String(payload.profile_id))?.name ?? 'BookMe';
 
                 Swal.fire({
-                    title: 'Rezervácia úspešná!',
+                    title: translations["Booking successful!"] || 'Rezervácia úspešná!',
                     html: `
                         <p class="mb-4">${successMessage}</p>
                         <div class="flex flex-col gap-2 mt-4">
                             <button onclick="downloadIcs('${title}', '${start}', ${durationMinutes}, '${shopName}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
-                                📱 Pridať do iOS kalendára
+                                📱 ${translations["Add to iOS calendar"] || 'Pridať do iOS kalendára'}
                             </button>
                             <button onclick="openGoogleCalendar('${title}', '${start}', ${durationMinutes}, '${shopName}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
-                                🤖 Pridať do Android kalendára
+                                🤖 ${translations["Add to Android calendar"] || 'Pridať do Android kalendára'}
                             </button>
                         </div>
                     `,
                     icon: 'success',
                     confirmButtonColor: '#10b981',
-                    confirmButtonText: 'Zavrieť'
+                    confirmButtonText: translations["Close"] || 'Zavrieť'
                 }).then(() => {
                     // Reset formy
                     if (bookingForm) {
                         bookingForm.reset();
-                        bookingOutput.textContent = 'Vyber službu a čas, systém preverí dostupnosť a potvrdí ti termín.';
+                        bookingOutput.textContent = translations["Choose service and time, the system will check availability and confirm your appointment."] || 'Vyber službu a čas, systém preverí dostupnosť a potvrdí ti termín.';
                         bookingOutput.classList.add('hidden');
                     }
 
@@ -810,9 +820,10 @@ bookingForm?.addEventListener('submit', (event) => {
             }
         })
         .catch((error) => {
+            const translations = window.translations || {};
             console.error('Chyba pri rezervácii', error);
             const errors = error.response?.data?.errors;
-            let message = error.response?.data?.message || 'Nepodarilo sa vytvoriť rezerváciu.';
+            let message = error.response?.data?.message || (translations["Error booking appointment."] || 'Nepodarilo sa vytvoriť rezerváciu.');
             if (errors) {
                 message = Object.values(errors).flat().join(' ');
             }
@@ -822,25 +833,27 @@ bookingForm?.addEventListener('submit', (event) => {
 
 shopSelect?.addEventListener('change', () => {
     const shopId = shopSelect.value;
+    const translations = window.translations || {};
     if (shopId) {
         populateServicesForShop(shopId);
         fetchWeekAvailability();
     } else {
         populateServiceSelect();
     }
-    variantSelect && (variantSelect.innerHTML = '<option value=\"\">Vyber variant</option>');
-    resetSlots('Vyber variant.');
+    variantSelect && (variantSelect.innerHTML = `<option value="">${translations["Choose variant"] || 'Vyber variant'}</option>`);
+    resetSlots(translations["Choose variant."] || 'Vyber variant.');
     updatePakavozFieldsVisibility(null);
 });
 
 serviceSelect?.addEventListener('change', () => {
+    const translations = window.translations || {};
     const serviceId = serviceSelect.value;
     if (serviceId) {
         populateVariants(serviceId);
         fetchWeekAvailability();
     } else {
-        variantSelect && (variantSelect.innerHTML = '<option value=\"\">Vyber variant</option>');
-        resetSlots('Vyber službu.');
+        variantSelect && (variantSelect.innerHTML = `<option value="">${translations["Choose variant"] || 'Vyber variant'}</option>`);
+        resetSlots(translations["Choose service."] || 'Vyber službu.');
         updatePakavozFieldsVisibility(null);
     }
 });
@@ -994,7 +1007,7 @@ function renderCalendar() {
         state.calendarStart = startOfWeek(today);
     }
     const start = state.calendarStart;
-    const monthFormatter = new Intl.DateTimeFormat('sk-SK', { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
+    const monthFormatter = new Intl.DateTimeFormat(window.locale || 'sk-SK', { month: 'long', year: 'numeric', timeZone: TIME_ZONE });
     calendarMonth.textContent = monthFormatter.format(start);
 
     calendarGrid.querySelectorAll('.calendar-item').forEach((el) => el.remove());
@@ -1084,42 +1097,45 @@ function initSelectedDate() {
         ].join('\n');
 
         const blob = new Blob([icsMsg], { type: 'text/calendar;charset=utf-8' });
+        const translations = window.translations || {};
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.setAttribute('download', 'rezervacia.ics');
+        link.setAttribute('download', translations["reservation.ics"] || 'reservation.ics');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
 
     window.openGoogleCalendar = function(title, start, duration, shopName) {
+        const translations = window.translations || {};
         const startDate = new Date(start);
         const endDate = new Date(startDate.getTime() + duration * 60000);
 
         const format = (d) => d.toISOString().replace(/-|:|\.\d+/g, '');
 
-        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${format(startDate)}/${format(endDate)}&details=${encodeURIComponent('Rezervácia v ' + shopName)}&location=${encodeURIComponent(shopName)}`;
+        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${format(startDate)}/${format(endDate)}&details=${encodeURIComponent((translations["Reservation at"] || 'Rezervácia v ') + shopName)}&location=${encodeURIComponent(shopName)}`;
         window.open(url, '_blank');
     };
 
     // Lightpick initialization
     const dateInputs = document.querySelectorAll('input[name="date"]:not([type="hidden"])');
+    const translations = window.translations || {};
     dateInputs.forEach(el => {
         new Lightpick({
             field: el,
             format: 'YYYY-MM-DD',
-            lang: 'sk',
+            lang: window.locale || 'sk',
             locale: {
                 buttons: {
                     prev: '←',
                     next: '→',
                     close: '×',
-                    reset: 'Vynulovať',
+                    reset: translations["Reset"] || 'Vynulovať',
                 },
                 tooltip: {
-                    one: 'deň',
-                    few: 'dni',
-                    many: 'dní',
+                    one: translations["day"] || 'deň',
+                    few: translations["days_2_4"] || 'dni',
+                    many: translations["days_5_more"] || 'dní',
                 },
                 pluralize: function(i, locale) {
                     if (i === 1) return locale.tooltip.one;

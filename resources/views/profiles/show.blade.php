@@ -173,8 +173,8 @@
         <div class="relative bg-white rounded-[32px] shadow-2xl w-full max-w-2xl p-6 md:p-8 overflow-hidden">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <p class="text-[10px] uppercase font-bold text-emerald-600 tracking-widest mb-1">Rezervácia termínu</p>
-                    <h3 class="text-2xl font-display font-semibold text-slate-900" id="modal_service_name">Služba</h3>
+                    <p class="text-[10px] uppercase font-bold text-emerald-600 tracking-widest mb-1">{{ __('Appointment booking') }}</p>
+                    <h3 class="text-2xl font-display font-semibold text-slate-900" id="modal_service_name">{{ __('Service') }}</h3>
                 </div>
                 <button onclick="closeBookingModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -191,40 +191,40 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1">
-                        <label class="label !ml-1">Vaše meno</label>
-                        <input name="customer_name" type="text" class="input-control" placeholder="Meno a priezvisko" required />
+                        <label class="label !ml-1">{{ __('Your name') }}</label>
+                        <input name="customer_name" type="text" class="input-control" placeholder="{{ __('Name and surname') }}" required />
                     </div>
                     <div class="space-y-1">
-                        <label class="label !ml-1">E-mail</label>
+                        <label class="label !ml-1">{{ __('Email') }}</label>
                         <input name="customer_email" type="email" class="input-control" placeholder="vas@email.sk" required />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1">
-                        <label class="label !ml-1">Telefón</label>
+                        <label class="label !ml-1">{{ __('Phone') }}</label>
                         <input name="customer_phone" id="modal_customer_phone" type="text" class="input-control" placeholder="+421..." required />
                     </div>
                     <div class="space-y-1">
-                        <label class="label !ml-1">Poznámka</label>
-                        <input name="notes" type="text" class="input-control" placeholder="Voliteľná poznámka" />
+                        <label class="label !ml-1">{{ __('Note') }}</label>
+                        <input name="notes" type="text" class="input-control" placeholder="{{ __('Optional note') }}" />
                     </div>
                 </div>
 
                 <div id="pakavoz-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1">
-                        <label class="label !ml-1">EČV (ŠPZ)</label>
+                        <label class="label !ml-1">{{ __('EČV (ŠPZ)') }}</label>
                         <input name="evc" id="modal_evc" type="text" class="input-control" placeholder="napr. BA123XY" />
                     </div>
                     <div class="space-y-1">
-                        <label class="label !ml-1">Model vozidla</label>
-                        <input name="vehicle_model" type="text" class="input-control" placeholder="napr. Škoda Octavia" />
+                        <label class="label !ml-1">{{ __('Vehicle model') }}</label>
+                        <input name="vehicle_model" type="text" class="input-control" placeholder="{{ __('e.g. Skoda Octavia') }}" />
                     </div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 pt-2">
                     <div class="space-y-3">
-                        <label class="label !ml-1">Vyberte dátum</label>
+                        <label class="label !ml-1">{{ __('Choose date') }}</label>
                         <div class="date-calendar !shadow-none !border-slate-100" id="modal-calendar">
                             <div class="flex items-center justify-between mb-2">
                                 <button type="button" class="cal-nav" id="modal-cal-prev">‹</button>
@@ -232,20 +232,20 @@
                                 <button type="button" class="cal-nav" id="modal-cal-next">›</button>
                             </div>
                             <div class="calendar-grid !gap-1" id="modal-cal-grid">
-                                <div class="calendar-heading">po</div>
-                                <div class="calendar-heading">ut</div>
-                                <div class="calendar-heading">st</div>
-                                <div class="calendar-heading">št</div>
-                                <div class="calendar-heading">pi</div>
-                                <div class="calendar-heading">so</div>
-                                <div class="calendar-heading">ne</div>
+                                <div class="calendar-heading">{{ __('mon') }}</div>
+                                <div class="calendar-heading">{{ __('tue') }}</div>
+                                <div class="calendar-heading">{{ __('wed') }}</div>
+                                <div class="calendar-heading">{{ __('thu') }}</div>
+                                <div class="calendar-heading">{{ __('fri') }}</div>
+                                <div class="calendar-heading">{{ __('sat') }}</div>
+                                <div class="calendar-heading">{{ __('sun') }}</div>
                             </div>
                         </div>
                     </div>
                     <div class="space-y-3">
-                        <label class="label !ml-1">Dostupné časy</label>
+                        <label class="label !ml-1">{{ __('Available times') }}</label>
                         <div class="max-h-[280px] overflow-y-auto pr-2 space-y-4" id="modal-time-grid">
-                            <p class="text-sm text-slate-400 italic">Načítavam voľné termíny...</p>
+                            <p class="text-sm text-slate-400 italic">{{ __('Loading free slots...') }}</p>
                         </div>
                     </div>
                 </div>
@@ -253,10 +253,10 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t border-slate-50">
                     <div class="flex items-center gap-2 text-[11px] text-slate-400 uppercase font-bold tracking-tight">
                         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Slot sa zamkne na 5 minút
+                        {{ __('Slot will be locked for 5 minutes') }}
                     </div>
                     <button type="submit" class="px-8 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition shadow-lg shadow-emerald-200/50">
-                        Potvrdiť rezerváciu
+                        {{ __('Confirm booking') }}
                     </button>
                 </div>
             </form>
