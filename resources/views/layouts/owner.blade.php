@@ -33,10 +33,12 @@
             "Pending": "{{ __('Pending') }}",
             "Confirm": "{{ __('Confirm') }}",
             "Mark as completed": "{{ __('Mark as completed') }}",
+            "Edit": "{{ __('Edit') }}",
             "Reschedule": "{{ __('Reschedule') }}",
             "Delete": "{{ __('Delete') }}",
             "Are you sure you want to delete this appointment?": "{{ __('Are you sure you want to delete this appointment?') }}",
-            "No upcoming appointments for this day.": "{{ __('No upcoming appointments for this day.') }}"
+            "No upcoming appointments for this day.": "{{ __('No upcoming appointments for this day.') }}",
+            "Failed to load appointments.": "{{ __('Failed to load appointments.') }}"
         };
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -62,7 +64,7 @@
                 </div>
 
                 <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-4">{{ __('Prehľad') }}</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-4">{{ __('Overview') }}</p>
                     <a href="{{ route('owner.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.dashboard') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         {{ __('Dashboard') }}
@@ -72,7 +74,7 @@
                         {{ __('Appointments') }}
                     </a>
 
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Správa prevádzky') }}</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Business management') }}</p>
                     <a href="{{ route('owner.services') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.services') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         {{ __('Services') }}
@@ -90,7 +92,7 @@
                         {{ __('Holidays') }}
                     </a>
 
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Nastavenia') }}</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Settings') }}</p>
                     <a href="{{ route('owner.calendar.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.calendar.settings') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         {{ __('Calendar') }}
@@ -100,7 +102,7 @@
                         {{ __('Billing details') }}
                     </a>
 
-                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Financie') }}</p>
+                    <p class="px-3 text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2 mt-6">{{ __('Finance') }}</p>
                     <a href="{{ route('owner.payments') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('owner.payments') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         {{ __('Revenue') }}

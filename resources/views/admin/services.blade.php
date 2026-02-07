@@ -88,7 +88,7 @@
                 @forelse($services as $service)
                     <div class="border border-slate-100 rounded-xl p-3 bg-white/80 space-y-3">
                         <details class="border border-slate-200 rounded-lg p-2">
-                            <summary class="cursor-pointer font-semibold text-slate-900">Upraviť službu</summary>
+                            <summary class="cursor-pointer font-semibold text-slate-900">{{ __('Edit service') }}</summary>
                             <form method="POST" action="{{ route('admin.services.update', $service) }}" class="space-y-2 mt-2">
                                 @csrf
                                 <input type="text" name="name" class="input-control" value="{{ $service->name }}" required>

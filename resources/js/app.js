@@ -1297,14 +1297,14 @@ function initAdminDashboard() {
                                 ${a.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
                                    (a.status === 'pending' ? 'bg-orange-100 text-orange-700' :
                                    (a.status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-500'))}">
-                                ${a.status === 'completed' ? (translations["Completed"] || 'Vybavené') : (a.status === 'confirmed' ? (translations["Confirmed"] || 'Potvrdené') : (a.status === 'pending' ? (translations["Pending"] || 'Čaká') : a.status))}
+                                ${a.status === 'completed' ? (translations["Completed"] || 'Completed') : (a.status === 'confirmed' ? (translations["Confirmed"] || 'Confirmed') : (a.status === 'pending' ? (translations["Pending"] || 'Pending') : a.status))}
                             </span>
                         ` : ''}
                         <div class="flex items-center gap-1">
                             ${a.status === 'pending' ? `
                                 <form method="POST" action="${a.confirm_url}">
                                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                                    <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="${translations["Confirm"] || 'Potvrdiť'}">
+                                    <button class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition" title="${translations["Confirm"] || 'Confirm'}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
                                 </form>
@@ -1314,8 +1314,8 @@ function initAdminDashboard() {
                                 <form method="POST" action="${a.status_update_url}">
                                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                                     <input type="hidden" name="status" value="completed">
-                                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="${translations["Mark as completed"] || 'Označiť ako vybavené'}">
-                                        ${translations["Completed"] || 'Vybavené'}
+                                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition shadow-sm" title="${translations["Mark as completed"] || 'Mark as completed'}">
+                                        ${translations["Completed"] || 'Completed'}
                                     </button>
                                 </form>
                             ` : ''}
@@ -1331,8 +1331,8 @@ function initAdminDashboard() {
                                 price: a.price,
                                 employee_id: a.employee_id,
                                 notes: ''
-                            })})' class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-100 transition" title="${translations["Edit"] || 'Upraviť'}">
-                                ${translations["Edit"] || 'Upraviť'}
+                            })})' class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold hover:bg-emerald-100 transition" title="${translations["Edit"] || 'Edit'}">
+                                ${translations["Edit"] || 'Edit'}
                             </button>
 
                             <button onclick='openEditAppointmentModal(${JSON.stringify({
@@ -1346,15 +1346,15 @@ function initAdminDashboard() {
                                 price: a.price,
                                 employee_id: a.employee_id,
                                 notes: ''
-                            })})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="${translations["Reschedule"] || 'Presunúť'}">
-                                ${translations["Reschedule"] || 'Presunúť'}
+                            })})' class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition" title="${translations["Reschedule"] || 'Reschedule'}">
+                                ${translations["Reschedule"] || 'Reschedule'}
                             </button>
 
-                            <form method="POST" action="${a.delete_url}" onsubmit="return confirm('${translations["Are you sure you want to delete this appointment?"] || 'Naozaj chcete vymazať túto rezerváciu?'}')">
+                            <form method="POST" action="${a.delete_url}" onsubmit="return confirm('${translations["Are you sure you want to delete this appointment?"] || 'Are you sure you want to delete this appointment?'}')">
                                 <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="${translations["Delete"] || 'Vymazať'}">
-                                    ${translations["Delete"] || 'Vymazať'}
+                                <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="${translations["Delete"] || 'Delete'}">
+                                    ${translations["Delete"] || 'Delete'}
                                 </button>
                             </form>
                         </div>

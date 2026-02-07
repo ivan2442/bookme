@@ -1,11 +1,224 @@
-HTTP/1.1 200 OK
-Host: 127.0.0.1:8000
-Connection: close
-X-Powered-By: PHP/8.4.1
-Cache-Control: no-cache, private
-Date: Fri, 06 Feb 2026 23:56:54 GMT
-Content-Type: application/json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 59
-Access-Control-Allow-Origin: *
-{"current_page":1,"data":[{"id":4,"owner_id":5,"name":{"sk":"Brhel Barber"},"slug":"brhel-barber","category":{"sk":"Kadren\u00edctvo & Barber"},"description":{"sk":"\"Vlasy vn\u00edmam ako tv\u00e1rny materi\u00e1l a pr\u00e1ca s nimi je r\u00f4znorod\u00e1, kr\u00e1sna a tvoriv\u00e1, lebo tak ako maliar pracuje s farbami, soch\u00e1r s hlinou, \u010di hudobn\u00edk s t\u00f3nmi, ja vytv\u00e1ram ,,\u017eiv\u00e9\" umenie z vlasov. Pre m\u0148a je \u00fa\u010des prejavom slobody osobnosti, vyjadren\u00edm ur\u010dit\u00e9ho pocitu,  n\u00e1zoru a \u017eivotn\u00e9ho \u0161t\u00fdlu. Zameriavam sa napr.na ,,Hair Tattoo\", \u010do je vytv\u00e1ranie r\u00f4znych obrazcov a ornamentov \u0161peci\u00e1lnou technikou. Ka\u017ed\u00e9ho \u010dloveka vn\u00edmam ve\u013emi individu\u00e1lne a mo\u017eno vid\u00edm aj to, \u010do in\u00ed nevidia. Niekedy aj mal\u00e1 zmena dok\u00e1\u017ee z\u00e1zraky, o\u017eiv\u00ed a zv\u00fdrazn\u00ed, \u010do je zauj\u00edmav\u00e9 a pekn\u00e9. Vlasy s\u00fa tv\u00e1rny materi\u00e1l. R\u00e1d vytv\u00e1ram nov\u00e9 \u00fa\u010desy, strihy, farebn\u00e9 kombin\u00e1cie, ale v\u017edy beriem do \u00favahy prianie a povahu z\u00e1kazn\u00edka.\""},"email":"brhel@bookme.sk","phone":"+421 123 456 789","website":null,"address_line1":"Doln\u00e1 32","address_line2":null,"city":"Bansk\u00e1 \u0160tiavnica","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":null,"subscription_plan":"free","logo_path":"profiles\/logos\/mExMDJjnVVenkICRmn4NAHoKTq0fOab7L514dAtb.jpg","banner_path":"profiles\/banners\/JRC3ZI6nyGqyJlyex9PAkKkIascrrR58ON0E3XOy.jpg","settings":null,"created_at":"2026-02-01T01:34:16.000000Z","updated_at":"2026-02-05T15:03:34.000000Z","billing_name":"Brhel Barber","billing_address":"Doln\u00e1 25","billing_city":"Bansk\u00e1 \u0160tiavnica","billing_postal_code":"96901","billing_country":"Slovensko","billing_ico":"123456789","billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T09:00:00+01:00","logo_url":"https:\/\/bookme.sk\/storage\/profiles\/logos\/mExMDJjnVVenkICRmn4NAHoKTq0fOab7L514dAtb.jpg","banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/JRC3ZI6nyGqyJlyex9PAkKkIascrrR58ON0E3XOy.jpg","trial_days_left":0,"trial_time_left":"0 dn\u00ed","services":[{"id":2,"profile_id":4,"name":{"sk":"P\u00e1nsky strih"},"category":{"sk":"Kadern\u00edctvo"},"base_price":"35.00","base_duration_minutes":30,"is_active":true,"is_pakavoz_enabled":false,"employees":[{"id":2,"name":"Brhel","pivot":{"service_id":2,"employee_id":2,"created_at":"2026-02-01T01:55:00.000000Z","updated_at":"2026-02-01T01:55:00.000000Z"}}],"variants":[]},{"id":3,"profile_id":4,"name":{"sk":"P\u00e1nsky strih"},"category":{"sk":"Kadern\u00edctvo"},"base_price":"25.00","base_duration_minutes":30,"is_active":true,"is_pakavoz_enabled":false,"employees":[{"id":3,"name":"Paja","pivot":{"service_id":3,"employee_id":3,"created_at":"2026-02-01T01:55:10.000000Z","updated_at":"2026-02-01T01:55:10.000000Z"}}],"variants":[]}],"employees":[{"id":2,"profile_id":4,"name":"Brhel"},{"id":3,"profile_id":4,"name":"Paja"}],"calendar_setting":{"id":2,"profile_id":4,"slot_interval_minutes":30,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":7,"min_notice_minutes":15,"cancellation_limit_hours":0,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-01T01:34:16.000000Z","updated_at":"2026-02-02T19:12:03.000000Z"},"schedules":[{"id":11,"profile_id":4,"employee_id":3,"day_of_week":1,"start_time":"09:00:00","end_time":"19:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:43.000000Z","updated_at":"2026-02-02T16:04:43.000000Z","breaks":[]},{"id":12,"profile_id":4,"employee_id":3,"day_of_week":2,"start_time":"09:00:00","end_time":"16:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:43.000000Z","updated_at":"2026-02-01T01:55:43.000000Z","breaks":[]},{"id":13,"profile_id":4,"employee_id":3,"day_of_week":3,"start_time":"09:00:00","end_time":"16:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:43.000000Z","updated_at":"2026-02-01T01:55:43.000000Z","breaks":[]},{"id":14,"profile_id":4,"employee_id":3,"day_of_week":4,"start_time":"09:00:00","end_time":"16:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:43.000000Z","updated_at":"2026-02-01T01:55:43.000000Z","breaks":[]},{"id":15,"profile_id":4,"employee_id":3,"day_of_week":5,"start_time":"09:00:00","end_time":"16:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:43.000000Z","updated_at":"2026-02-01T01:55:43.000000Z","breaks":[]},{"id":16,"profile_id":4,"employee_id":2,"day_of_week":1,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:52.000000Z","updated_at":"2026-02-01T01:55:52.000000Z","breaks":[]},{"id":17,"profile_id":4,"employee_id":2,"day_of_week":2,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:52.000000Z","updated_at":"2026-02-01T01:55:52.000000Z","breaks":[]},{"id":18,"profile_id":4,"employee_id":2,"day_of_week":3,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:52.000000Z","updated_at":"2026-02-01T01:55:52.000000Z","breaks":[]},{"id":19,"profile_id":4,"employee_id":2,"day_of_week":4,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:52.000000Z","updated_at":"2026-02-01T01:55:52.000000Z","breaks":[]},{"id":20,"profile_id":4,"employee_id":2,"day_of_week":5,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-01T01:55:52.000000Z","updated_at":"2026-02-01T01:55:52.000000Z","breaks":[]}],"holidays":[]},{"id":5,"owner_id":6,"name":{"sk":"Nataly"},"slug":"nataly","category":{"sk":"Kadren\u00edctvo & Barber"},"description":"Vlasy nie s\u00fa pre m\u0148a len pr\u00e1ca, ale v\u00e1\u0161e\u0148. Ka\u017ed\u00fd strih a farbu rob\u00edm tak, akoby boli moje vlastn\u00e9 \u2013 s citom, prec\u00edznos\u0165ou a re\u0161pektom k tomu, k\u00fdm ste. Moj\u00edm cie\u013eom nie je len pekn\u00fd \u00fa\u010des, ale pocit, \u017ee sa na seba radi pozriete do zrkadla.","email":"natalia@bookme.sk","phone":"+421 123 456 789","website":null,"address_line1":"N\u00e1mestie Slovensk\u00e9ho n\u00e1rodn\u00e9ho povstania 1, Krupina","address_line2":null,"city":"Krupina","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":true,"subscription_starts_at":null,"subscription_plan":"premium","logo_path":"profiles\/logos\/9uPjMmT57adwvThtNRnCWvdhweGVSxswYggtZr3R.png","banner_path":"profiles\/banners\/ApZrzHpoNezuU78tvUqEwHE0fe6v7TafQWSqXIgP.jpg","settings":null,"created_at":"2026-02-02T19:15:02.000000Z","updated_at":"2026-02-06T23:02:05.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T09:00:00+01:00","logo_url":"https:\/\/bookme.sk\/storage\/profiles\/logos\/9uPjMmT57adwvThtNRnCWvdhweGVSxswYggtZr3R.png","banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/ApZrzHpoNezuU78tvUqEwHE0fe6v7TafQWSqXIgP.jpg","trial_days_left":0,"trial_time_left":"0 dn\u00ed","services":[{"id":4,"profile_id":5,"name":{"sk":"P\u00e1nsky strih"},"category":{"sk":"Beauty Hair & Spa"},"base_price":"20.00","base_duration_minutes":30,"is_active":true,"is_pakavoz_enabled":false,"employees":[{"id":4,"name":"Nat\u00e1lia","pivot":{"service_id":4,"employee_id":4,"created_at":"2026-02-02T19:18:39.000000Z","updated_at":"2026-02-02T19:18:39.000000Z"}}],"variants":[]},{"id":5,"profile_id":5,"name":{"sk":"D\u00e1msky strih"},"category":{"sk":"Beauty Hair & Spa"},"base_price":"50.00","base_duration_minutes":60,"is_active":true,"is_pakavoz_enabled":false,"employees":[{"id":4,"name":"Nat\u00e1lia","pivot":{"service_id":5,"employee_id":4,"created_at":"2026-02-02T19:19:08.000000Z","updated_at":"2026-02-02T19:19:08.000000Z"}}],"variants":[]},{"id":6,"profile_id":5,"name":{"sk":"Farbenie"},"category":{"sk":"Beauty Hair & Spa"},"base_price":"50.00","base_duration_minutes":60,"is_active":true,"is_pakavoz_enabled":false,"employees":[{"id":4,"name":"Nat\u00e1lia","pivot":{"service_id":6,"employee_id":4,"created_at":"2026-02-02T19:19:34.000000Z","updated_at":"2026-02-02T19:19:34.000000Z"}}],"variants":[]}],"employees":[{"id":4,"profile_id":5,"name":"Nat\u00e1lia"}],"calendar_setting":{"id":3,"profile_id":5,"slot_interval_minutes":30,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":5,"min_notice_minutes":30,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-02T19:15:02.000000Z","updated_at":"2026-02-02T21:00:22.000000Z"},"schedules":[{"id":26,"profile_id":5,"employee_id":4,"day_of_week":1,"start_time":"09:00:00","end_time":"20:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T21:00:08.000000Z","updated_at":"2026-02-05T00:53:16.000000Z","breaks":[{"id":1,"schedule_id":26,"start_time":"17:30:00","end_time":"18:30:00","label":"Prest\u00e1vka","created_at":"2026-02-05T00:53:16.000000Z","updated_at":"2026-02-05T00:53:16.000000Z"}]},{"id":27,"profile_id":5,"employee_id":4,"day_of_week":2,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T21:00:08.000000Z","updated_at":"2026-02-02T21:00:08.000000Z","breaks":[]},{"id":28,"profile_id":5,"employee_id":4,"day_of_week":3,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T21:00:08.000000Z","updated_at":"2026-02-02T21:00:08.000000Z","breaks":[]},{"id":29,"profile_id":5,"employee_id":4,"day_of_week":4,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T21:00:08.000000Z","updated_at":"2026-02-02T21:00:08.000000Z","breaks":[]},{"id":30,"profile_id":5,"employee_id":4,"day_of_week":5,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T21:00:08.000000Z","updated_at":"2026-02-02T21:00:08.000000Z","breaks":[]}],"holidays":[]},{"id":6,"owner_id":8,"name":{"sk":"Jasmin"},"slug":"jasmin","category":{"sk":"Kozmetick\u00fd sal\u00f3n"},"description":null,"email":"ivet@bookme.sk","phone":null,"website":null,"address_line1":"L.Svobodu 25, 96901, Bansk\u00e1 \u0160tiavnica","address_line2":null,"city":"Bansk\u00e1 \u0160tiavnica","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":null,"subscription_plan":"free","logo_path":"profiles\/logos\/xtywFIS1dA1J7aZgDrMV6hdND5KCcccBBIpzSYhb.jpg","banner_path":"profiles\/banners\/0KpHLffbOF7cOZBWbdnbyz0IrEwlQYq8c7Cw03Gn.jpg","settings":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-05T00:44:52.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T09:00:00+01:00","logo_url":"https:\/\/bookme.sk\/storage\/profiles\/logos\/xtywFIS1dA1J7aZgDrMV6hdND5KCcccBBIpzSYhb.jpg","banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/0KpHLffbOF7cOZBWbdnbyz0IrEwlQYq8c7Cw03Gn.jpg","trial_days_left":0,"trial_time_left":"0 dn\u00ed","services":[],"employees":[],"calendar_setting":{"id":4,"profile_id":6,"slot_interval_minutes":15,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":90,"min_notice_minutes":60,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-02T22:27:35.000000Z"},"schedules":[{"id":31,"profile_id":6,"employee_id":null,"day_of_week":1,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-02T22:27:35.000000Z","breaks":[]},{"id":32,"profile_id":6,"employee_id":null,"day_of_week":2,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-02T22:27:35.000000Z","breaks":[]},{"id":33,"profile_id":6,"employee_id":null,"day_of_week":3,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-02T22:27:35.000000Z","breaks":[]},{"id":34,"profile_id":6,"employee_id":null,"day_of_week":4,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-02T22:27:35.000000Z","breaks":[]},{"id":35,"profile_id":6,"employee_id":null,"day_of_week":5,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-02T22:27:35.000000Z","updated_at":"2026-02-02T22:27:35.000000Z","breaks":[]}],"holidays":[]},{"id":7,"owner_id":9,"name":{"sk":"\u0160t\u00fadio Kr\u00e1sy"},"slug":"studio-krasy","category":{"sk":"Kozmet\u00edck\u00fd sal\u00f3n"},"description":null,"email":null,"phone":null,"website":null,"address_line1":null,"address_line2":null,"city":"Bratislava","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":"2026-02-04T22:10:00.000000Z","subscription_plan":"free","logo_path":null,"banner_path":null,"settings":null,"created_at":"2026-02-04T22:10:00.000000Z","updated_at":"2026-02-06T15:03:32.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":null,"logo_url":null,"banner_url":null,"trial_days_left":87,"trial_time_left":"2 Mesiace 27 Dn\u00ed","services":[],"employees":[],"calendar_setting":{"id":5,"profile_id":7,"slot_interval_minutes":30,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":30,"min_notice_minutes":60,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":null,"preferences":null,"created_at":"2026-02-04T22:10:00.000000Z","updated_at":"2026-02-04T22:10:00.000000Z"},"schedules":[],"holidays":[]},{"id":9,"owner_id":11,"name":{"sk":"STK Pakavoz"},"slug":"stk-pakavoz","category":{"sk":"Stanica technickej kontroly"},"description":{"sk":"Spo\u013eahliv\u00e1 stanica technickej a emisnej kontroly pre osobn\u00e9 aj \u00fa\u017eitkov\u00e9 vozidl\u00e1. U n\u00e1s vybav\u00edte v\u0161etko r\u00fdchlo, bez zbyto\u010dn\u00e9ho \u010dakania a s profesion\u00e1lnym pr\u00edstupom"},"email":"pakavoz@bookme.sk","phone":null,"website":null,"address_line1":"Bystrick\u00e1 1521, 966 81 \u017darnovica","address_line2":null,"city":"\u017darnovica","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":"2026-02-03T23:00:00.000000Z","subscription_plan":"free","logo_path":"profiles\/logos\/lnP0FO5GJikHCZdNdHqkj7TIbINO3HmhfD4iNlk1.png","banner_path":"profiles\/banners\/cEj2zPfZMtARkrRycVgd5iCXvFaaSCJPt1TlhZlb.png","settings":null,"created_at":"2026-02-05T11:07:41.000000Z","updated_at":"2026-02-05T12:36:18.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T06:00:00+01:00","logo_url":"https:\/\/bookme.sk\/storage\/profiles\/logos\/lnP0FO5GJikHCZdNdHqkj7TIbINO3HmhfD4iNlk1.png","banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/cEj2zPfZMtARkrRycVgd5iCXvFaaSCJPt1TlhZlb.png","trial_days_left":86,"trial_time_left":"2 Mesiace 26 Dn\u00ed","services":[{"id":7,"profile_id":9,"name":{"sk":"Technick\u00e1 a Emisn\u00e1 Kontrola"},"category":{"sk":"Osobn\u00e9 Bez-kat (M1,N1)"},"base_price":"95.00","base_duration_minutes":30,"is_active":true,"is_pakavoz_enabled":true,"employees":[],"variants":[]}],"employees":[],"calendar_setting":{"id":7,"profile_id":9,"slot_interval_minutes":60,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":90,"min_notice_minutes":60,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-05T11:07:41.000000Z","updated_at":"2026-02-05T12:50:35.000000Z"},"schedules":[{"id":58,"profile_id":9,"employee_id":null,"day_of_week":1,"start_time":"06:00:00","end_time":"20:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:49:06.000000Z","updated_at":"2026-02-05T12:49:06.000000Z","breaks":[]},{"id":59,"profile_id":9,"employee_id":null,"day_of_week":2,"start_time":"06:00:00","end_time":"20:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:49:06.000000Z","updated_at":"2026-02-05T12:49:06.000000Z","breaks":[]},{"id":60,"profile_id":9,"employee_id":null,"day_of_week":3,"start_time":"06:00:00","end_time":"20:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:49:06.000000Z","updated_at":"2026-02-05T12:49:06.000000Z","breaks":[]},{"id":61,"profile_id":9,"employee_id":null,"day_of_week":4,"start_time":"06:00:00","end_time":"20:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:49:06.000000Z","updated_at":"2026-02-05T12:49:06.000000Z","breaks":[]},{"id":62,"profile_id":9,"employee_id":null,"day_of_week":5,"start_time":"06:00:00","end_time":"20:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:49:06.000000Z","updated_at":"2026-02-05T12:49:06.000000Z","breaks":[]}],"holidays":[]},{"id":10,"owner_id":12,"name":{"sk":"STKSADZH"},"slug":"stksadzh","category":{"sk":"Stanica technickej kontroly"},"description":{"sk":"Novootvoren\u00e1 STK SAD ZH v are\u00e1li SAD \u017diar nad Hronom V\u00e1m pon\u00faka nielen slu\u017eby technickej a emisnej kontroly, ale aj ve\u013ek\u00e9 mno\u017estvo doplnkov\u00fdch slu\u017eieb. Bez stresu, starost\u00ed a dlh\u00e9ho \u010dakania na vo\u013en\u00fd term\u00edn."},"email":"stksadzh@bookme.sk","phone":null,"website":null,"address_line1":"Priemyseln\u00e1 257, 965 01 \u017diar nad Hronom","address_line2":null,"city":"\u017diar nad Hronom","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":"2026-02-03T23:00:00.000000Z","subscription_plan":"free","logo_path":"profiles\/logos\/0CYI4lbEb9cdu8mUySemJ7kTPT1NDZFbxgXLes1y.png","banner_path":"profiles\/banners\/O1Ci5JlOHcAiymrjGgRkedgJlGId229S0hz4MC1a.jpg","settings":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T12:36:31.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T09:00:00+01:00","logo_url":"https:\/\/bookme.sk\/storage\/profiles\/logos\/0CYI4lbEb9cdu8mUySemJ7kTPT1NDZFbxgXLes1y.png","banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/O1Ci5JlOHcAiymrjGgRkedgJlGId229S0hz4MC1a.jpg","trial_days_left":86,"trial_time_left":"2 Mesiace 26 Dn\u00ed","services":[],"employees":[],"calendar_setting":{"id":8,"profile_id":10,"slot_interval_minutes":15,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":90,"min_notice_minutes":60,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T11:11:42.000000Z"},"schedules":[{"id":41,"profile_id":10,"employee_id":null,"day_of_week":1,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T11:11:42.000000Z","breaks":[]},{"id":42,"profile_id":10,"employee_id":null,"day_of_week":2,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T11:11:42.000000Z","breaks":[]},{"id":43,"profile_id":10,"employee_id":null,"day_of_week":3,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T11:11:42.000000Z","breaks":[]},{"id":44,"profile_id":10,"employee_id":null,"day_of_week":4,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T11:11:42.000000Z","breaks":[]},{"id":45,"profile_id":10,"employee_id":null,"day_of_week":5,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:11:42.000000Z","updated_at":"2026-02-05T11:11:42.000000Z","breaks":[]}],"holidays":[]},{"id":11,"owner_id":13,"name":{"sk":"Svet \u00dasmevu"},"slug":"svet-usmevu","category":{"sk":"Zubn\u00e1 klinika a Pohotovos\u0165"},"description":{"sk":"na\u0161om svete \u00fasmevu poskytujeme \u0161irok\u00e9 spektrum slu\u017eieb vysokej kvality a prec\u00edznosti. Pri na\u0161ej pr\u00e1ci pou\u017e\u00edvame najmodernej\u0161ie technol\u00f3gie. Ku ka\u017ed\u00e9mu klientovi pristupujeme individu\u00e1lne a na\u0161im poslan\u00edm je, aby ka\u017ed\u00fd klient odch\u00e1dzal s vysn\u00edvan\u00fdm \u00fasmevom na tv\u00e1ri."},"email":"svetusmevu@bookme.sk","phone":"+421 907 797 347","website":null,"address_line1":"Kr\u00ed\u017ena 44, 821 08 Bratislava","address_line2":null,"city":"Bratislava","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":"2026-02-04T23:00:00.000000Z","subscription_plan":"basic","logo_path":null,"banner_path":"profiles\/banners\/RK4bmTEYUGa79mlvehxGGhHEoZk09YECbSvyh58a.png","settings":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-06T15:40:59.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T09:00:00+01:00","logo_url":null,"banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/RK4bmTEYUGa79mlvehxGGhHEoZk09YECbSvyh58a.png","trial_days_left":87,"trial_time_left":"2 Mesiace 27 Dn\u00ed","services":[],"employees":[],"calendar_setting":{"id":9,"profile_id":11,"slot_interval_minutes":15,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":90,"min_notice_minutes":60,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-05T11:43:06.000000Z"},"schedules":[{"id":46,"profile_id":11,"employee_id":null,"day_of_week":1,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-05T11:43:06.000000Z","breaks":[]},{"id":47,"profile_id":11,"employee_id":null,"day_of_week":2,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-05T11:43:06.000000Z","breaks":[]},{"id":48,"profile_id":11,"employee_id":null,"day_of_week":3,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-05T11:43:06.000000Z","breaks":[]},{"id":49,"profile_id":11,"employee_id":null,"day_of_week":4,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-05T11:43:06.000000Z","breaks":[]},{"id":50,"profile_id":11,"employee_id":null,"day_of_week":5,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T11:43:06.000000Z","updated_at":"2026-02-05T11:43:06.000000Z","breaks":[]}],"holidays":[]},{"id":12,"owner_id":14,"name":{"sk":"Y\u016aMAN"},"slug":"yuman","category":{"sk":"Manik\u00fara. Pedik\u00fara. Mas\u00e1\u017e."},"description":{"sk":"Y\u016aMAN nie je len sal\u00f3n \u2013 je to nov\u00fd z\u00e1\u017eitok pre mu\u017eov, ktor\u00ed vedia, \u017ee detaily rozhoduj\u00fa. \r\n\r\nManik\u00fara. Pedik\u00fara. Mas\u00e1\u017e. \r\n\r\nV Y\u016aMAN nejde len o proced\u00fary, ale o pr\u00edstup k \u017eivotu."},"email":"yuman@bookme.sk","phone":"+421 915 912 325    +421 905 230 971","website":null,"address_line1":"Kr\u00ed\u017ena 62, 821 08 Bratislava","address_line2":null,"city":"Bratislava","state":null,"postal_code":null,"country":null,"latitude":null,"longitude":null,"timezone":"Europe\/Bratislava","status":"published","is_multilingual":false,"subscription_starts_at":"2026-02-05T12:00:47.000000Z","subscription_plan":"free","logo_path":null,"banner_path":"profiles\/banners\/X4UyFXTVgkgZA1O5ZLHdUnme6EltpI1R83TiS3uf.png","settings":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z","billing_name":null,"billing_address":null,"billing_city":null,"billing_postal_code":null,"billing_country":null,"billing_ico":null,"billing_dic":null,"billing_ic_dph":null,"billing_iban":null,"billing_swift":null,"next_slot":"2026-02-09T09:00:00+01:00","logo_url":null,"banner_url":"https:\/\/bookme.sk\/storage\/profiles\/banners\/X4UyFXTVgkgZA1O5ZLHdUnme6EltpI1R83TiS3uf.png","trial_days_left":88,"trial_time_left":"2 Mesiace 28 Dn\u00ed","services":[],"employees":[],"calendar_setting":{"id":10,"profile_id":12,"slot_interval_minutes":15,"buffer_before_minutes":0,"buffer_after_minutes":0,"max_advance_days":90,"min_notice_minutes":60,"cancellation_limit_hours":24,"requires_confirmation":false,"is_public":true,"timezone":"Europe\/Bratislava","preferences":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z"},"schedules":[{"id":51,"profile_id":12,"employee_id":null,"day_of_week":1,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z","breaks":[]},{"id":52,"profile_id":12,"employee_id":null,"day_of_week":2,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z","breaks":[]},{"id":53,"profile_id":12,"employee_id":null,"day_of_week":3,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z","breaks":[]},{"id":54,"profile_id":12,"employee_id":null,"day_of_week":4,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z","breaks":[]},{"id":55,"profile_id":12,"employee_id":null,"day_of_week":5,"start_time":"09:00:00","end_time":"17:00:00","is_recurring":true,"effective_from":null,"effective_to":null,"metadata":null,"created_at":"2026-02-05T12:00:47.000000Z","updated_at":"2026-02-05T12:00:47.000000Z","breaks":[]}],"holidays":[]}],"first_page_url":"http:\/\/127.0.0.1:8000\/api\/shops?page=1","from":1,"last_page":1,"last_page_url":"http:\/\/127.0.0.1:8000\/api\/shops?page=1","links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"http:\/\/127.0.0.1:8000\/api\/shops?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"next_page_url":null,"path":"http:\/\/127.0.0.1:8000\/api\/shops","per_page":15,"prev_page_url":null,"to":8,"total":8}%
+diff --git a/app/Http/Controllers/OwnerDashboardController.php b/app/Http/Controllers/OwnerDashboardController.php
+index dba62aa..4405fbc 100644
+--- a/app/Http/Controllers/OwnerDashboardController.php
++++ b/app/Http/Controllers/OwnerDashboardController.php
+@@ -76,7 +76,8 @@ public function index(Request $request): View
+     public function getAppointmentsForDay(Request $request): JsonResponse
+     {
+         $user = $request->user();
+-        $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
++        $allProfiles = Profile::where('owner_id', $user->id)->get();
++        $profileIds = $allProfiles->pluck('id');
+         $date = $request->date;
+         $dayStart = Carbon::parse($date)->startOfDay();
+         $dayEnd = Carbon::parse($date)->endOfDay();
+@@ -130,6 +131,37 @@ public function getAppointmentsForDay(Request $request): JsonResponse
+         ]);
+     }
+
++    public function getCalendarStatus(Request $request): JsonResponse
++    {
++        $user = $request->user();
++        $allProfiles = Profile::where('owner_id', $user->id)->get();
++        $start = Carbon::parse($request->start);
++        $days = (int) ($request->days ?: 7);
++
++        $closedDays = [];
++        foreach ($allProfiles as $profile) {
++            $workingWindows = $this->availability->getWorkingWindows($profile, $start, $days);
++            foreach ($workingWindows as $date => $windows) {
++                if (empty($windows)) {
++                    $closedDays[] = $date;
++                }
++            }
++        }
++
++        // Deň je "zatvorený" len ak je zatvorený vo VŠETKÝCH profiloch majiteľa
++        $counts = array_count_values($closedDays);
++        $trulyClosed = [];
++        foreach ($counts as $date => $count) {
++            if ($count === $allProfiles->count()) {
++                $trulyClosed[] = $date;
++            }
++        }
++
++        return response()->json([
++            'closed_days' => array_values(array_unique($trulyClosed))
++        ]);
++    }
++
+     public function getAppointmentsForDayFull(Request $request): JsonResponse
+     {
+         $user = $request->user();
+diff --git a/lang/en.json b/lang/en.json
+index 8cbf7ee..9212940 100644
+--- a/lang/en.json
++++ b/lang/en.json
+@@ -479,5 +479,8 @@
+     "Your name": "Your name",
+     "Choose date": "Choose date",
+     "Available times": "Available times",
+-    "Loading free slots...": "Loading free slots..."
++    "Loading free slots...": "Loading free slots...",
++    "BookMe": "BookMe",
++    "Bookings that fit into the day": "Bookings that fit into the day",
++    "BookMe — online reservations without phone calls.": "BookMe — online reservations without phone calls."
+ }
+diff --git a/lang/ru.json b/lang/ru.json
+index d1f5bfc..b54580b 100644
+--- a/lang/ru.json
++++ b/lang/ru.json
+@@ -480,5 +480,8 @@
+     "Your name": "Ваше имя",
+     "Choose date": "Выберите дату",
+     "Available times": "Доступное время",
+-    "Loading free slots...": "Загрузка свободных мест..."
++    "Loading free slots...": "Загрузка свободных мест...",
++    "BookMe": "BookMe",
++    "Bookings that fit into the day": "Бронирования, которые впишутся в ваш день",
++    "BookMe — online reservations without phone calls.": "BookMe — онлайн бронирование без звонков."
+ }
+diff --git a/lang/sk.json b/lang/sk.json
+index 1be63fc..e7d44e0 100644
+--- a/lang/sk.json
++++ b/lang/sk.json
+@@ -482,5 +482,7 @@
+     "Your name": "Vaše meno",
+     "Choose date": "Vyberte dátum",
+     "Available times": "Dostupné časy",
+-    "Loading free slots...": "Načítavam voľné termíny..."
++    "Loading free slots...": "Načítavam voľné termíny...",
++    "Bookings that fit into the day": "Rezervácie, ktoré zapadnú do dňa",
++    "BookMe — online reservations without phone calls.": "BookMe — online rezervácie bez telefonátov."
+ }
+diff --git a/resources/js/app.js b/resources/js/app.js
+index f50bd00..ccae059 100644
+--- a/resources/js/app.js
++++ b/resources/js/app.js
+@@ -220,7 +220,7 @@ function populateCategorySelect() {
+     if (!categorySelect) return;
+     const translations = window.translations || {};
+     const categories = Array.from(new Set(state.shops.map((shop) => shop.category).filter(Boolean)));
+-    categorySelect.innerHTML = `<option value="">${translations["All categories"] || 'Všetky'}</option>`;
++    categorySelect.innerHTML = `<option value="">${translations["All"] || 'Všetky'}</option>`;
+     categories.forEach((category) => {
+         const opt = document.createElement('option');
+         opt.value = category;
+@@ -1172,9 +1172,21 @@ function initAdminDashboard() {
+
+     let adminState = {
+         calendarStart: startOfWeek(new Date()),
+-        selectedDate: formatIsoDate(new Date())
++        selectedDate: formatIsoDate(new Date()),
++        closedDays: []
+     };
+
++    async function fetchAdminCalendarStatus() {
++        const startIso = formatIsoDate(adminState.calendarStart);
++        try {
++            const response = await axios.get(`/owner/appointments/calendar-status?start=${startIso}&days=7`);
++            adminState.closedDays = response.data.closed_days || [];
++            renderAdminCalendar();
++        } catch (error) {
++            console.error('Chyba pri načítaní stavu kalendára', error);
++        }
++    }
++
+     function renderAdminCalendar() {
+         if (!adminCalGrid || !adminCalMonth) return;
+         const start = adminState.calendarStart;
+@@ -1189,10 +1201,14 @@ function initAdminDashboard() {
+             day.setDate(start.getDate() + i);
+             const dayNum = day.getDate();
+             const iso = formatIsoDate(day);
++            const isClosed = adminState.closedDays.includes(iso);
+
+             const item = document.createElement('a');
+             item.href = '#';
+             item.className = 'calendar-item overflow-hidden';
++            if (isClosed) {
++                item.classList.add('!text-rose-500', '!bg-rose-50', 'hover:!bg-rose-100');
++            }
+             item.textContent = dayNum;
+
+             if (adminState.selectedDate === iso) {
+@@ -1342,7 +1358,7 @@ function initAdminDashboard() {
+             const newDate = new Date(adminState.calendarStart);
+             newDate.setDate(newDate.getDate() - 7);
+             adminState.calendarStart = newDate;
+-            renderAdminCalendar();
++            fetchAdminCalendarStatus();
+         });
+     }
+
+@@ -1352,9 +1368,9 @@ function initAdminDashboard() {
+             const newDate = new Date(adminState.calendarStart);
+             newDate.setDate(newDate.getDate() + 7);
+             adminState.calendarStart = newDate;
+-            renderAdminCalendar();
++            fetchAdminCalendarStatus();
+         });
+     }
+
+-    renderAdminCalendar();
++    fetchAdminCalendarStatus();
+ }
+diff --git a/resources/views/layouts/app.blade.php b/resources/views/layouts/app.blade.php
+index 89ffefd..3cd7793 100644
+--- a/resources/views/layouts/app.blade.php
++++ b/resources/views/layouts/app.blade.php
+@@ -103,7 +103,8 @@
+             "Your name": "{{ __('Your name') }}",
+             "Choose date": "{{ __('Choose date') }}",
+             "Available times": "{{ __('Available times') }}",
+-            "Loading free slots...": "{{ __('Loading free slots...') }}"
++            "Loading free slots...": "{{ __('Loading free slots...') }}",
++            "All": "{{ __('All') }}"
+         };
+     </script>
+     @vite(['resources/css/app.css', 'resources/js/app.js'])
+@@ -223,8 +224,8 @@
+                 <a href="/" id="logo" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-200/60 flex items-center justify-center text-slate-900 font-semibold">B</div>
+                     <div>
+-                        <p class="font-display text-lg leading-tight">BookMe</p>
+-                        <p class="text-sm text-slate-500">Rezervácie, ktoré zapadnú do dňa</p>
++                        <p class="font-display text-lg leading-tight">{{ __('BookMe') }}</p>
++                        <p class="text-sm text-slate-500">{{ __('Bookings that fit into the day') }}</p>
+                     </div>
+                 </a>
+                 <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
+@@ -293,7 +294,7 @@
+
+         <footer class="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-600">
+             <div class="flex flex-col md:flex-row justify-between gap-3 border-t border-slate-200 pt-6">
+-                <p>BookMe — online rezervácie bez telefonátov.</p>
++                <p>{{ __('BookMe — online reservations without phone calls.') }}</p>
+                 <p class="text-slate-500">&copy 2026 WsTechnology.dev All Rights Reserved</p>
+             </div>
+         </footer>
+diff --git a/resources/views/owner/dashboard.blade.php b/resources/views/owner/dashboard.blade.php
+index 4eab513..8e4294c 100644
+--- a/resources/views/owner/dashboard.blade.php
++++ b/resources/views/owner/dashboard.blade.php
+@@ -78,7 +78,7 @@
+             </div>
+         </div>
+
+-        <div class="card p-6 h-full">
++        <div class="card p-6 h-full xl:col-span-2 lg:col-span-2 md:col-span-2">
+             <div class="flex items-center justify-between mb-2">
+                 <div class="flex items-center gap-2">
+                     <div class="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+diff --git a/routes/web.php b/routes/web.php
+index c71294a..7c4c156 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -86,6 +86,7 @@
+     Route::get('/appointments/day', [OwnerDashboardController::class, 'getAppointmentsForDay'])->name('appointments.day');
+     Route::get('/appointments/day-full', [OwnerDashboardController::class, 'getAppointmentsForDayFull'])->name('appointments.day-full');
+     Route::get('/appointments/free-slots', [OwnerDashboardController::class, 'getFreeSlots'])->name('appointments.free-slots');
++    Route::get('/appointments/calendar-status', [OwnerDashboardController::class, 'getCalendarStatus'])->name('appointments.calendar-status');
+     Route::post('/appointments', [OwnerDashboardController::class, 'storeManualAppointment'])->name('appointments.manual.store');
+     Route::post('/appointments/{appointment}/confirm', [OwnerDashboardController::class, 'confirmAppointment'])->name('appointments.confirm');
+     Route::post('/appointments/{appointment}/status', [OwnerDashboardController::class, 'updateAppointmentStatus'])->name('appointments.status.update');
