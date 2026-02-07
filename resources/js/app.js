@@ -220,7 +220,7 @@ function populateCategorySelect() {
     if (!categorySelect) return;
     const translations = window.translations || {};
     const categories = Array.from(new Set(state.shops.map((shop) => shop.category).filter(Boolean)));
-    categorySelect.innerHTML = `<option value="">${translations["All categories"] || 'Všetky'}</option>`;
+    categorySelect.innerHTML = `<option value="">${translations["All"] || 'Všetky'}</option>`;
     categories.forEach((category) => {
         const opt = document.createElement('option');
         opt.value = category;
@@ -1172,8 +1172,20 @@ function initAdminDashboard() {
 
     let adminState = {
         calendarStart: startOfWeek(new Date()),
-        selectedDate: formatIsoDate(new Date())
+        selectedDate: formatIsoDate(new Date()),
+        closedDays: []
     };
+
+    async function fetchAdminCalendarStatus() {
+        const startIso = formatIsoDate(adminState.calendarStart);
+        try {
+            const response = await axios.get(`/owner/appointments/calendar-status?start=${startIso}&days=7`);
+            adminState.closedDays = response.data.closed_days || [];
+            renderAdminCalendar();
+        } catch (error) {
+            console.error('Chyba pri načítaní stavu kalendára', error);
+        }
+    }
 
     function renderAdminCalendar() {
         if (!adminCalGrid || !adminCalMonth) return;
@@ -1189,10 +1201,14 @@ function initAdminDashboard() {
             day.setDate(start.getDate() + i);
             const dayNum = day.getDate();
             const iso = formatIsoDate(day);
+            const isClosed = adminState.closedDays.includes(iso);
 
             const item = document.createElement('a');
             item.href = '#';
             item.className = 'calendar-item overflow-hidden';
+            if (isClosed) {
+                item.classList.add('!text-rose-500', '!bg-rose-50', 'hover:!bg-rose-100');
+            }
             item.textContent = dayNum;
 
             if (adminState.selectedDate === iso) {
@@ -1342,7 +1358,7 @@ function initAdminDashboard() {
             const newDate = new Date(adminState.calendarStart);
             newDate.setDate(newDate.getDate() - 7);
             adminState.calendarStart = newDate;
-            renderAdminCalendar();
+            fetchAdminCalendarStatus();
         });
     }
 
@@ -1352,9 +1368,9 @@ function initAdminDashboard() {
             const newDate = new Date(adminState.calendarStart);
             newDate.setDate(newDate.getDate() + 7);
             adminState.calendarStart = newDate;
-            renderAdminCalendar();
+            fetchAdminCalendarStatus();
         });
     }
 
-    renderAdminCalendar();
+    fetchAdminCalendarStatus();
 }

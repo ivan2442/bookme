@@ -76,7 +76,8 @@ class OwnerDashboardController extends Controller
     public function getAppointmentsForDay(Request $request): JsonResponse
     {
         $user = $request->user();
-        $profileIds = Profile::where('owner_id', $user->id)->pluck('id');
+        $allProfiles = Profile::where('owner_id', $user->id)->get();
+        $profileIds = $allProfiles->pluck('id');
         $date = $request->date;
         $dayStart = Carbon::parse($date)->startOfDay();
         $dayEnd = Carbon::parse($date)->endOfDay();
@@ -127,6 +128,37 @@ class OwnerDashboardController extends Controller
             'appointments' => $appointments,
             'revenue' => (float) $revenue,
             'revenue_formatted' => number_format($revenue, 2, ',', ' ') . ' €'
+        ]);
+    }
+
+    public function getCalendarStatus(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $allProfiles = Profile::where('owner_id', $user->id)->get();
+        $start = Carbon::parse($request->start);
+        $days = (int) ($request->days ?: 7);
+
+        $closedDays = [];
+        foreach ($allProfiles as $profile) {
+            $workingWindows = $this->availability->getWorkingWindows($profile, $start, $days);
+            foreach ($workingWindows as $date => $windows) {
+                if (empty($windows)) {
+                    $closedDays[] = $date;
+                }
+            }
+        }
+
+        // Deň je "zatvorený" len ak je zatvorený vo VŠETKÝCH profiloch majiteľa
+        $counts = array_count_values($closedDays);
+        $trulyClosed = [];
+        foreach ($counts as $date => $count) {
+            if ($count === $allProfiles->count()) {
+                $trulyClosed[] = $date;
+            }
+        }
+
+        return response()->json([
+            'closed_days' => array_values(array_unique($trulyClosed))
         ]);
     }
 

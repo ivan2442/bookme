@@ -78,7 +78,7 @@
             </div>
         </div>
 
-        <div class="card p-6 h-full">
+        <div class="card p-6 h-full xl:col-span-2 lg:col-span-2 md:col-span-2">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
                     <div class="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">

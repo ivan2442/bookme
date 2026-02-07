@@ -103,7 +103,8 @@
             "Your name": "{{ __('Your name') }}",
             "Choose date": "{{ __('Choose date') }}",
             "Available times": "{{ __('Available times') }}",
-            "Loading free slots...": "{{ __('Loading free slots...') }}"
+            "Loading free slots...": "{{ __('Loading free slots...') }}",
+            "All": "{{ __('All') }}"
         };
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -223,8 +224,8 @@
                 <a href="/" id="logo" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-200/60 flex items-center justify-center text-slate-900 font-semibold">B</div>
                     <div>
-                        <p class="font-display text-lg leading-tight">BookMe</p>
-                        <p class="text-sm text-slate-500">Rezervácie, ktoré zapadnú do dňa</p>
+                        <p class="font-display text-lg leading-tight">{{ __('BookMe') }}</p>
+                        <p class="text-sm text-slate-500">{{ __('Bookings that fit into the day') }}</p>
                     </div>
                 </a>
                 <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700 ml-auto">
@@ -293,7 +294,7 @@
 
         <footer class="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-600">
             <div class="flex flex-col md:flex-row justify-between gap-3 border-t border-slate-200 pt-6">
-                <p>BookMe — online rezervácie bez telefonátov.</p>
+                <p>{{ __('BookMe — online reservations without phone calls.') }}</p>
                 <p class="text-slate-500">&copy 2026 WsTechnology.dev All Rights Reserved</p>
             </div>
         </footer>
