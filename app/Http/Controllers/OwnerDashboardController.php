@@ -52,6 +52,26 @@ class OwnerDashboardController extends Controller
             $freeSlotsCount += collect($slots['slots'])->where('status', 'available')->count();
         }
 
+        // Calculate closed days for the next 35 days to have them ready for Flatpickr
+        $closedDays = [];
+        if ($allProfiles->count() > 0) {
+            $tempClosed = [];
+            foreach ($allProfiles as $profile) {
+                $workingWindows = $this->availability->getWorkingWindows($profile, $now->copy()->startOfDay(), 35);
+                foreach ($workingWindows as $date => $windows) {
+                    if (empty($windows)) {
+                        $tempClosed[] = $date;
+                    }
+                }
+            }
+            $counts = array_count_values($tempClosed);
+            foreach ($counts as $date => $count) {
+                if ($count === $allProfiles->count()) {
+                    $closedDays[] = $date;
+                }
+            }
+        }
+
         $stats = [
             'appointments_today' => (clone $baseQuery)->whereBetween('start_at', [$todayStart, $todayEnd])->count(),
             'appointments_month' => (clone $baseQuery)->whereBetween('start_at', [$monthStart, $now])->count(),
@@ -70,7 +90,7 @@ class OwnerDashboardController extends Controller
             ->orderBy('start_at')
             ->get();
 
-        return view('owner.dashboard', compact('stats', 'upcoming', 'allProfiles'));
+        return view('owner.dashboard', compact('stats', 'upcoming', 'allProfiles', 'closedDays'));
     }
 
     public function getAppointmentsForDay(Request $request): JsonResponse
@@ -136,7 +156,7 @@ class OwnerDashboardController extends Controller
         $user = $request->user();
         $allProfiles = Profile::where('owner_id', $user->id)->get();
         $start = Carbon::parse($request->start);
-        $days = (int) ($request->days ?: 7);
+        $days = (int) ($request->days ?: 35);
 
         $closedDays = [];
         foreach ($allProfiles as $profile) {

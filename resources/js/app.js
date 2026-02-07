@@ -78,8 +78,14 @@ let state = {
     employeesByVariant: {},
     variantMap: {},
     calendarStart: null,
-    closedDays: [],
+    closedDays: window.initialClosedDays || [],
     lockToken: null,
+};
+
+window.adminState = {
+    calendarStart: null,
+    selectedDate: null,
+    closedDays: window.adminInitialClosedDays || []
 };
 
 function formatRelativeSlot(isoDate) {
@@ -477,12 +483,17 @@ async function fetchWeekAvailability() {
             service_variant_id: variantSelect.value || null,
             employee_id: employeeInput?.value || null,
             date: startIso,
-            days: 7,
+            days: 35,
         });
 
         if (response.data?.closed_days) {
             state.closedDays = response.data.closed_days;
             renderCalendar();
+
+            // Prekreslíme Flatpickr ak existuje
+            document.querySelectorAll('input').forEach(el => {
+                if (el._flatpickr) el._flatpickr.redraw();
+            });
         }
     } catch (error) {
         console.error('Chyba pri načítaní týždennej dostupnosti', error);
@@ -538,6 +549,11 @@ async function fetchAvailability(autoSelectNearest = false) {
 
         renderCalendar();
         renderSlots(filteredSlots);
+
+        // Prekreslíme Flatpickr ak existuje
+        document.querySelectorAll('input').forEach(el => {
+            if (el._flatpickr) el._flatpickr.redraw();
+        });
     } catch (error) {
         const translations = window.translations || {};
         console.error('Chyba pri načítaní dostupnosti', error);
@@ -1232,18 +1248,23 @@ function initAdminDashboard() {
 
     if (!adminCalGrid || !adminDateInput) return;
 
-    window.adminState = {
-        calendarStart: startOfWeek(new Date()),
-        selectedDate: formatIsoDate(new Date()),
-        closedDays: []
-    };
+    window.adminState.calendarStart = startOfWeek(new Date());
+    window.adminState.selectedDate = formatIsoDate(new Date());
+    if (window.adminState.closedDays.length === 0 && window.adminInitialClosedDays) {
+        window.adminState.closedDays = window.adminInitialClosedDays;
+    }
 
     async function fetchAdminCalendarStatus() {
         const startIso = formatIsoDate(window.adminState.calendarStart);
         try {
-            const response = await axios.get(`/owner/appointments/calendar-status?start=${startIso}&days=7`);
+            const response = await axios.get(`/owner/appointments/calendar-status?start=${startIso}&days=35`);
             window.adminState.closedDays = response.data.closed_days || [];
             renderAdminCalendar();
+
+            // Prekreslíme Flatpickr ak existuje, aby sa aplikovali nové closedDays
+            document.querySelectorAll('input').forEach(el => {
+                if (el._flatpickr) el._flatpickr.redraw();
+            });
         } catch (error) {
             console.error('Chyba pri načítaní stavu kalendára', error);
         }

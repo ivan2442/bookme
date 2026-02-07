@@ -459,6 +459,8 @@
 </div>
 
 <script>
+    window.adminInitialClosedDays = @json($closedDays ?? []);
+
     function openManualAppointmentModal() {
         const profile = @json($allProfiles->first());
         const services = @json($allProfiles->first()->services);

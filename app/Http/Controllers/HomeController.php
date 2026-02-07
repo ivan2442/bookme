@@ -33,6 +33,16 @@ class HomeController extends Controller
             })
             ->firstOrFail();
 
-        return view('profiles.show', compact('profile'));
+        // Precalculate closed days for the next 35 days
+        $availability = app(\App\Services\AvailabilityService::class);
+        $workingWindows = $availability->getWorkingWindows($profile, now()->startOfDay(), 35);
+        $closedDays = [];
+        foreach ($workingWindows as $date => $windows) {
+            if (empty($windows)) {
+                $closedDays[] = $date;
+            }
+        }
+
+        return view('profiles.show', compact('profile', 'closedDays'));
     }
 }

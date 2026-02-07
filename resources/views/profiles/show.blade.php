@@ -266,9 +266,11 @@
 </div>
 
 <script>
+    window.initialClosedDays = @json($closedDays ?? []);
+
     let modalState = {
         calendarStart: null,
-        closedDays: [],
+        closedDays: window.initialClosedDays || [],
         selectedDate: '{{ date('Y-m-d') }}',
         shopId: null,
         serviceId: null,
@@ -300,6 +302,7 @@
             evcInput.removeAttribute('required');
         }
 
+        updateModalCalendar();
         fetchCalendarData();
         fetchModalAvailability();
     }
