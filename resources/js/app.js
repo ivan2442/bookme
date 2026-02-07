@@ -162,14 +162,16 @@ function renderShops() {
         card.innerHTML = `
             ${bannerHtml}
             <div class="p-5 min-w-0">
-                <div class="flex items-center justify-between mb-2 gap-2">
-                    <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md truncate">${shop.category ?? ''}</span>
-                    <div class="flex items-center gap-1 text-xs font-bold text-slate-900 flex-shrink-0">
-                        <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                        ${rating}
+                <div class="flex flex-col gap-1.5 mb-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md truncate">${shop.category ?? ''}</span>
+                        <div class="flex items-center gap-1 text-xs font-bold text-slate-900 flex-shrink-0">
+                            <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            ${rating}
+                        </div>
                     </div>
+                    <h3 class="font-display text-lg text-slate-900 group-hover:text-emerald-600 transition-colors font-bold leading-snug">${shop.name}</h3>
                 </div>
-                <h3 class="font-display text-lg text-slate-900 group-hover:text-emerald-600 transition-colors mb-1 font-bold truncate">${shop.name}</h3>
                 <div class="flex items-center gap-1.5 text-slate-400 text-xs mb-4 truncate">
                     <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span class="truncate">${shop.city ?? ''}</span>
@@ -177,12 +179,12 @@ function renderShops() {
 
                 <div class="flex items-center justify-between pt-4 border-t border-slate-50 gap-2">
                     <div class="flex flex-col min-w-0">
-                        <span class="text-[10px] uppercase font-bold text-slate-500 tracking-tight leading-none mb-1">Najbližší termín</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 tracking-tight leading-none mb-1">${translations["Next slot"] || 'Najbližší termín'}</span>
                         <span class="text-sm font-bold text-slate-900 truncate">${nextSlot}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <a href="/prevadzka/${shop.slug}" class="stop-propagation h-8 px-3 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-colors text-[10px] font-bold uppercase tracking-tight">
-                            Detail
+                            ${translations["Detail"] || 'Detail'}
                         </a>
                         <div class="h-8 w-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-500 transition-colors flex-shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
@@ -257,13 +259,11 @@ function renderServices(shopId = null) {
         card.dataset.shopId = service.profile_id;
         card.dataset.serviceId = service.id;
         card.innerHTML = `
-            <div class="flex items-center justify-between gap-2">
-                <div class="min-w-0">
-                    <p class="font-semibold text-lg text-slate-900 truncate">${service.name}</p>
-                </div>
-                <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider flex-shrink-0">${service.category ?? ''}</span>
+            <div class="flex flex-col gap-1.5">
+                <span class="inline-flex w-fit px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest leading-tight">${service.category ?? ''}</span>
+                <p class="font-semibold text-lg text-slate-900 leading-snug">${service.name}</p>
             </div>
-            <div class="flex items-center justify-between mt-2 text-xs text-slate-500 gap-2">
+            <div class="flex items-center justify-between mt-3 text-xs text-slate-500 gap-2">
                 <div class="flex items-center gap-1.5 flex-shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span>${duration} min</span>
@@ -274,12 +274,12 @@ function renderServices(shopId = null) {
                 employeeNames
                     ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100 w-full overflow-hidden">
                          <div class="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0"></div>
-                         <p class="text-[10px] font-bold text-slate-600 uppercase tracking-tight truncate">Zamestnanec: ${employeeNames}</p>
+                         <p class="text-[10px] font-bold text-slate-600 uppercase tracking-tight truncate">${translations["Employee"] || 'Zamestnanec'}: ${employeeNames}</p>
                        </div>`
                     : ''
             }
             <button class="mt-3 px-3 py-2 w-full rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" data-choose-service="${service.id}">
-                Vybrať termín
+                ${translations["Select"] || 'Vybrať termín'}
             </button>
         `;
         servicesList.appendChild(card);
@@ -308,7 +308,8 @@ function renderServices(shopId = null) {
 
 function populateShopSelect() {
     if (!shopSelect) return;
-    shopSelect.innerHTML = '<option value="">Vyber prevádzku</option>';
+    const translations = window.translations || {};
+    shopSelect.innerHTML = `<option value="">${translations["Choose business"] || 'Vyber prevádzku'}</option>`;
     state.shops.forEach((shop) => {
         const opt = document.createElement('option');
         opt.value = shop.id;
@@ -319,7 +320,8 @@ function populateShopSelect() {
 
 function populateServiceSelect() {
     if (!serviceSelect) return;
-    serviceSelect.innerHTML = '<option value="">Vyber službu</option>';
+    const translations = window.translations || {};
+    serviceSelect.innerHTML = `<option value="">${translations["Choose service"] || 'Vyber službu'}</option>`;
     state.services.forEach((service) => {
         const opt = document.createElement('option');
         opt.value = service.id;
@@ -330,7 +332,8 @@ function populateServiceSelect() {
 
 function populateServicesForShop(shopId) {
     if (!serviceSelect) return;
-    serviceSelect.innerHTML = '<option value="">Vyber službu</option>';
+    const translations = window.translations || {};
+    serviceSelect.innerHTML = `<option value="">${translations["Choose service"] || 'Vyber službu'}</option>`;
     state.services
         .filter((s) => String(s.profile_id) === String(shopId))
         .forEach((service) => {
