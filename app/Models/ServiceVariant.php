@@ -23,6 +23,7 @@ class ServiceVariant extends Model
         'buffer_before_minutes',
         'buffer_after_minutes',
         'is_active',
+        'is_special',
     ];
 
     protected $translatable = [
@@ -34,6 +35,7 @@ class ServiceVariant extends Model
         'name' => 'array',
         'description' => 'array',
         'is_active' => 'bool',
+        'is_special' => 'bool',
     ];
 
     public function service(): BelongsTo
@@ -44,6 +46,11 @@ class ServiceVariant extends Model
     public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class, 'employee_service_variant')->withTimestamps();
+    }
+
+    public function availabilityRules(): HasMany
+    {
+        return $this->hasMany(ServiceAvailabilityRule::class, 'service_variant_id');
     }
 
     public function appointments(): HasMany

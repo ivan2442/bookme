@@ -290,7 +290,7 @@ class OwnerDashboardController extends Controller
     public function services(Request $request): View
     {
         $profileIds = $this->getOwnerProfileIds($request);
-        $services = Service::with(['variants', 'profile', 'employees'])
+        $services = Service::with(['variants.availabilityRules', 'profile', 'employees', 'availabilityRules'])
             ->whereIn('profile_id', $profileIds)
             ->get();
         $profiles = Profile::whereIn('id', $profileIds)->get();
@@ -368,6 +368,11 @@ class OwnerDashboardController extends Controller
             'employee_ids.*' => ['exists:employees,id'],
             'is_pakavoz_enabled' => ['nullable', 'boolean'],
             'pakavoz_api_key' => ['nullable', 'string', 'max:255'],
+            'is_special' => ['nullable'],
+            'availability_rules' => ['nullable', 'array'],
+            'availability_rules.*.day_of_week' => ['nullable'],
+            'availability_rules.*.start_time' => ['nullable', 'string'],
+            'availability_rules.*.end_time' => ['nullable', 'string'],
         ]);
 
         $service->update([
@@ -377,10 +382,24 @@ class OwnerDashboardController extends Controller
             'base_duration_minutes' => $data['base_duration_minutes'],
             'is_pakavoz_enabled' => $request->boolean('is_pakavoz_enabled'),
             'pakavoz_api_key' => $data['pakavoz_api_key'] ?? null,
+            'is_special' => $request->has('is_special'),
         ]);
 
         if (isset($data['employee_ids'])) {
             $service->employees()->sync($data['employee_ids']);
+        }
+
+        if ($request->has('availability_rules')) {
+            $service->availabilityRules()->whereNull('service_variant_id')->delete();
+            foreach ($request->input('availability_rules') as $rule) {
+                if (!empty($rule['start_time']) && !empty($rule['end_time'])) {
+                    $service->availabilityRules()->create([
+                        'day_of_week' => ($rule['day_of_week'] === "" || $rule['day_of_week'] === null) ? null : (int)$rule['day_of_week'],
+                        'start_time' => $rule['start_time'],
+                        'end_time' => $rule['end_time'],
+                    ]);
+                }
+            }
         }
 
         return back()->with('status', __('Service updated.'));
@@ -432,9 +451,33 @@ class OwnerDashboardController extends Controller
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
             'duration_minutes' => ['required', 'integer', 'min:1'],
+            'is_special' => ['nullable'],
+            'availability_rules' => ['nullable', 'array'],
+            'availability_rules.*.day_of_week' => ['nullable'],
+            'availability_rules.*.start_time' => ['nullable', 'string'],
+            'availability_rules.*.end_time' => ['nullable', 'string'],
         ]);
 
-        $variant->update($data);
+        $variant->update([
+            'name' => $data['name'],
+            'price' => $data['price'],
+            'duration_minutes' => $data['duration_minutes'],
+            'is_special' => $request->has('is_special'),
+        ]);
+
+        if ($request->has('availability_rules')) {
+            $variant->availabilityRules()->delete();
+            foreach ($request->input('availability_rules') as $rule) {
+                if (!empty($rule['start_time']) && !empty($rule['end_time'])) {
+                    $variant->availabilityRules()->create([
+                        'service_id' => $service->id,
+                        'day_of_week' => ($rule['day_of_week'] === "" || $rule['day_of_week'] === null) ? null : (int)$rule['day_of_week'],
+                        'start_time' => $rule['start_time'],
+                        'end_time' => $rule['end_time'],
+                    ]);
+                }
+            }
+        }
 
         return back()->with('status', __('Variant updated.'));
     }

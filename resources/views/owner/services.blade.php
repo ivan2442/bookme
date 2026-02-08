@@ -104,24 +104,119 @@
                                     </div>
                                 </div>
                                 @endif
-                                <button class="w-full px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">{{ __('Save changes') }}</button>
+
+                                <div class="mt-4 pt-4 border-t border-slate-100">
+                                    <label class="flex items-center gap-2 mb-2 cursor-pointer">
+                                        <input type="checkbox" name="is_special" value="1" @checked($service->is_special)>
+                                        <span class="text-xs font-bold uppercase text-slate-500">{{ __('Special service (exclusive time)') }}</span>
+                                    </label>
+
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] uppercase font-bold text-slate-400">{{ __('Availability rules') }}</label>
+                                        @foreach($service->availabilityRules->whereNull('service_variant_id') as $index => $rule)
+                                            <div class="grid grid-cols-3 gap-2">
+                                                <select name="availability_rules[{{ $index }}][day_of_week]" class="input-control !py-1 !text-[10px]">
+                                                    <option value="">{{ __('Every day') }}</option>
+                                                    @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
+                                                        <option value="{{ $i }}" @selected($rule->day_of_week !== null && (int)$rule->day_of_week === $i)>{{ __($day) }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="time" name="availability_rules[{{ $index }}][start_time]" value="{{ substr($rule->start_time, 0, 5) }}" class="input-control !py-1 !text-[10px]">
+                                                <input type="time" name="availability_rules[{{ $index }}][end_time]" value="{{ substr($rule->end_time, 0, 5) }}" class="input-control !py-1 !text-[10px]">
+                                            </div>
+                                        @endforeach
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <select name="availability_rules[new][day_of_week]" class="input-control !py-1 !text-[10px]">
+                                                <option value="">{{ __('Every day') }}</option>
+                                                @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
+                                                    <option value="{{ $i }}">{{ __($day) }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="time" name="availability_rules[new][start_time]" class="input-control !py-1 !text-[10px]">
+                                            <input type="time" name="availability_rules[new][end_time]" class="input-control !py-1 !text-[10px]">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="w-full px-3 py-1.5 mt-3 rounded-lg bg-slate-900 text-white text-xs font-semibold">{{ __('Save changes') }}</button>
                             </form>
 
                             <div class="mt-4 pt-4 border-t border-slate-100 space-y-3">
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Variants') }}</h4>
                                 <div class="space-y-2">
                                     @foreach($service->variants as $variant)
-                                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 text-xs">
-                                            <div>
-                                                <span class="font-bold text-slate-700">{{ $variant->name }}</span>
-                                                <span class="text-slate-500 ml-2">{{ $variant->duration_minutes }} min • €{{ number_format($variant->price, 2) }}</span>
+                                        <div class="p-2 rounded-lg bg-slate-50 text-xs space-y-2">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <span class="font-bold text-slate-700">{{ $variant->name }}</span>
+                                                    <span class="text-slate-500 ml-2">{{ $variant->duration_minutes }} min • €{{ number_format($variant->price, 2) }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <button type="button" onclick="toggleEditVariant('{{ $variant->id }}')" class="text-slate-400 hover:text-slate-600" title="{{ __('Edit') }}">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                    </button>
+                                                    <form action="{{ route('owner.services.variants.delete', [$service, $variant]) }}" method="POST" class="inline" onsubmit="confirmDelete(event, '{{ __('Are you sure you want to delete this variant?') }}')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-500 hover:text-red-700" title="{{ __('Delete') }}">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
-                                            <form action="{{ route('owner.services.variants.delete', [$service, $variant]) }}" method="POST" class="inline" onsubmit="confirmDelete(event, '{{ __('Are you sure you want to delete this variant?') }}')">
+
+                                            <form id="edit-variant-{{ $variant->id }}" method="POST" action="{{ route('owner.services.variants.update', [$service, $variant]) }}" class="hidden space-y-2 pt-2 border-t border-slate-200">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                </button>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('Name') }}</label>
+                                                        <input type="text" name="name" class="input-control !py-1 !text-[10px]" value="{{ $variant->name }}" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('Duration') }}</label>
+                                                        <input type="number" name="duration_minutes" class="input-control !py-1 !text-[10px]" value="{{ $variant->duration_minutes }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('Price') }}</label>
+                                                        <input type="number" name="price" step="0.01" class="input-control !py-1 !text-[10px]" value="{{ $variant->price }}" required>
+                                                    </div>
+                                                    <div class="flex items-end">
+                                                        <button type="submit" class="w-full px-2 py-1 rounded bg-slate-800 text-white font-bold text-[10px]">{{ __('Save') }}</button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-2 pt-2 border-t border-slate-200">
+                                                    <label class="flex items-center gap-2 mb-1 cursor-pointer">
+                                                        <input type="checkbox" name="is_special" value="1" @checked($variant->is_special)>
+                                                        <span class="text-[9px] font-bold uppercase text-slate-400">{{ __('Special variant (exclusive time)') }}</span>
+                                                    </label>
+                                                    <div class="space-y-1">
+                                                        @foreach($variant->availabilityRules as $index => $rule)
+                                                            <div class="grid grid-cols-3 gap-1">
+                                                                <select name="availability_rules[{{ $index }}][day_of_week]" class="input-control !py-0.5 !text-[9px]">
+                                                                    <option value="">{{ __('Every day') }}</option>
+                                                                    @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $i => $day)
+                                                                        <option value="{{ $i }}" @selected($rule->day_of_week !== null && (int)$rule->day_of_week === $i)>{{ __($day) }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                                <input type="time" name="availability_rules[{{ $index }}][start_time]" value="{{ substr($rule->start_time, 0, 5) }}" class="input-control !py-0.5 !text-[9px]">
+                                                                <input type="time" name="availability_rules[{{ $index }}][end_time]" value="{{ substr($rule->end_time, 0, 5) }}" class="input-control !py-0.5 !text-[9px]">
+                                                            </div>
+                                                        @endforeach
+                                                        <div class="grid grid-cols-3 gap-1">
+                                                            <select name="availability_rules[new][day_of_week]" class="input-control !py-0.5 !text-[9px]">
+                                                                <option value="">{{ __('Every day') }}</option>
+                                                                @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $i => $day)
+                                                                    <option value="{{ $i }}">{{ __($day) }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <input type="time" name="availability_rules[new][start_time]" class="input-control !py-0.5 !text-[9px]">
+                                                            <input type="time" name="availability_rules[new][end_time]" class="input-control !py-0.5 !text-[9px]">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </form>
                                         </div>
                                     @endforeach
@@ -320,6 +415,15 @@
             container.style.display = 'block';
         } else {
             container.style.display = 'none';
+        }
+    }
+
+    function toggleEditVariant(id) {
+        const form = document.getElementById('edit-variant-' + id);
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+        } else {
+            form.classList.add('hidden');
         }
     }
 </script>

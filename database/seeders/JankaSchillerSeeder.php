@@ -43,7 +43,7 @@ class JankaSchillerSeeder extends Seeder
             ]
         );
 
-        // Working hours: Mon-Fri 09:00 - 17:00
+        // Working hours: Mon-Fri 09:00 - 17:00, Sat 09:00 - 13:00
         for ($i = 1; $i <= 5; $i++) {
             Schedule::updateOrCreate(
                 ['profile_id' => $profile->id, 'day_of_week' => $i],
@@ -53,6 +53,13 @@ class JankaSchillerSeeder extends Seeder
                 ]
             );
         }
+        Schedule::updateOrCreate(
+            ['profile_id' => $profile->id, 'day_of_week' => 6],
+            [
+                'start_time' => '09:00',
+                'end_time' => '13:00',
+            ]
+        );
 
         $employee = Employee::updateOrCreate(
             ['profile_id' => $profile->id, 'name' => 'Jana Schiller'],
@@ -88,7 +95,13 @@ class JankaSchillerSeeder extends Seeder
 
         $s3 = Service::updateOrCreate(
             ['profile_id' => $profile->id, 'name->sk' => 'Make up'],
-            ['base_duration_minutes' => 45, 'base_price' => 40, 'is_active' => true]
+            [
+                'base_duration_minutes' => 45,
+                'base_price' => 40,
+                'is_active' => true,
+                'is_special' => true,
+                'slot_interval_minutes' => 15
+            ]
         );
         if ($s3->variants()->count() === 0) {
             $s3->variants()->createMany([
@@ -97,6 +110,13 @@ class JankaSchillerSeeder extends Seeder
             ]);
         }
         $s3->employees()->sync([$employee->id]);
+
+        // Availability rules for Make up: Fri 14:00-17:00, Sat 09:00-13:00
+        $s3->availabilityRules()->delete();
+        $s3->availabilityRules()->createMany([
+            ['day_of_week' => 5, 'start_time' => '14:00', 'end_time' => '17:00'],
+            ['day_of_week' => 6, 'start_time' => '09:00', 'end_time' => '13:00'],
+        ]);
 
         // Restricted Service (demonstration of new feature)
         // This service is ONLY available between 13:00 and 15:00
@@ -107,11 +127,16 @@ class JankaSchillerSeeder extends Seeder
                 'base_duration_minutes' => 30,
                 'base_price' => 50,
                 'is_active' => true,
-                'available_from' => '13:00',
-                'available_to' => '15:00',
+                'is_special' => true,
                 'slot_interval_minutes' => 10,
             ]
         );
         $s4->employees()->sync([$employee->id]);
+
+        $s4->availabilityRules()->delete();
+        $s4->availabilityRules()->create([
+            'start_time' => '13:00',
+            'end_time' => '15:00',
+        ]);
     }
 }

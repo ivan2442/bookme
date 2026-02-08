@@ -7,6 +7,7 @@ use App\Models\AppointmentLock;
 use App\Models\Holiday;
 use App\Models\Profile;
 use App\Models\Schedule;
+use App\Models\Service;
 use App\Models\ServiceVariant;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -26,11 +27,19 @@ class AvailabilityService
         $endRange = $start->copy()->addDays($days)->endOfDay();
 
         $settings = $profile->calendarSetting;
-        $targetService = $serviceId ? $profile->services()->find($serviceId) : null;
-        $restrictedServices = $profile->services()
-            ->whereNotNull('available_from')
-            ->whereNotNull('available_to')
+        $targetService = $serviceId ? $profile->services()->with('availabilityRules')->find($serviceId) : null;
+        $targetVariant = $variantId ? ServiceVariant::with('availabilityRules')->find($variantId) : null;
+
+        $specialServices = $profile->services()
+            ->where('is_special', true)
             ->where('is_active', true)
+            ->with('availabilityRules')
+            ->get();
+
+        $specialVariants = ServiceVariant::where('is_special', true)
+            ->where('is_active', true)
+            ->with('availabilityRules')
+            ->whereHas('service', fn($q) => $q->where('profile_id', $profile->id))
             ->get();
 
         $slotInterval = max($settings?->slot_interval_minutes ?? 15, 5);
@@ -126,35 +135,61 @@ class AvailabilityService
             // Flatten all windows for this day to iterate over them
             $mergedWindows = $this->mergeWindows(collect($dailyWindows)->flatten(1)->toArray());
 
-            // If target service has restricted time, we restrict mergedWindows to that window
-            if ($targetService && $targetService->available_from && $targetService->available_to) {
-                $serviceStart = $date->copy()->setTimeFromTimeString($targetService->available_from);
-                $serviceEnd = $date->copy()->setTimeFromTimeString($targetService->available_to);
-
-                $restrictedMergedWindows = [];
-                foreach ($mergedWindows as [$wStart, $wEnd]) {
-                    $overlapStart = $wStart->gt($serviceStart) ? $wStart : $serviceStart;
-                    $overlapEnd = $wEnd->lt($serviceEnd) ? $wEnd : $serviceEnd;
-
-                    if ($overlapStart->lt($overlapEnd)) {
-                        $restrictedMergedWindows[] = [$overlapStart, $overlapEnd];
-                    }
-                }
-                $mergedWindows = $restrictedMergedWindows;
+            // If target service or variant is special, restrict mergedWindows to its defined rules
+            $restrictToRules = null;
+            if ($targetVariant && $targetVariant->is_special) {
+                $restrictToRules = $targetVariant;
+            } elseif ($targetService && $targetService->is_special) {
+                $restrictToRules = $targetService;
             }
 
-            // If ANY OTHER services have restricted time windows, we MUST subtract them from mergedWindows
-            // so they are not available for the current target service.
-            $otherRestrictedServices = $restrictedServices->filter(fn($rs) => !$targetService || $rs->id !== $targetService->id);
-            if ($otherRestrictedServices->isNotEmpty()) {
-                $blockedIntervals = [];
-                foreach ($otherRestrictedServices as $rs) {
-                    $blockedIntervals[] = [
-                        $date->copy()->setTimeFromTimeString($rs->available_from),
-                        $date->copy()->setTimeFromTimeString($rs->available_to)
-                    ];
+            if ($restrictToRules) {
+                $serviceWindows = $this->getAvailabilityWindowsForDay($restrictToRules, $date, $timezone);
+                if (!empty($serviceWindows)) {
+                    $restrictedMergedWindows = [];
+                    foreach ($mergedWindows as [$wStart, $wEnd]) {
+                        foreach ($serviceWindows as [$sStart, $sEnd]) {
+                            $overlapStart = $wStart->gt($sStart) ? $wStart : $sStart;
+                            $overlapEnd = $wEnd->lt($sEnd) ? $wEnd : $sEnd;
+
+                            if ($overlapStart->lt($overlapEnd)) {
+                                $restrictedMergedWindows[] = [$overlapStart, $overlapEnd];
+                            }
+                        }
+                    }
+                    $mergedWindows = $restrictedMergedWindows;
+                } else {
+                    $mergedWindows = [];
                 }
-                $mergedWindows = $this->subtractIntervals($mergedWindows, $blockedIntervals);
+            }
+
+            // All special service/variant windows are unavailable for other services
+            $otherSpecialWindows = [];
+
+            // Other special services
+            foreach ($specialServices as $ss) {
+                if ($targetService && $ss->id === $targetService->id) {
+                    continue;
+                }
+                $ssWindows = $this->getAvailabilityWindowsForDay($ss, $date, $timezone);
+                foreach ($ssWindows as $swin) {
+                    $otherSpecialWindows[] = $swin;
+                }
+            }
+
+            // Other special variants
+            foreach ($specialVariants as $sv) {
+                if ($targetVariant && $sv->id === $targetVariant->id) {
+                    continue;
+                }
+                $svWindows = $this->getAvailabilityWindowsForDay($sv, $date, $timezone);
+                foreach ($svWindows as $swin) {
+                    $otherSpecialWindows[] = $swin;
+                }
+            }
+
+            if (!empty($otherSpecialWindows)) {
+                $mergedWindows = $this->subtractIntervals($mergedWindows, $otherSpecialWindows);
             }
 
             foreach ($mergedWindows as [$windowStart, $windowEnd]) {
@@ -505,7 +540,27 @@ class AvailabilityService
         if ($lockConflict) {
             return 'locking';
         }
-
         return 'available';
+    }
+
+    protected function getAvailabilityWindowsForDay($model, CarbonInterface $date, string $timezone): array
+    {
+        $rules = $model->availabilityRules
+            ->filter(fn($rule) => $rule->day_of_week === null || (int)$rule->day_of_week === (int)$date->dayOfWeek);
+
+        if ($rules->isEmpty()) {
+            if ($model instanceof Service && $model->available_from && $model->available_to) {
+                return [[
+                    $date->copy()->setTimeFromTimeString($model->available_from),
+                    $date->copy()->setTimeFromTimeString($model->available_to)
+                ]];
+            }
+            return [];
+        }
+
+        return $rules->map(fn($rule) => [
+            $date->copy()->setTimeFromTimeString($rule->start_time),
+            $date->copy()->setTimeFromTimeString($rule->end_time)
+        ])->all();
     }
 }

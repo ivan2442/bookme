@@ -22,6 +22,7 @@ class Service extends Model
         'base_price',
         'currency',
         'is_active',
+        'is_special',
         'is_pakavoz_enabled',
         'pakavoz_api_key',
         'available_from',
@@ -40,6 +41,7 @@ class Service extends Model
         'category' => 'array',
         'description' => 'array',
         'is_active' => 'bool',
+        'is_special' => 'bool',
         'is_pakavoz_enabled' => 'bool',
     ];
 
@@ -56,5 +58,10 @@ class Service extends Model
     public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class, 'employee_service')->withTimestamps();
+    }
+
+    public function availabilityRules(): HasMany
+    {
+        return $this->hasMany(ServiceAvailabilityRule::class);
     }
 }
