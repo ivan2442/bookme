@@ -100,7 +100,7 @@ class JankaSchillerSeeder extends Seeder
                 'base_price' => 40,
                 'is_active' => true,
                 'is_special' => true,
-                'slot_interval_minutes' => 15
+                'slot_interval_minutes' => null,
             ]
         );
         if ($s3->variants()->count() === 0) {
@@ -128,7 +128,7 @@ class JankaSchillerSeeder extends Seeder
                 'base_price' => 50,
                 'is_active' => true,
                 'is_special' => true,
-                'slot_interval_minutes' => 10,
+                'slot_interval_minutes' => null,
             ]
         );
         $s4->employees()->sync([$employee->id]);

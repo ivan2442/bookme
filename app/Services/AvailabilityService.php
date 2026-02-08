@@ -46,6 +46,14 @@ class AvailabilityService
         if ($targetService && $targetService->slot_interval_minutes) {
             $slotInterval = $targetService->slot_interval_minutes;
         }
+
+        // Ak je služba špeciálna, interval slotov sa rozdelí podľa dĺžky služby (ak nie je určený inak)
+        if (($targetVariant && $targetVariant->is_special) || ($targetService && $targetService->is_special)) {
+            if (!$targetService || !$targetService->slot_interval_minutes) {
+                // Použijeme celkovú dĺžku vrátane bufferov pre čisté rozdelenie
+                $slotInterval = ($durationMinutes ?: 30) + $bufferBefore + $bufferAfter;
+            }
+        }
         $minNotice = $settings?->min_notice_minutes ?? 60;
         $maxAdvance = $settings?->max_advance_days ?? 90;
         $bufferBefore = ($settings?->buffer_before_minutes ?? 0) + $bufferBefore;
@@ -130,7 +138,7 @@ class AvailabilityService
             // For now, we use a single timeline but check if ANY employee is free at that time.
 
             // To find windows, we need to know when the business/employees are working
-            $dailyWindows = $this->getWorkingWindowsForEmployees($profile, $employeeIds, $allSchedules, $allHolidays, $date);
+            $dailyWindows = $this->getWorkingWindowsForEmployees($profile, $employeeIds, $allSchedules, $allHolidays, $date, $serviceId, $variantId);
 
             // Flatten all windows for this day to iterate over them
             $mergedWindows = $this->mergeWindows(collect($dailyWindows)->flatten(1)->toArray());
@@ -163,34 +171,6 @@ class AvailabilityService
                 }
             }
 
-            // All special service/variant windows are unavailable for other services
-            $otherSpecialWindows = [];
-
-            // Other special services
-            foreach ($specialServices as $ss) {
-                if ($targetService && $ss->id === $targetService->id) {
-                    continue;
-                }
-                $ssWindows = $this->getAvailabilityWindowsForDay($ss, $date, $timezone);
-                foreach ($ssWindows as $swin) {
-                    $otherSpecialWindows[] = $swin;
-                }
-            }
-
-            // Other special variants
-            foreach ($specialVariants as $sv) {
-                if ($targetVariant && $sv->id === $targetVariant->id) {
-                    continue;
-                }
-                $svWindows = $this->getAvailabilityWindowsForDay($sv, $date, $timezone);
-                foreach ($svWindows as $swin) {
-                    $otherSpecialWindows[] = $swin;
-                }
-            }
-
-            if (!empty($otherSpecialWindows)) {
-                $mergedWindows = $this->subtractIntervals($mergedWindows, $otherSpecialWindows);
-            }
 
             foreach ($mergedWindows as [$windowStart, $windowEnd]) {
                 for ($slotStart = $windowStart->copy(); $slotStart->lt($windowEnd); $slotStart->addMinutes($slotInterval)) {
@@ -236,10 +216,23 @@ class AvailabilityService
         ];
     }
 
-    protected function getWorkingWindowsForEmployees(Profile $profile, array $employeeIds, Collection $allSchedules, Collection $allHolidays, CarbonInterface $date): array
+    protected function getWorkingWindowsForEmployees(Profile $profile, array $employeeIds, Collection $allSchedules, Collection $allHolidays, CarbonInterface $date, ?int $targetServiceId = null, ?int $targetVariantId = null): array
     {
         $timezone = $profile->timezone ?? config('app.timezone');
         $windowsPerEmployee = [];
+
+        // Načítame všetky špeciálne pravidlá pre celú prevádzku
+        $specialServices = $profile->services()
+            ->where('is_special', true)
+            ->where('is_active', true)
+            ->with(['availabilityRules', 'employees'])
+            ->get();
+
+        $specialVariants = ServiceVariant::where('is_special', true)
+            ->where('is_active', true)
+            ->whereHas('service', fn($q) => $q->where('profile_id', $profile->id))
+            ->with(['availabilityRules', 'employees', 'service.employees'])
+            ->get();
 
         foreach ($employeeIds as $empId) {
             $empSchedules = $allSchedules->filter(fn($s) => $s->employee_id == $empId);
@@ -267,6 +260,45 @@ class AvailabilityService
                     $empWindows[] = $window;
                 }
             }
+
+            // Odčítame špeciálne okná OSTATNÝCH služieb, ktoré tento zamestnanec vykonáva
+            $blockedBySpecial = [];
+            foreach ($specialServices as $ss) {
+                if ($targetServiceId && (int)$ss->id === (int)$targetServiceId) {
+                    continue;
+                }
+
+                // Ak zamestnanec vykonáva túto špeciálnu službu (alebo je to business-wide), blokuje mu čas pre iné služby
+                if ($empId === null || $ss->employees->contains($empId)) {
+                    $ssWindows = $this->getAvailabilityWindowsForDay($ss, $date, $timezone);
+                    foreach ($ssWindows as $swin) {
+                        $blockedBySpecial[] = $swin;
+                    }
+                }
+            }
+
+            foreach ($specialVariants as $sv) {
+                if ($targetVariantId && (int)$sv->id === (int)$targetVariantId) {
+                    continue;
+                }
+
+                $svEmployeeIds = $sv->employees->pluck('id')->toArray();
+                if (empty($svEmployeeIds)) {
+                    $svEmployeeIds = $sv->service->employees->pluck('id')->toArray();
+                }
+
+                if ($empId === null || in_array($empId, $svEmployeeIds)) {
+                    $svWindows = $this->getAvailabilityWindowsForDay($sv, $date, $timezone);
+                    foreach ($svWindows as $swin) {
+                        $blockedBySpecial[] = $swin;
+                    }
+                }
+            }
+
+            if (!empty($blockedBySpecial)) {
+                $empWindows = $this->subtractIntervals($empWindows, $blockedBySpecial);
+            }
+
             $windowsPerEmployee[$empId] = $empWindows;
         }
 
