@@ -397,9 +397,16 @@
         fetchModalAvailability();
     }
 
-    if (window.loadServicesNextSlots) {
-        window.loadServicesNextSlots();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.loadServicesNextSlots) {
+            window.loadServicesNextSlots();
+        } else {
+            // Ak app.js ešte nie je pripravený (kvôli type="module"), skúsime to o chvíľu
+            setTimeout(() => {
+                if (window.loadServicesNextSlots) window.loadServicesNextSlots();
+            }, 500);
+        }
+    });
 
     function closeBookingModal() {
         document.getElementById('bookingModal').classList.add('hidden');

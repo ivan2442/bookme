@@ -164,13 +164,19 @@ window.loadServicesNextSlots = async function() {
                 const formatted = window.formatFullNextSlot(firstAvailable.start_at);
                 if (textElement) {
                     textElement.textContent = `${prefix} ${formatted}`;
-                    textElement.classList.remove('opacity-0');
                 }
             } else {
                 if (textElement) textElement.textContent = translations["No free slots available for this day."] || 'Žiadne voľné termíny';
             }
+            if (textElement) {
+                textElement.classList.remove('opacity-0');
+            }
         } catch (error) {
             console.error('Error loading next slot for service ' + serviceId, error);
+            if (textElement) {
+                textElement.textContent = translations["Failed to load data."] || 'Chyba pri načítaní dát.';
+                textElement.classList.remove('opacity-0');
+            }
         }
     });
 };
@@ -1571,4 +1577,13 @@ function initAdminDashboard() {
     }
 
     fetchAdminCalendarStatus();
+}
+
+// Inicializácia najbližších termínov pre služby
+if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => window.loadServicesNextSlots());
+    } else {
+        window.loadServicesNextSlots();
+    }
 }

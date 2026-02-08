@@ -104,6 +104,9 @@
             "Choose date": "{{ __('Choose date') }}",
             "Available times": "{{ __('Available times') }}",
             "Loading free slots...": "{{ __('Loading free slots...') }}",
+            "Next slot": "{{ __('Next slot') }}",
+            "at": "{{ __('at') }}",
+            "No free slots available for this day.": "{{ __('No free slots available for this day.') }}",
             "All": "{{ __('All') }}"
         };
     </script>
