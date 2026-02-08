@@ -34,8 +34,7 @@
          x-transition:enter-end="opacity-100 translate-y-0"
          class="bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-indigo-200 flex items-center justify-between gap-4 sticky top-4 z-20">
         <div class="flex items-center gap-3">
-            <span class="flex items-center justify-center w-6 h-6 bg-white/20 rounded-full text-[12px] font-bold" x-text="selected.length"></span>
-            <span class="text-sm font-medium">{{ __('Selected') }}</span>
+            <span class="text-sm font-bold uppercase tracking-wider">{{ __('Selected') }} (<span x-text="selected.length"></span>)</span>
         </div>
 
         <div class="flex items-center gap-2">
@@ -60,10 +59,8 @@
 
     <form id="bulkForm" x-ref="bulkForm" action="{{ route('owner.appointments.bulk') }}" method="POST" class="hidden">
         @csrf
-        <input type="hidden" name="action" :value="action">
-        <template x-for="id in selected" :key="id">
-            <input type="hidden" name="appointment_ids[]" :value="id">
-        </template>
+        <input type="hidden" name="action" id="bulk_action_field">
+        <div x-ref="idsContainer"></div>
     </form>
 
     <div class="card overflow-hidden !p-0">
@@ -73,8 +70,8 @@
                     <tr class="bg-slate-50 text-left text-slate-500 uppercase tracking-widest text-[10px] font-bold border-b border-slate-100">
                         <th class="w-12 px-6 py-4">
                             <div class="flex items-center gap-2">
-                                <input type="checkbox" @change="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
-                                <span class="cursor-pointer select-none hidden sm:inline" @click="toggleAll">{{ __('Select all') }}</span>
+                                <input type="checkbox" @click="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                <span class="cursor-pointer select-none hidden sm:inline text-indigo-100 hover:text-white transition-colors" @click="toggleAll">{{ __('Select all') }}</span>
                             </div>
                         </th>
                         <th class="px-6 py-4">{{ __('Client & Service') }}</th>
@@ -152,11 +149,10 @@
     function bulkActions() {
         return {
             selected: [],
-            action: '',
             allIds: @json($appointments->pluck('id')).map(id => id.toString()),
 
             toggleAll() {
-                if (this.selected.length === this.allIds.length) {
+                if (this.allSelected) {
                     this.selected = [];
                 } else {
                     this.selected = [...this.allIds];
@@ -164,11 +160,10 @@
             },
 
             get allSelected() {
-                return this.selected.length === this.allIds.length && this.allIds.length > 0;
+                return this.allIds.length > 0 && this.selected.length === this.allIds.length;
             },
 
             submitBulk(action) {
-                this.action = action;
                 let message = '{{ __("Are you sure you want to perform this action on selected appointments?") }}';
 
                 if (action === 'delete') {
@@ -187,9 +182,22 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.$nextTick(() => {
-                            this.$refs.bulkForm.submit();
+                        const form = this.$refs.bulkForm;
+                        const actionField = document.getElementById('bulk_action_field');
+                        const container = this.$refs.idsContainer;
+
+                        actionField.value = action;
+                        container.innerHTML = '';
+
+                        this.selected.forEach(id => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'appointment_ids[]';
+                            input.value = id;
+                            container.appendChild(input);
                         });
+
+                        form.submit();
                     }
                 });
             }
