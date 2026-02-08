@@ -1217,6 +1217,7 @@ function initSelectedDate() {
         const config = {
             dateFormat: "Y-m-d",
             locale: window.locale || "sk",
+            rangeSeparator: " to ",
             disableMobile: true, // Zablokuje natívny kalendár na mobiloch
             allowInput: true,
             onReady: function(selectedDates, dateStr, instance) {
@@ -1246,6 +1247,10 @@ function initSelectedDate() {
             // Zakážeme minulosť pre rezervácie (pokiaľ nie je explicitne povolená cez data-allow-past)
             if (el.dataset.allowPast === undefined) {
                 instanceConfig.minDate = "today";
+            }
+
+            if (el.dataset.mode !== undefined) {
+                instanceConfig.mode = el.dataset.mode;
             }
 
             // Špecifická logika pre domovskú stránku a výber dátumu

@@ -22,15 +22,15 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/services', [AdminController::class, 'services'])->name('services');
     Route::post('/services', [AdminController::class, 'storeService'])->name('services.store');
-    Route::post('/services/{service}', [AdminController::class, 'updateService'])->name('services.update');
+    Route::post('/services/{service}/update', [AdminController::class, 'updateService'])->name('services.update');
     Route::delete('/services/{service}', [AdminController::class, 'deleteService'])->name('services.delete');
     Route::post('/services/{service}/variants', [AdminController::class, 'storeVariant'])->name('services.variants.store');
-    Route::post('/services/{service}/variants/{variant}', [AdminController::class, 'updateVariant'])->name('services.variants.update');
+    Route::post('/services/{service}/variants/{variant}/update', [AdminController::class, 'updateVariant'])->name('services.variants.update');
     Route::delete('/services/{service}/variants/{variant}', [AdminController::class, 'deleteVariant'])->name('services.variants.delete');
 
     Route::get('/employees', [AdminController::class, 'employees'])->name('employees');
     Route::post('/employees', [AdminController::class, 'storeEmployee'])->name('employees.store');
-    Route::post('/employees/{employee}', [AdminController::class, 'updateEmployee'])->name('employees.update');
+    Route::post('/employees/{employee}/update', [AdminController::class, 'updateEmployee'])->name('employees.update');
 
     Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
     Route::post('/appointments/{appointment}/confirm', [AdminController::class, 'confirmAppointment'])->name('appointments.confirm');
@@ -51,7 +51,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     Route::get('/holidays', [AdminController::class, 'holidays'])->name('holidays');
     Route::post('/holidays', [AdminController::class, 'storeHoliday'])->name('holidays.store');
-    Route::post('/holidays/{holiday}', [AdminController::class, 'updateHoliday'])->name('holidays.update');
+    Route::post('/holidays/{holiday}/update', [AdminController::class, 'updateHoliday'])->name('holidays.update');
     Route::delete('/holidays/{holiday}', [AdminController::class, 'deleteHoliday'])->name('holidays.delete');
 
     Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
@@ -75,16 +75,16 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     // Služby
     Route::get('/services', [OwnerDashboardController::class, 'services'])->name('services');
     Route::post('/services', [OwnerDashboardController::class, 'storeService'])->name('services.store');
-    Route::post('/services/{service}', [OwnerDashboardController::class, 'updateService'])->name('services.update');
+    Route::post('/services/{service}/update', [OwnerDashboardController::class, 'updateService'])->name('services.update');
     Route::delete('/services/{service}', [OwnerDashboardController::class, 'deleteService'])->name('services.delete');
     Route::post('/services/{service}/variants', [OwnerDashboardController::class, 'storeVariant'])->name('services.variants.store');
-    Route::post('/services/{service}/variants/{variant}', [OwnerDashboardController::class, 'updateVariant'])->name('services.variants.update');
+    Route::post('/services/{service}/variants/{variant}/update', [OwnerDashboardController::class, 'updateVariant'])->name('services.variants.update');
     Route::delete('/services/{service}/variants/{variant}', [OwnerDashboardController::class, 'deleteVariant'])->name('services.variants.delete');
 
     // Zamestnanci
     Route::get('/employees', [OwnerDashboardController::class, 'employees'])->name('employees');
     Route::post('/employees', [OwnerDashboardController::class, 'storeEmployee'])->name('employees.store');
-    Route::post('/employees/{employee}', [OwnerDashboardController::class, 'updateEmployee'])->name('employees.update');
+    Route::post('/employees/{employee}/update', [OwnerDashboardController::class, 'updateEmployee'])->name('employees.update');
 
     // Rezervácie
     Route::get('/appointments', [OwnerDashboardController::class, 'appointments'])->name('appointments');
@@ -103,7 +103,7 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     // Rozvrhy
     Route::get('/schedules', [OwnerDashboardController::class, 'schedules'])->name('schedules');
     Route::post('/schedules', [OwnerDashboardController::class, 'storeSchedule'])->name('schedules.store');
-    Route::post('/schedules/{schedule}', [OwnerDashboardController::class, 'updateSchedule'])->name('schedules.update');
+    Route::post('/schedules/{schedule}/update', [OwnerDashboardController::class, 'updateSchedule'])->name('schedules.update');
     Route::delete('/schedules/{schedule}', [OwnerDashboardController::class, 'deleteSchedule'])->name('schedules.delete');
 
     // Nastavenia kalendára
@@ -113,7 +113,8 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
     // Sviatky a uzávierky
     Route::get('/holidays', [OwnerDashboardController::class, 'holidays'])->name('holidays');
     Route::post('/holidays', [OwnerDashboardController::class, 'storeHoliday'])->name('holidays.store');
-    Route::post('/holidays/{holiday}', [OwnerDashboardController::class, 'updateHoliday'])->name('holidays.update');
+    Route::post('/holidays/bulk-delete', [OwnerDashboardController::class, 'bulkDeleteHolidays'])->name('holidays.bulkDelete');
+    Route::post('/holidays/{holiday}/update', [OwnerDashboardController::class, 'updateHoliday'])->name('holidays.update');
     Route::delete('/holidays/{holiday}', [OwnerDashboardController::class, 'deleteHoliday'])->name('holidays.delete');
 
     // Platby (zatial len prehlad)

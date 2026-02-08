@@ -578,17 +578,50 @@ class AdminController extends Controller
         $data = $request->validate([
             'profile_id' => ['required', 'exists:profiles,id'],
             'employee_id' => ['nullable', 'exists:employees,id'],
-            'date' => ['required', 'date'],
+            'date' => ['required', 'string'],
             'is_closed' => ['nullable', 'boolean'],
             'reason' => ['nullable', 'string', 'max:255'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
         ]);
 
-        Holiday::create([
-            ...$data,
-            'is_closed' => $request->boolean('is_closed', true),
-        ]);
+        $dateString = $data['date'];
+        $isClosed = $request->boolean('is_closed');
+
+        if ($isClosed) {
+            $data['start_time'] = null;
+            $data['end_time'] = null;
+        }
+
+        if (preg_match('/^(\d{4}-\d{2}-\d{2}).*?(\d{4}-\d{2}-\d{2})$/', $dateString, $matches)) {
+            $start = Carbon::parse($matches[1]);
+            $end = Carbon::parse($matches[2]);
+
+            $period = \Carbon\CarbonPeriod::create($start, $end);
+            foreach ($period as $date) {
+                Holiday::updateOrCreate([
+                    'profile_id' => $data['profile_id'],
+                    'employee_id' => $data['employee_id'] ?? null,
+                    'date' => $date->format('Y-m-d'),
+                    'start_time' => $data['start_time'] ?? null,
+                    'end_time' => $data['end_time'] ?? null,
+                ], [
+                    'is_closed' => $isClosed,
+                    'reason' => $data['reason'] ?? null,
+                ]);
+            }
+        } else {
+            Holiday::updateOrCreate([
+                'profile_id' => $data['profile_id'],
+                'employee_id' => $data['employee_id'] ?? null,
+                'date' => Carbon::parse($dateString)->format('Y-m-d'),
+                'start_time' => $data['start_time'] ?? null,
+                'end_time' => $data['end_time'] ?? null,
+            ], [
+                'is_closed' => $isClosed,
+                'reason' => $data['reason'] ?? null,
+            ]);
+        }
 
         return back()->with('status', 'Sviatok/uzávierka bola pridaná.');
     }
@@ -607,7 +640,7 @@ class AdminController extends Controller
 
         $holiday->update([
             ...$data,
-            'is_closed' => $request->boolean('is_closed', false),
+            'is_closed' => $request->boolean('is_closed'),
         ]);
 
         return back()->with('status', 'Sviatok/uzávierka bola upravená.');

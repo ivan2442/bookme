@@ -273,6 +273,10 @@
     "per page": "na stranu",
     "Are you sure you want to perform this action on selected appointments?": "Skutočne chcete vykonať túto akciu na vybraných rezerváciách?",
     "Are you sure you want to delete selected appointments?": "Skutočne chcete vymazať vybrané rezervácie?",
+    "Remove blockages": "Odstrániť blokácie",
+    "Are you sure you want to perform this action on selected blockages?": "Skutočne chcete vykonať túto akciu na vybraných blokáciách?",
+    "Are you sure you want to delete selected blockages?": "Skutočne chcete odstrániť vybrané blokácie?",
+    ":count blockage deleted.": "{1} :count blokácia bola odstránená.|[2,4] :count blokácie boli odstránené.|[5,*] :count blokácií bolo odstránených.",
     "Yes, delete them!": "Áno, vymazať!",
     "Yes, do it!": "Áno, vykonať!",
     ":count appointment deleted.": "{1} :count rezervácia bola vymazaná.|[2,4] :count rezervácie boli vymazané.|[5,*] :count rezervácií bolo vymazaných.",
@@ -537,5 +541,7 @@
     "Yes, do it!": "Áno, vykonať!",
     "Yes, delete them!": "Áno, odstrániť vybrané!",
     "Are you sure you want to perform this action on selected appointments?": "Skutočne chcete vykonať túto akciu na vybraných rezerváciách?",
-    "Are you sure you want to delete selected appointments?": "Skutočne chcete odstrániť vybrané rezervácie?"
+    "Are you sure you want to delete selected appointments?": "Skutočne chcete odstrániť vybrané rezervácie?",
+    "Date / Range": "Dátum / Rozsah",
+    "Select date or range": "Vyberte dátum alebo rozsah"
 }

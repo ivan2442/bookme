@@ -275,6 +275,10 @@
     "per page": "на страницу",
     "Are you sure you want to perform this action on selected appointments?": "Вы уверены, что хотите выполнить это действие для выбранных записей?",
     "Are you sure you want to delete selected appointments?": "Вы действительно хотите удалить выбранные записи?",
+    "Remove blockages": "Удалить блокировки",
+    "Are you sure you want to perform this action on selected blockages?": "Вы действительно хотите выполнить это действие над выбранными блокировками?",
+    "Are you sure you want to delete selected blockages?": "Вы действительно хотите удалить выбранные блокировки?",
+    ":count blockage deleted.": "{1} :count блокировка удалена.|[2,4] :count блокировки удалены.|[5,*] :count блокировок удалено.",
     "Yes, delete them!": "Да, удалить их!",
     "Yes, do it!": "Да, выполнить!",
     ":count appointment deleted.": "{1} :count запись удалена.|[2,4] :count записи удалены.|[5,*] :count записей удалено.",
@@ -531,5 +535,7 @@
     "Yes, do it!": "Да, выполнить!",
     "Yes, delete them!": "Да, удалить выбранные!",
     "Are you sure you want to perform this action on selected appointments?": "Вы действительно хотите выполнить это действие над выбранными записями?",
-    "Are you sure you want to delete selected appointments?": "Вы действительно хотите удалить выбранные записи?"
+    "Are you sure you want to delete selected appointments?": "Вы действительно хотите удалить выбранные записи?",
+    "Date / Range": "Дата / Диапазон",
+    "Select date or range": "Выберите дату или диапазон"
 }

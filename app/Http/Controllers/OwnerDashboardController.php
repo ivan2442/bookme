@@ -851,7 +851,7 @@ class OwnerDashboardController extends Controller
             'day_of_week' => ['required', 'integer', 'between:0,6'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-            'has_break' => ['nullable', 'string'],
+            'has_break' => ['nullable'],
             'break_start_time' => ['nullable', 'required_if:has_break,on', 'date_format:H:i'],
             'break_end_time' => ['nullable', 'required_if:has_break,on', 'date_format:H:i', 'after:break_start_time'],
         ]);
@@ -870,7 +870,7 @@ class OwnerDashboardController extends Controller
 
         // Handle breaks
         $schedule->breaks()->delete();
-        if ($request->boolean('has_break')) {
+        if ($request->boolean('has_break') && isset($data['break_start_time']) && isset($data['break_end_time'])) {
             $schedule->breaks()->create([
                 'start_time' => $data['break_start_time'],
                 'end_time' => $data['break_end_time'],
@@ -983,7 +983,7 @@ class OwnerDashboardController extends Controller
         $data = $request->validate([
             'profile_id' => ['required', 'exists:profiles,id'],
             'employee_id' => ['nullable', 'exists:employees,id'],
-            'date' => ['required', 'date'],
+            'date' => ['required', 'string'],
             'is_closed' => ['nullable', 'boolean'],
             'reason' => ['nullable', 'string', 'max:255'],
             'start_time' => ['nullable', 'date_format:H:i'],
@@ -994,10 +994,43 @@ class OwnerDashboardController extends Controller
             abort(403);
         }
 
-        Holiday::create([
-            ...$data,
-            'is_closed' => $request->boolean('is_closed', true),
-        ]);
+        $dateString = $data['date'];
+        $isClosed = $request->boolean('is_closed');
+
+        if ($isClosed) {
+            $data['start_time'] = null;
+            $data['end_time'] = null;
+        }
+
+        if (preg_match('/^(\d{4}-\d{2}-\d{2}).*?(\d{4}-\d{2}-\d{2})$/', $dateString, $matches)) {
+            $start = Carbon::parse($matches[1]);
+            $end = Carbon::parse($matches[2]);
+
+            $period = \Carbon\CarbonPeriod::create($start, $end);
+            foreach ($period as $date) {
+                Holiday::updateOrCreate([
+                    'profile_id' => $data['profile_id'],
+                    'employee_id' => $data['employee_id'] ?? null,
+                    'date' => $date->format('Y-m-d'),
+                    'start_time' => $data['start_time'] ?? null,
+                    'end_time' => $data['end_time'] ?? null,
+                ], [
+                    'is_closed' => $isClosed,
+                    'reason' => $data['reason'] ?? null,
+                ]);
+            }
+        } else {
+            Holiday::updateOrCreate([
+                'profile_id' => $data['profile_id'],
+                'employee_id' => $data['employee_id'] ?? null,
+                'date' => Carbon::parse($dateString)->format('Y-m-d'),
+                'start_time' => $data['start_time'] ?? null,
+                'end_time' => $data['end_time'] ?? null,
+            ], [
+                'is_closed' => $isClosed,
+                'reason' => $data['reason'] ?? null,
+            ]);
+        }
 
         return back()->with('status', __('Holiday / closure added.'));
     }
@@ -1023,9 +1056,15 @@ class OwnerDashboardController extends Controller
             abort(403);
         }
 
+        $isClosed = $request->boolean('is_closed');
+        if ($isClosed) {
+            $data['start_time'] = null;
+            $data['end_time'] = null;
+        }
+
         $holiday->update([
             ...$data,
-            'is_closed' => $request->boolean('is_closed', true),
+            'is_closed' => $isClosed,
         ]);
 
         return back()->with('status', __('Holiday updated.'));
@@ -1041,6 +1080,22 @@ class OwnerDashboardController extends Controller
         $holiday->delete();
 
         return back()->with('status', __('Holiday deleted.'));
+    }
+
+    public function bulkDeleteHolidays(Request $request): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return back()->with('error', __('No items selected.'));
+        }
+
+        $count = Holiday::whereIn('id', $ids)
+            ->whereIn('profile_id', $profileIds)
+            ->delete();
+
+        return back()->with('status', trans_choice(':count blockage deleted.', $count, ['count' => $count]));
     }
 
     public function payments(Request $request): View

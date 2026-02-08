@@ -37,7 +37,7 @@
                 <div class="grid sm:grid-cols-3 gap-3">
                     <div>
                         <label class="label">Dátum</label>
-                        <input type="text" name="date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD" data-allow-past>
+                        <input type="text" name="date" class="input-control" value="{{ old('date') }}" required readonly placeholder="YYYY-MM-DD" data-allow-past data-mode="range">
                     </div>
                     <div>
                         <label class="label">Od</label>

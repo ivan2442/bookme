@@ -274,6 +274,10 @@
     "per page": "per page",
     "Are you sure you want to perform this action on selected appointments?": "Are you sure you want to perform this action on selected appointments?",
     "Are you sure you want to delete selected appointments?": "Are you sure you want to delete selected appointments?",
+    "Remove blockages": "Remove blockages",
+    "Are you sure you want to perform this action on selected blockages?": "Are you sure you want to perform this action on selected blockages?",
+    "Are you sure you want to delete selected blockages?": "Are you sure you want to delete selected blockages?",
+    ":count blockage deleted.": "{1} :count blockage deleted.|[2,*] :count blockages deleted.",
     "Yes, delete them!": "Yes, delete them!",
     "Yes, do it!": "Yes, do it!",
     ":count appointment deleted.": "{1} :count appointment deleted.|[2,*] :count appointments deleted.",
@@ -528,5 +532,7 @@
     "Yes, do it!": "Yes, do it!",
     "Yes, delete them!": "Yes, delete them!",
     "Are you sure you want to perform this action on selected appointments?": "Are you sure you want to perform this action on selected appointments?",
-    "Are you sure you want to delete selected appointments?": "Are you sure you want to delete selected appointments?"
+    "Are you sure you want to delete selected appointments?": "Are you sure you want to delete selected appointments?",
+    "Date / Range": "Date / Range",
+    "Select date or range": "Select date or range"
 }
