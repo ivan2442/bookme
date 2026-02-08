@@ -195,6 +195,23 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'email' => 'Email address',
+        'password' => 'Password',
+        'business_name' => 'Business name',
+        'category' => 'Category',
+        'city' => 'City',
+        'name' => 'Name and surname',
+        'phone' => 'Phone number',
+        'base_price' => 'Base price',
+        'base_duration_minutes' => 'Base duration',
+        'duration_minutes' => 'Duration',
+        'start_time' => 'Start time',
+        'end_time' => 'End time',
+        'employee_id' => 'Employee',
+        'profile_id' => 'Business',
+        'service_id' => 'Service',
+        'price' => 'Price',
+    ],
 
 ];

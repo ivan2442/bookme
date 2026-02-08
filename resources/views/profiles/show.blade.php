@@ -40,9 +40,11 @@
                     </p>
                 </div>
             </div>
-            <button onclick="openBookingModal({{ $profile->id }}, null, '{{ __('General reservation') }}', false)" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
-                {{ __('Book now') }}
-            </button>
+            @if($profile->services->count() > 0)
+                <button onclick="document.getElementById('services-list').scrollIntoView({ behavior: 'smooth' })" class="px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-2xl hover:-translate-y-1 active:translate-y-0">
+                    {{ __('Book now') }}
+                </button>
+            @endif
         </div>
     </div>
 
@@ -59,7 +61,7 @@
                 </div>
             </section>
 
-            <section class="space-y-6">
+            <section id="services-list" class="space-y-6">
                 <h2 class="text-2xl font-display font-bold text-slate-900 flex items-center gap-3">
                     <span class="w-8 h-1 bg-emerald-500 rounded-full"></span>
                     {{ __('Our services') }}
@@ -277,14 +279,14 @@
         lockToken: null
     };
 
-    function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false) {
+    async function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false) {
         modalState.shopId = shopId;
         modalState.serviceId = serviceId;
-        modalState.calendarStart = new Date();
-        // Nastavenie na pondelok aktuálneho týždňa
-        const day = modalState.calendarStart.getDay();
-        const diff = modalState.calendarStart.getDate() - day + (day === 0 ? -6 : 1);
-        modalState.calendarStart.setDate(diff);
+
+        const now = new Date();
+        const todayIso = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        modalState.calendarStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        modalState.selectedDate = todayIso;
 
         document.getElementById('modal_service_name').textContent = serviceName;
         document.getElementById('modal_profile_id').value = shopId;
@@ -302,8 +304,49 @@
             evcInput.removeAttribute('required');
         }
 
+        // Predbežne načítame dostupnosť na 30 dní, aby sme našli prvý voľný deň
+        try {
+            const response = await axios.post('/api/availability', {
+                profile_id: shopId,
+                service_id: serviceId,
+                date: todayIso,
+                days: 35
+            });
+
+            const slots = response.data.slots || [];
+            // Hľadáme prvý dostupný slot, ktorý nie je v minulosti
+            const firstAvailableSlot = slots.find(s => s.status === 'available');
+
+            if (firstAvailableSlot) {
+                const firstDate = firstAvailableSlot.start_at.split('T')[0];
+                modalState.selectedDate = firstDate;
+                const parts = firstDate.split('-');
+                modalState.calendarStart = new Date(parts[0], parts[1]-1, parts[2]);
+            }
+
+            // Nastavenie na pondelok týždňa, v ktorom sa nachádza vybraný deň
+            const d = new Date(modalState.calendarStart);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            d.setDate(diff);
+            modalState.calendarStart = d;
+
+            if (response.data.closed_days) {
+                modalState.closedDays = response.data.closed_days;
+            }
+        } catch (error) {
+            console.error('Error finding first available day', error);
+            // Fallback na dnešok
+            const d = new Date();
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            d.setDate(diff);
+            modalState.calendarStart = d;
+        }
+
+        document.getElementById('modal_date').value = modalState.selectedDate;
+
         updateModalCalendar();
-        fetchCalendarData();
         fetchModalAvailability();
     }
 
@@ -350,25 +393,36 @@
 
             const dayEl = document.createElement('button');
             dayEl.type = 'button';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             const iso = day.getFullYear() + '-' + String(day.getMonth() + 1).padStart(2, '0') + '-' + String(day.getDate()).padStart(2, '0');
-            const isToday = iso === new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0') + '-' + String(new Date().getDate()).padStart(2, '0');
+            const isToday = iso === today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            const isPast = day < today;
             const isSelected = iso === modalState.selectedDate;
             const isClosed = modalState.closedDays.includes(iso);
 
             dayEl.className = `calendar-day h-10 w-10 flex items-center justify-center rounded-xl text-xs font-bold transition-all
                 ${isSelected ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' :
-                  isClosed ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'hover:bg-emerald-50 text-slate-700'}`;
+                  isClosed ? 'bg-red-50 text-red-500 hover:bg-red-100' :
+                  isPast ? 'opacity-30 cursor-not-allowed text-slate-300' : 'hover:bg-emerald-50 text-slate-700'}`;
 
             if (isToday && !isSelected && !isClosed) dayEl.classList.add('border', 'border-emerald-200', 'text-emerald-600');
             if (isToday && isClosed) dayEl.classList.add('border', 'border-red-200');
 
             dayEl.textContent = day.getDate();
-            dayEl.onclick = () => {
-                modalState.selectedDate = iso;
-                document.getElementById('modal_date').value = iso;
-                updateModalCalendar();
-                fetchModalAvailability();
-            };
+
+            if (!isPast) {
+                dayEl.onclick = () => {
+                    modalState.selectedDate = iso;
+                    document.getElementById('modal_date').value = iso;
+                    updateModalCalendar();
+                    fetchModalAvailability();
+                };
+            } else {
+                dayEl.disabled = true;
+            }
 
             grid.appendChild(dayEl);
         }
@@ -394,42 +448,82 @@
             }
 
             grid.innerHTML = '';
+            let renderedCount = 0;
             slots.forEach(slot => {
+                const isAvailable = slot.status === 'available';
+                const isLocking = slot.status === 'locking';
+
+                // Ak nie je dostupný a nie je to locking (čiže je obsadený), tak ho preskočíme
+                if (!isAvailable && !isLocking) {
+                    return;
+                }
+
+                renderedCount++;
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 const time = new Date(slot.start_at).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-                btn.className = 'w-full p-3 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all flex items-center justify-between group';
-                btn.innerHTML = `
-                    <span class="font-bold text-slate-900">${time}</span>
-                    <span class="text-[10px] font-bold uppercase text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">${translations["Select"] || 'Vybrať'}</span>
-                `;
+                btn.className = 'w-full p-3 rounded-2xl border border-slate-100 transition-all flex items-center justify-between group';
 
-                btn.onclick = () => {
-                    grid.querySelectorAll('button').forEach(b => b.classList.remove('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20'));
-                    btn.classList.add('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20');
-                    document.getElementById('modal_start_at').value = slot.start_at;
+                if (isLocking) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-70', 'cursor-not-allowed', 'bg-slate-50');
+                    btn.innerHTML = `
+                        <span class="font-bold text-slate-400">${time}</span>
+                        <span class="text-[10px] font-bold uppercase text-orange-500">${translations["locking"] || 'obsadzuje sa'}</span>
+                    `;
+                } else {
+                    btn.classList.add('hover:border-emerald-200', 'hover:bg-emerald-50');
+                    btn.innerHTML = `
+                        <span class="font-bold text-slate-900">${time}</span>
+                        <span class="text-[10px] font-bold uppercase text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">${translations["Select"] || 'Vybrať'}</span>
+                    `;
 
-                    // Create lock
-                    axios.post('/api/locks', {
-                        profile_id: modalState.shopId,
-                        service_id: modalState.serviceId,
-                        start_at: slot.start_at,
-                        date: modalState.selectedDate
-                    }).then(response => {
-                        modalState.lockToken = response.data.token;
-                    }).catch(err => console.error('Lock error', err));
-                };
+                    btn.onclick = () => {
+                        grid.querySelectorAll('button').forEach(b => b.classList.remove('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20'));
+                        btn.classList.add('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20');
+                        document.getElementById('modal_start_at').value = slot.start_at;
+
+                        // Create lock
+                        axios.post('/api/locks', {
+                            profile_id: modalState.shopId,
+                            service_id: modalState.serviceId,
+                            start_at: slot.start_at,
+                            date: modalState.selectedDate
+                        }).then(response => {
+                            modalState.lockToken = response.data.token;
+                        }).catch(err => console.error('Lock error', err));
+                    };
+                }
 
                 grid.appendChild(btn);
             });
+
+            if (renderedCount === 0) {
+                grid.innerHTML = `<p class="text-sm text-slate-500 italic">${translations["No free slots for this day."] || 'Žiadne voľné termíny na tento deň.'}</p>`;
+            }
         } catch (error) {
             grid.innerHTML = '<p class="text-sm text-red-500">Chyba pri načítaní dát.</p>';
         }
     }
 
     document.getElementById('modal-cal-prev').onclick = () => {
-        modalState.calendarStart.setDate(modalState.calendarStart.getDate() - 7);
+        const newStart = new Date(modalState.calendarStart);
+        newStart.setDate(newStart.getDate() - 7);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Získame pondelok aktuálneho týždňa
+        const currentWeekMonday = new Date(today);
+        const day = currentWeekMonday.getDay();
+        const diff = currentWeekMonday.getDate() - day + (day === 0 ? -6 : 1);
+        currentWeekMonday.setDate(diff);
+
+        // Ak by sme sa mali vrátiť pred aktuálny týždeň, nerobíme nič
+        if (newStart < currentWeekMonday) return;
+
+        modalState.calendarStart = newStart;
         fetchCalendarData();
     };
     document.getElementById('modal-cal-next').onclick = () => {

@@ -7,10 +7,20 @@
             <h1 class="font-display text-3xl text-slate-900">{{ __('Profile Overview') }}</h1>
             <p class="text-sm text-slate-500">{{ __('Welcome to your dashboard') }}</p>
         </div>
-        <button onclick="openManualAppointmentModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            <span>{{ __('Add Appointment') }}</span>
-        </button>
+        <div class="flex items-center gap-2">
+            @if($allProfiles->count() > 0)
+                <button onclick="copyBusinessLink('{{ route('profiles.show', $allProfiles->first()->slug) }}')" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition shadow-sm flex items-center gap-2" title="{{ __('Copy link') }}">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span class="hidden sm:inline">{{ __('Copy link') }}</span>
+                </button>
+            @endif
+            <button onclick="openManualAppointmentModal()" class="px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition shadow-md shadow-emerald-200/50 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>{{ __('Add Appointment') }}</span>
+            </button>
+        </div>
     </div>
 
     @if($allProfiles->first() && $allProfiles->first()->subscription_starts_at)
@@ -460,6 +470,21 @@
 
 <script>
     window.adminInitialClosedDays = @json($closedDays ?? []);
+
+    function copyBusinessLink(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            Swal.fire({
+                title: window.translations['Success'] || 'Úspech',
+                text: window.translations['Link copied to clipboard'] || 'Odkaz bol skopírovaný do schránky',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+    }
 
     function openManualAppointmentModal() {
         const profile = @json($allProfiles->first());

@@ -516,7 +516,7 @@ async function fetchAvailability(autoSelectNearest = false) {
             service_variant_id: variantSelect.value || null,
             employee_id: employeeInput?.value || null,
             date,
-            days: autoSelectNearest ? 14 : 1,
+            days: autoSelectNearest ? 35 : 1,
         });
 
     let slots = response.data?.slots ?? [];
@@ -1482,6 +1482,15 @@ function initAdminDashboard() {
             e.preventDefault();
             const newDate = new Date(adminState.calendarStart);
             newDate.setDate(newDate.getDate() - 7);
+
+            const today = new Date();
+            const currentWeekMonday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const day = (currentWeekMonday.getDay() + 6) % 7;
+            currentWeekMonday.setDate(currentWeekMonday.getDate() - day);
+            currentWeekMonday.setHours(0, 0, 0, 0);
+
+            if (newDate < currentWeekMonday) return;
+
             adminState.calendarStart = newDate;
             fetchAdminCalendarStatus();
         });

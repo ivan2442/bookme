@@ -27,7 +27,7 @@ class AvailabilityController extends Controller
             'service_variant_id' => ['nullable', 'exists:service_variants,id'],
             'employee_id' => ['nullable', 'exists:employees,id'],
             'date' => ['required', 'date'],
-            'days' => ['nullable', 'integer', 'min:1', 'max:14'],
+            'days' => ['nullable', 'integer', 'min:1', 'max:35'],
         ]);
 
         $profile = Profile::findOrFail($validated['profile_id']);

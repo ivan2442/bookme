@@ -105,7 +105,21 @@
                 </div>
             </div>
 
-            <div>
+            <div id="registration-form-container">
+                @if ($errors->any())
+                    <div id="errors-block" class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-800 text-sm shadow-sm animate-fade-in">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="font-bold">{{ __('Registration failed:') }}</span>
+                        </div>
+                        <ul class="list-disc list-inside space-y-1 ml-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form action="{{ route('auth.register.business') }}" method="POST" class="space-y-4">
                     @csrf
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -169,4 +183,15 @@
         </div>
     </section>
 </div>
+
+@if ($errors->any())
+<script>
+    window.onload = function() {
+        const errorsBlock = document.getElementById('errors-block');
+        if (errorsBlock) {
+            errorsBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+</script>
+@endif
 @endsection

@@ -106,7 +106,7 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', __('Registration failed:') . ' ' . $e->getMessage());
+            return back()->withInput()->withErrors(['registration_error' => $e->getMessage()]);
         }
     }
 

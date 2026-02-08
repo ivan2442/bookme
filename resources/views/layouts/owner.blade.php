@@ -36,6 +36,8 @@
             "Edit": "{{ __('Edit') }}",
             "Reschedule": "{{ __('Reschedule') }}",
             "Delete": "{{ __('Delete') }}",
+            "Success": "{{ __('Success') }}",
+            "Link copied to clipboard": "{{ __('Link copied to clipboard') }}",
             "Are you sure you want to delete this appointment?": "{{ __('Are you sure you want to delete this appointment?') }}",
             "No upcoming appointments for this day.": "{{ __('No upcoming appointments for this day.') }}",
             "Failed to load appointments.": "{{ __('Failed to load appointments.') }}"
