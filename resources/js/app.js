@@ -27,6 +27,26 @@ const toggleAdvanced = document.getElementById('toggle-advanced');
 const advancedFilters = document.getElementById('advanced-filters');
 const advancedIcon = document.getElementById('advanced-icon');
 
+let activeBookingRequests = 0;
+function showBookingLoading() {
+    const loader = document.getElementById('booking-loading');
+    if (loader) {
+        activeBookingRequests++;
+        loader.classList.remove('hidden');
+    }
+}
+
+function hideBookingLoading() {
+    const loader = document.getElementById('booking-loading');
+    if (loader) {
+        activeBookingRequests--;
+        if (activeBookingRequests <= 0) {
+            activeBookingRequests = 0;
+            loader.classList.add('hidden');
+        }
+    }
+}
+
 if (toggleAdvanced && advancedFilters) {
     toggleAdvanced.addEventListener('click', () => {
         const isOpen = advancedFilters.classList.contains('opacity-100');
@@ -409,6 +429,7 @@ function renderServices(shopId = null) {
 
             const bookingSection = document.getElementById('booking');
             if (bookingSection) {
+                showBookingLoading();
                 bookingSection.classList.remove('hidden');
                 bookingSection.scrollIntoView({ behavior: 'smooth' });
             }
@@ -433,6 +454,7 @@ function renderServices(shopId = null) {
 
             const bookingSection = document.getElementById('booking');
             if (bookingSection) {
+                showBookingLoading();
                 bookingSection.classList.remove('hidden');
                 bookingSection.scrollIntoView({ behavior: 'smooth' });
             }
@@ -602,6 +624,7 @@ async function fetchWeekAvailability() {
         return;
     }
 
+    showBookingLoading();
     const startIso = formatIsoDate(state.calendarStart);
 
     try {
@@ -625,6 +648,8 @@ async function fetchWeekAvailability() {
         }
     } catch (error) {
         console.error('Chyba pri načítaní týždennej dostupnosti', error);
+    } finally {
+        hideBookingLoading();
     }
 }
 
@@ -635,6 +660,7 @@ async function fetchAvailability(autoSelectNearest = false) {
         return;
     }
 
+    showBookingLoading();
     let date = dateInput?.value || formatIsoDate(new Date());
 
     try {
@@ -647,7 +673,7 @@ async function fetchAvailability(autoSelectNearest = false) {
             days: autoSelectNearest ? 35 : 1,
         });
 
-    let slots = response.data?.slots ?? [];
+        let slots = response.data?.slots ?? [];
         const closedDays = response.data?.closed_days ?? [];
 
         // Update state with closed days if we received them
@@ -686,6 +712,8 @@ async function fetchAvailability(autoSelectNearest = false) {
         const translations = window.translations || {};
         console.error('Chyba pri načítaní dostupnosti', error);
         resetSlots(translations["Failed to load availability."] || 'Nepodarilo sa načítať dostupnosť.');
+    } finally {
+        hideBookingLoading();
     }
 }
 

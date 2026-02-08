@@ -207,6 +207,16 @@
         <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeBookingModal()"></div>
 
         <div class="relative bg-white rounded-[32px] shadow-2xl w-full max-w-2xl p-6 md:p-8 overflow-hidden">
+            <!-- Loading Overlay -->
+            <div id="modal-booking-loading" class="absolute inset-0 z-20 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-[32px] hidden">
+                <div class="flex flex-col items-center gap-3">
+                    <svg class="animate-spin h-10 w-10 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-sm font-bold text-slate-600 uppercase tracking-widest">{{ __('Loading...') }}</span>
+                </div>
+            </div>
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <p class="text-[10px] uppercase font-bold text-emerald-600 tracking-widest mb-1">{{ __('Appointment booking') }}</p>
@@ -314,6 +324,26 @@
 <script>
     window.initialClosedDays = @json($closedDays ?? []);
 
+    let activeModalRequests = 0;
+    function showModalLoading() {
+        const loader = document.getElementById('modal-booking-loading');
+        if (loader) {
+            activeModalRequests++;
+            loader.classList.remove('hidden');
+        }
+    }
+
+    function hideModalLoading() {
+        const loader = document.getElementById('modal-booking-loading');
+        if (loader) {
+            activeModalRequests--;
+            if (activeModalRequests <= 0) {
+                activeModalRequests = 0;
+                loader.classList.add('hidden');
+            }
+        }
+    }
+
     let modalState = {
         calendarStart: null,
         closedDays: window.initialClosedDays || [],
@@ -404,6 +434,7 @@
         }
 
         // Predbežne načítame dostupnosť na 30 dní, aby sme našli prvý voľný deň
+        showModalLoading();
         try {
             const response = await axios.post('/api/availability', {
                 profile_id: shopId,
@@ -442,6 +473,8 @@
             const diff = d.getDate() - day + (day === 0 ? -6 : 1);
             d.setDate(diff);
             modalState.calendarStart = d;
+        } finally {
+            hideModalLoading();
         }
 
         document.getElementById('modal_date').value = modalState.selectedDate;
@@ -472,6 +505,7 @@
         const start = modalState.calendarStart;
         const startIso = start.getFullYear() + '-' + String(start.getMonth() + 1).padStart(2, '0') + '-' + String(start.getDate()).padStart(2, '0');
 
+        showModalLoading();
         try {
             const response = await axios.post('/api/availability', {
                 profile_id: modalState.shopId,
@@ -485,6 +519,8 @@
         } catch (error) {
             console.error('Calendar data error', error);
             updateModalCalendar();
+        } finally {
+            hideModalLoading();
         }
     }
 
@@ -545,6 +581,7 @@
         const translations = window.translations || {};
         grid.innerHTML = `<p class="text-sm text-slate-400 italic">${translations["Loading..."] || 'Načítavam...'}</p>`;
 
+        showModalLoading();
         try {
             const response = await axios.post('/api/availability', {
                 profile_id: modalState.shopId,
@@ -618,6 +655,8 @@
             }
         } catch (error) {
             grid.innerHTML = '<p class="text-sm text-red-500">Chyba pri načítaní dát.</p>';
+        } finally {
+            hideModalLoading();
         }
     }
 
