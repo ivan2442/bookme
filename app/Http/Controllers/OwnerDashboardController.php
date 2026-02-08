@@ -555,10 +555,10 @@ class OwnerDashboardController extends Controller
         }
 
         $message = match ($data['action']) {
-            'delete' => trans_choice(':count appointment deleted.|:count appointments deleted.', $count),
-            'confirm' => trans_choice(':count appointment confirmed.|:count appointments confirmed.', $count),
-            'cancel' => trans_choice(':count appointment cancelled.|:count appointments cancelled.', $count),
-            'complete' => trans_choice(':count appointment completed.|:count appointments completed.', $count),
+            'delete' => trans_choice(':count appointment deleted.', $count),
+            'confirm' => trans_choice(':count appointment confirmed.', $count),
+            'cancel' => trans_choice(':count appointment cancelled.', $count),
+            'complete' => trans_choice(':count appointment completed.', $count),
             default => __('Appointments updated.'),
         };
 

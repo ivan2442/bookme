@@ -58,9 +58,9 @@
         </div>
     </div>
 
-    <form id="bulkForm" action="{{ route('owner.appointments.bulk') }}" method="POST" class="hidden">
+    <form id="bulkForm" x-ref="bulkForm" action="{{ route('owner.appointments.bulk') }}" method="POST" class="hidden">
         @csrf
-        <input type="hidden" name="action" x-model="action">
+        <input type="hidden" name="action" :value="action">
         <template x-for="id in selected" :key="id">
             <input type="hidden" name="appointment_ids[]" :value="id">
         </template>
@@ -73,7 +73,7 @@
                     <tr class="bg-slate-50 text-left text-slate-500 uppercase tracking-widest text-[10px] font-bold border-b border-slate-100">
                         <th class="w-12 px-6 py-4">
                             <div class="flex items-center gap-2">
-                                <input type="checkbox" @click="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                <input type="checkbox" @change="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
                                 <span class="cursor-pointer select-none hidden sm:inline" @click="toggleAll">{{ __('Select all') }}</span>
                             </div>
                         </th>
@@ -153,14 +153,13 @@
         return {
             selected: [],
             action: '',
-            allSelected: false,
-            allIds: @json($appointments->pluck('id')),
+            allIds: @json($appointments->pluck('id')).map(id => id.toString()),
 
             toggleAll() {
                 if (this.selected.length === this.allIds.length) {
                     this.selected = [];
                 } else {
-                    this.selected = [...this.allIds.map(id => id.toString())];
+                    this.selected = [...this.allIds];
                 }
             },
 
@@ -189,7 +188,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.$nextTick(() => {
-                            document.getElementById('bulkForm').submit();
+                            this.$refs.bulkForm.submit();
                         });
                     }
                 });
