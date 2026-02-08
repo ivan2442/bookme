@@ -208,7 +208,7 @@
 
         <div class="relative bg-white rounded-[32px] shadow-2xl w-full max-w-2xl p-6 md:p-8 overflow-hidden">
             <!-- Loading Overlay -->
-            <div id="modal-booking-loading" class="absolute inset-0 z-20 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-[32px] hidden">
+            <div id="modal-booking-loading" class="absolute inset-0 z-20 bg-white/95 backdrop-blur-sm flex items-center justify-center rounded-[32px] hidden">
                 <div class="flex flex-col items-center gap-3">
                     <svg class="animate-spin h-10 w-10 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -473,14 +473,13 @@
             const diff = d.getDate() - day + (day === 0 ? -6 : 1);
             d.setDate(diff);
             modalState.calendarStart = d;
-        } finally {
-            hideModalLoading();
         }
 
         document.getElementById('modal_date').value = modalState.selectedDate;
 
         updateModalCalendar();
-        fetchModalAvailability();
+        await fetchModalAvailability();
+        hideModalLoading();
     }
 
     document.addEventListener('DOMContentLoaded', () => {

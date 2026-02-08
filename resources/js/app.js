@@ -429,10 +429,10 @@ function renderServices(shopId = null) {
 
             const bookingSection = document.getElementById('booking');
             if (bookingSection) {
-                showBookingLoading();
                 bookingSection.classList.remove('hidden');
                 bookingSection.scrollIntoView({ behavior: 'smooth' });
             }
+            fetchWeekAvailability();
         });
     });
 
@@ -454,10 +454,10 @@ function renderServices(shopId = null) {
 
             const bookingSection = document.getElementById('booking');
             if (bookingSection) {
-                showBookingLoading();
                 bookingSection.classList.remove('hidden');
                 bookingSection.scrollIntoView({ behavior: 'smooth' });
             }
+            fetchWeekAvailability();
         });
     });
 }
