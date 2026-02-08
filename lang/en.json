@@ -504,5 +504,9 @@
     "Upcoming available times": "Upcoming available times",
     "BookMe": "BookMe",
     "Bookings that fit into the day": "Bookings that fit into the day",
-    "BookMe — online reservations without phone calls.": "BookMe — online reservations without phone calls."
+    "BookMe — online reservations without phone calls.": "BookMe — online reservations without phone calls.",
+    "Are you sure?": "Are you sure?",
+    "Yes, delete it!": "Yes, delete it!",
+    "Are you sure you want to delete this appointment?": "Are you sure you want to delete this appointment?",
+    "Cancel": "Cancel"
 }

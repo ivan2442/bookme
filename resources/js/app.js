@@ -1315,6 +1315,33 @@ renderCalendar();
 bindCalendarNav();
 initAdminDashboard();
 
+window.confirmDeleteAppointment = function(event, form) {
+    if (event) event.preventDefault();
+    const translations = window.translations || {};
+
+    Swal.fire({
+        title: translations['Are you sure?'] || 'Ste si istý?',
+        text: translations['Are you sure you want to delete this appointment?'] || 'Skutočne chcete odstrániť túto rezerváciu?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e11d48',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: translations['Yes, delete it!'] || 'Áno, odstrániť!',
+        cancelButtonText: translations['Cancel'] || 'Zrušiť',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const selectedDateInput = document.getElementById('admin-selected-date');
+            if (selectedDateInput && selectedDateInput.value) {
+                const action = form.getAttribute('action');
+                const separator = action.includes('?') ? '&' : '?';
+                form.setAttribute('action', action + separator + 'date=' + selectedDateInput.value);
+            }
+            form.submit();
+        }
+    });
+};
+
 function initAdminDashboard() {
     const adminCalGrid = document.querySelector('[data-admin-cal-grid]');
     const adminCalMonth = document.querySelector('[data-admin-cal-month]');
@@ -1326,8 +1353,19 @@ function initAdminDashboard() {
 
     if (!adminCalGrid || !adminDateInput) return;
 
-    window.adminState.calendarStart = startOfWeek(new Date());
-    window.adminState.selectedDate = formatIsoDate(new Date());
+    // Inicializácia z URL parametra ak existuje
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    let initialDate = new Date();
+
+    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+        initialDate = new Date(dateParam);
+    }
+
+    window.adminState.calendarStart = startOfWeek(initialDate);
+    window.adminState.selectedDate = formatIsoDate(initialDate);
+    adminDateInput.value = window.adminState.selectedDate;
+
     if (window.adminState.closedDays.length === 0 && window.adminInitialClosedDays) {
         window.adminState.closedDays = window.adminInitialClosedDays;
     }

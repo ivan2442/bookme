@@ -505,5 +505,9 @@
     "Upcoming available times": "Ближайшие свободные места",
     "BookMe": "BookMe",
     "Bookings that fit into the day": "Бронирования, которые впишутся в ваш день",
-    "BookMe — online reservations without phone calls.": "BookMe — онлайн бронирование без звонков."
+    "BookMe — online reservations without phone calls.": "BookMe — онлайн бронирование без звонков.",
+    "Are you sure?": "Вы уверены?",
+    "Yes, delete it!": "Да, удалить!",
+    "Are you sure you want to delete this appointment?": "Вы действительно хотите удалить эту запись?",
+    "Cancel": "Отмена"
 }

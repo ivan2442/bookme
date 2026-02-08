@@ -222,10 +222,10 @@
                                         {{ __('Reschedule') }}
                                     </button>
 
-                                    <form method="POST" action="{{ route('owner.appointments.delete', $appointment) }}">
+                                    <form method="POST" action="{{ route('owner.appointments.delete', $appointment) }}" onsubmit="confirmDeleteAppointment(event, this)">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="{{ __('Delete') }}">
+                                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="{{ __('Delete') }}">
                                             {{ __('Delete') }}
                                         </button>
                                     </form>

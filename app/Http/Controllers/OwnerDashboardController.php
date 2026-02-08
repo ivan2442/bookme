@@ -32,7 +32,13 @@ class OwnerDashboardController extends Controller
         $allProfiles = Profile::with(['employees', 'calendarSetting', 'services'])->where('owner_id', $user->id)->get();
         $profileIds = $allProfiles->pluck('id');
 
-        $now = Carbon::now();
+        $selectedDate = $request->query('date');
+        try {
+            $now = $selectedDate ? Carbon::parse($selectedDate) : Carbon::now();
+        } catch (\Exception $e) {
+            $now = Carbon::now();
+        }
+
         $todayStart = $now->copy()->startOfDay();
         $todayEnd = $now->copy()->endOfDay();
         $monthStart = $now->copy()->startOfMonth();
@@ -523,7 +529,12 @@ class OwnerDashboardController extends Controller
 
         $appointment->delete();
 
-        return back()->with('status', __('Appointment deleted.'));
+        $redirect = back();
+        if (request()->has('date')) {
+            $redirect = redirect()->route('owner.dashboard', ['date' => request('date')]);
+        }
+
+        return $redirect->with('status', __('Appointment deleted.'));
     }
 
     public function updateAppointmentStatus(Request $request, Appointment $appointment): RedirectResponse
@@ -611,12 +622,7 @@ class OwnerDashboardController extends Controller
             ],
         ]);
 
-        return back()->with('status', 'Rezervácia bola úspešne pridaná.')->with('last_appointment_data', [
-            'title' => $data['service_name'],
-            'start' => $startAt->toIso8601String(),
-            'duration' => (int) $data['duration_minutes'],
-            'shopName' => $appointment->profile->name
-        ]);
+        return back()->with('status', 'Rezervácia bola úspešne pridaná.');
     }
 
     public function rescheduleAppointment(Request $request, Appointment $appointment): RedirectResponse
