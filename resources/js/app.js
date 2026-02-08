@@ -111,6 +111,70 @@ function formatRelativeSlot(isoDate) {
     }
 }
 
+window.formatFullNextSlot = function(isoDate) {
+    const translations = window.translations || {};
+    if (!isoDate) return translations["soon"] || 'čoskoro';
+    const date = new Date(isoDate);
+
+    const dayNames = [
+        translations["Sunday"] || 'Nedeľa',
+        translations["Monday"] || 'Pondelok',
+        translations["Tuesday"] || 'Utorok',
+        translations["Wednesday"] || 'Streda',
+        translations["Thursday"] || 'Štvrtok',
+        translations["Friday"] || 'Piatok',
+        translations["Saturday"] || 'Sobota'
+    ];
+
+    const dayName = dayNames[date.getDay()];
+    const d = date.getDate();
+    const m = date.getMonth() + 1;
+    const time = timeFormatter.format(date);
+    const at = translations["at"] || 'o';
+
+    return `${dayName} ${d}.${m}. ${at} ${time}`;
+};
+
+window.loadServicesNextSlots = async function() {
+    const buttons = document.querySelectorAll('[data-next-slot-button]');
+    if (!buttons.length) return;
+
+    const shopId = document.getElementById('profile-data')?.dataset.profileId;
+    if (!shopId) return;
+
+    const translations = window.translations || {};
+    const prefix = translations["Next slot"] || 'Najbližší termín';
+
+    buttons.forEach(async (button) => {
+        const serviceId = button.dataset.nextSlotButton;
+        const textElement = button.querySelector('[data-next-slot-text]');
+
+        try {
+            const response = await axios.post('/api/availability', {
+                profile_id: shopId,
+                service_id: serviceId,
+                date: formatIsoDate(new Date()),
+                days: 35
+            });
+
+            const slots = response.data.slots || [];
+            const firstAvailable = slots.find(s => s.status === 'available');
+
+            if (firstAvailable) {
+                const formatted = window.formatFullNextSlot(firstAvailable.start_at);
+                if (textElement) {
+                    textElement.textContent = `${prefix} ${formatted}`;
+                    textElement.classList.remove('opacity-0');
+                }
+            } else {
+                if (textElement) textElement.textContent = translations["No free slots available for this day."] || 'Žiadne voľné termíny';
+            }
+        } catch (error) {
+            console.error('Error loading next slot for service ' + serviceId, error);
+        }
+    });
+};
+
 function applyFilters() {
     const city = cityInput?.value.toLowerCase().trim() ?? '';
     const category = categorySelect?.value.toLowerCase().trim() ?? '';
@@ -772,8 +836,8 @@ bookingForm?.addEventListener('submit', (event) => {
     const selectedService =
         state.serviceById[selectedVariant?.service_id] ||
         state.services.find((s) => String(s.id) === String(payload.service_id));
-    const durationMinutes = selectedService?.base_duration_minutes || 30;
-    const price = selectedService?.base_price ?? 0;
+    const durationMinutes = selectedVariant ? (selectedVariant.duration_minutes ?? selectedService?.base_duration_minutes) : (selectedService?.base_duration_minutes || 30);
+    const price = selectedVariant ? (selectedVariant.price ?? selectedService?.base_price) : (selectedService?.base_price ?? 0);
     let endTimeReadable = '';
     try {
         const startDate = new Date(payload.start_at);

@@ -46,8 +46,8 @@ class AvailabilityController extends Controller
             $bufferBefore = $variant->buffer_before_minutes ?? 0;
             $bufferAfter = $variant->buffer_after_minutes ?? 0;
             $currency = $variant->currency;
-            // variant je doplnok k základnej službe, pripočítaj jeho čas
-            $duration = ($service->base_duration_minutes ?? 0) + ($variant->duration_minutes ?? 0);
+            // Variant má vlastný čas (ak nie je definovaný, použije sa základný)
+            $duration = $variant->duration_minutes ?? $service->base_duration_minutes;
         } else {
             $service = Service::findOrFail($validated['service_id']);
             $currency = $service->currency;

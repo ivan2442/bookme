@@ -42,7 +42,8 @@ class AppointmentLockController extends Controller
         $variantBufferAfter = $variant?->buffer_after_minutes ?? 0;
         $bufferBefore = ($settings?->buffer_before_minutes ?? 0) + $variantBufferBefore;
         $bufferAfter = ($settings?->buffer_after_minutes ?? 0) + $variantBufferAfter;
-        $baseDuration = ($service->base_duration_minutes ?? 30) + ($variant?->duration_minutes ?? 0);
+        // Variant má vlastný čas (ak nie je definovaný, použije sa základný)
+        $baseDuration = $variant ? ($variant->duration_minutes ?? $service->base_duration_minutes) : ($service->base_duration_minutes ?? 30);
         $duration = $baseDuration + $bufferBefore + $bufferAfter;
         $endAt = $startAt->copy()->addMinutes($duration);
 

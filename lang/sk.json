@@ -1,4 +1,6 @@
 {
+    "at": "o",
+    "No free slots available for this day.": "Žiadne voľné termíny pre tento deň.",
     "Search business": "Vyhľadať prevádzku",
     "For businesses": "Pre prevádzky",
     "Login": "Prihlásiť sa",
@@ -476,6 +478,11 @@
     "days_5_more": "dní",
     "Reservation at": "Rezervácia v ",
     "reservation.ics": "rezervacia.ics",
+    "Variants": "Varianty",
+    "Add variant": "Pridať variant",
+    "Variant name": "Názov variantu",
+    "Are you sure you want to delete this variant?": "Naozaj chcete odstrániť tento variant?",
+    "Add": "Pridať",
     "None (use service base)": "Žiadny (použiť základ služby)",
     "Continue booking?": "Pokračovať v rezervácii?",
     "Due to inactivity, your pending reservation will be cancelled soon.": "Z dôvodu neaktivity bude vaša rozpracovaná rezervácia čoskoro zrušená.",

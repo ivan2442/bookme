@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-12 pb-20 overflow-x-hidden">
+<div class="space-y-12 pb-20 overflow-x-hidden" id="profile-data" data-profile-id="{{ $profile->id }}">
     <!-- Hero Banner & Logo -->
     <div class="relative h-72 md:h-96 w-full rounded-[40px] overflow-hidden shadow-2xl mt-8">
         @if($profile->banner_url)
@@ -66,36 +66,45 @@
                     <span class="w-8 h-1 bg-emerald-500 rounded-full"></span>
                     {{ __('Our services') }}
                 </h2>
-                <div class="grid sm:grid-cols-1 gap-4">
+                <div class="grid sm:grid-cols-1 gap-6">
                     @foreach($profile->services as $service)
-                        <div class="group p-6 rounded-[32px] bg-white border border-slate-50 hover:border-emerald-100 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-200/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="flex-1">
-                                <p class="font-bold text-xl text-slate-900 group-hover:text-emerald-600 transition-colors">{{ $service->name }}</p>
-                                <div class="flex items-center gap-3 mt-1">
-                                    <span class="text-sm font-medium text-slate-400 flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        {{ $service->base_duration_minutes }} min
-                                    </span>
-                                    <span class="h-1 w-1 rounded-full bg-slate-200"></span>
-                                    <span class="text-sm font-bold text-emerald-600">od €{{ number_format($service->base_price, 2) }}</span>
-                                </div>
-
-                                @if($service->employees->count() > 0)
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach($service->employees as $employee)
-                                            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
-                                                <div class="h-1.5 w-1.5 rounded-full bg-slate-400"></div>
-                                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tight">Zamestnanec: {{ $employee->name }}</span>
-                                            </div>
-                                        @endforeach
+                        <div class="group p-6 rounded-[32px] bg-white border border-slate-50 hover:border-emerald-100 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-200/20 flex flex-col gap-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <p class="font-bold text-2xl text-slate-900 group-hover:text-emerald-600 transition-colors">{{ $service->name }}</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-base font-medium text-slate-400 flex items-center gap-1.5">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            {{ $service->base_duration_minutes }} min
+                                        </span>
+                                        <span class="h-1.5 w-1.5 rounded-full bg-slate-200"></span>
+                                        <span class="text-base font-bold text-emerald-600">@if($service->variants->count() > 0) od @endif €{{ number_format($service->base_price, 2) }}</span>
                                     </div>
-                                @endif
+
+                                    @if($service->employees->count() > 0)
+                                        <div class="mt-4 flex flex-wrap gap-2">
+                                            @foreach($service->employees as $employee)
+                                                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
+                                                    <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
+                                                    <span class="text-[12px] font-bold text-slate-600 uppercase tracking-tight">{{ __('Employee') }}: {{ $employee->name }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}', {{ $service->is_pakavoz_enabled ? 'true' : 'false' }})" class="p-4 rounded-[20px] bg-slate-50 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-emerald-200 group-hover:-translate-y-0.5">
+
+                            <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}', {{ $service->is_pakavoz_enabled ? 'true' : 'false' }})"
+                                    class="w-full py-4 rounded-[20px] bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200/50 flex flex-col items-center justify-center gap-1 group/btn"
+                                    data-next-slot-button="{{ $service->id }}">
+                                <div class="flex items-center gap-2">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                </button>
-                            </div>
+                                    <span class="text-lg uppercase tracking-wide">{{ __('Select') }}</span>
+                                </div>
+                                <div class="text-[11px] text-emerald-100 font-medium opacity-0 transition-opacity" data-next-slot-text>
+                                    {{ __('Loading...') }}
+                                </div>
+                            </button>
                         </div>
                     @endforeach
                 </div>
@@ -191,6 +200,15 @@
                 <input type="hidden" name="date" id="modal_date" value="{{ date('Y-m-d') }}">
                 <input type="hidden" name="employee_id" id="modal_employee_id">
 
+                <div class="grid grid-cols-1 gap-4 hidden" id="modal_variant_wrapper">
+                    <div class="space-y-1">
+                        <label class="label !ml-1">{{ __('Variant') }}</label>
+                        <select name="service_variant_id" id="modal_variant_select" class="input-control">
+                            <option value="">{{ __('Choose variant') }}</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="label !ml-1">{{ __('Your name') }}</label>
@@ -276,12 +294,14 @@
         selectedDate: '{{ date('Y-m-d') }}',
         shopId: null,
         serviceId: null,
+        serviceVariantId: null,
         lockToken: null
     };
 
     async function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false) {
         modalState.shopId = shopId;
         modalState.serviceId = serviceId;
+        modalState.serviceVariantId = null;
 
         const now = new Date();
         const todayIso = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
@@ -304,11 +324,38 @@
             evcInput.removeAttribute('required');
         }
 
+        // Načítame varianty pre danú službu
+        const variantWrapper = document.getElementById('modal_variant_wrapper');
+        const variantSelect = document.getElementById('modal_variant_select');
+        variantSelect.innerHTML = `<option value="">{{ __('None (use service base)') }}</option>`;
+
+        // Služby máme v Blade, tak ich skúsime nájsť
+        const services = @json($profile->services->load('variants'));
+        const service = services.find(s => s.id === serviceId);
+
+        if (service && service.variants && service.variants.length > 0) {
+            service.variants.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.textContent = `${v.name} — ${v.duration_minutes} min (€${Number(v.price ?? 0).toFixed(2)})`;
+                variantSelect.appendChild(opt);
+            });
+            variantWrapper.classList.remove('hidden');
+        } else {
+            variantWrapper.classList.add('hidden');
+        }
+
+        variantSelect.onchange = () => {
+            modalState.serviceVariantId = variantSelect.value;
+            fetchModalAvailability();
+        };
+
         // Predbežne načítame dostupnosť na 30 dní, aby sme našli prvý voľný deň
         try {
             const response = await axios.post('/api/availability', {
                 profile_id: shopId,
                 service_id: serviceId,
+                service_variant_id: modalState.serviceVariantId,
                 date: todayIso,
                 days: 35
             });
@@ -350,6 +397,10 @@
         fetchModalAvailability();
     }
 
+    if (window.loadServicesNextSlots) {
+        window.loadServicesNextSlots();
+    }
+
     function closeBookingModal() {
         document.getElementById('bookingModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
@@ -365,6 +416,7 @@
             const response = await axios.post('/api/availability', {
                 profile_id: modalState.shopId,
                 service_id: modalState.serviceId,
+                service_variant_id: modalState.serviceVariantId,
                 date: startIso,
                 days: 7
             });
@@ -437,6 +489,7 @@
             const response = await axios.post('/api/availability', {
                 profile_id: modalState.shopId,
                 service_id: modalState.serviceId,
+                service_variant_id: modalState.serviceVariantId,
                 date: modalState.selectedDate,
                 days: 1
             });
@@ -488,6 +541,7 @@
                         axios.post('/api/locks', {
                             profile_id: modalState.shopId,
                             service_id: modalState.serviceId,
+                            service_variant_id: modalState.serviceVariantId,
                             start_at: slot.start_at,
                             date: modalState.selectedDate
                         }).then(response => {

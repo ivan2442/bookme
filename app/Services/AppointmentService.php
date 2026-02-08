@@ -40,8 +40,8 @@ class AppointmentService
         $variantBufferAfter = $variant?->buffer_after_minutes ?? 0;
         $bufferBefore = ($settings?->buffer_before_minutes ?? 0) + $variantBufferBefore;
         $bufferAfter = ($settings?->buffer_after_minutes ?? 0) + $variantBufferAfter;
-        // Variant slúži ako doplnok k základnej službe, takže čas = základ + variant
-        $baseDuration = ($service->base_duration_minutes ?? 30) + ($variant?->duration_minutes ?? 0);
+        // Variant má vlastný čas (ak nie je definovaný, použije sa základný)
+        $baseDuration = $variant ? ($variant->duration_minutes ?? $service->base_duration_minutes) : ($service->base_duration_minutes ?? 30);
         $duration = $baseDuration + $bufferBefore + $bufferAfter;
         $endAt = $startAt->copy()->addMinutes($duration);
 
@@ -149,7 +149,8 @@ class AppointmentService
                 'start_at' => $startAt,
                 'end_at' => $endAt,
                 'status' => $requiresConfirmation ? 'pending' : 'confirmed',
-                'price' => ($service->base_price ?? 0) + ($variant?->price ?? 0),
+                // Variant má vlastnú cenu (ak nie je definovaná, použije sa základná)
+                'price' => $variant ? ($variant->price ?? $service->base_price) : ($service->base_price ?? 0),
                 'currency' => $service->currency ?? $variant?->currency,
                 'confirmation_code' => (string) Str::uuid(),
                 'metadata' => [

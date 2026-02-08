@@ -106,6 +106,42 @@
                                 @endif
                                 <button class="w-full px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">{{ __('Save changes') }}</button>
                             </form>
+
+                            <div class="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Variants') }}</h4>
+                                <div class="space-y-2">
+                                    @foreach($service->variants as $variant)
+                                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 text-xs">
+                                            <div>
+                                                <span class="font-bold text-slate-700">{{ $variant->name }}</span>
+                                                <span class="text-slate-500 ml-2">{{ $variant->duration_minutes }} min • €{{ number_format($variant->price, 2) }}</span>
+                                            </div>
+                                            <form action="{{ route('owner.services.variants.delete', [$service, $variant]) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirmDelete(event, '{{ __('Are you sure you want to delete this variant?') }}')" class="text-red-500 hover:text-red-700">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <details class="text-[10px]">
+                                    <summary class="cursor-pointer text-emerald-600 hover:text-emerald-700 font-bold uppercase tracking-tight">{{ __('Add variant') }}</summary>
+                                    <form method="POST" action="{{ route('owner.services.variants.store', $service) }}" class="space-y-2 mt-2">
+                                        @csrf
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="text" name="name" class="input-control !py-1 !text-xs" placeholder="{{ __('Variant name') }}" required>
+                                            <input type="number" name="duration_minutes" class="input-control !py-1 !text-xs" placeholder="{{ __('Duration (min)') }}" required>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="number" name="price" step="0.01" class="input-control !py-1 !text-xs" placeholder="{{ __('Price (€)') }}" required>
+                                            <button class="px-3 py-1 rounded-lg bg-emerald-500 text-white font-bold">{{ __('Add') }}</button>
+                                        </div>
+                                    </form>
+                                </details>
+                            </div>
                         </details>
                     </div>
                 @empty
