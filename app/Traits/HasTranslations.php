@@ -16,9 +16,11 @@ trait HasTranslations
                 // Špeciálny prípad pre ukrajinčinu (ua), kde chceme použiť ruštinu (ru) podľa požiadavky
                 $targetLocale = ($locale === 'ua') ? 'ru' : $locale;
 
-                return $value[$targetLocale] ??
+                $translated = $value[$targetLocale] ??
                        $value[config('app.fallback_locale')] ??
-                       ($value['sk'] ?? (is_array($value) && count($value) > 0 ? reset($value) : $value));
+                       ($value['sk'] ?? (is_array($value) && count($value) > 0 ? reset($value) : ''));
+
+                return is_array($translated) ? '' : (string)($translated ?? '');
             }
         }
 
@@ -41,6 +43,7 @@ trait HasTranslations
 
     public function getTranslations($key)
     {
-        return parent::getAttribute($key) ?: [];
+        $value = parent::getAttribute($key);
+        return is_array($value) ? $value : [];
     }
 }
