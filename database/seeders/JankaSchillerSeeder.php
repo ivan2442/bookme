@@ -120,17 +120,21 @@ class JankaSchillerSeeder extends Seeder
 
         // Restricted Service (demonstration of new feature)
         // This service is ONLY available between 13:00 and 15:00
-        // and uses a 10 minute slot interval instead of the default 30.
-        $s4 = Service::updateOrCreate(
-            ['profile_id' => $profile->id, 'name->sk' => 'Špeciálna poobedná služba'],
-            [
-                'base_duration_minutes' => 30,
-                'base_price' => 50,
-                'is_active' => true,
-                'is_special' => true,
-                'slot_interval_minutes' => null,
-            ]
-        );
+        Service::where('profile_id', $profile->id)
+            ->where(function($q) {
+                $q->where('name', 'like', '%Špeciálna poobedná služba%')
+                  ->orWhere('name->sk', 'like', '%Špeciálna poobedná služba%');
+            })->delete();
+
+        $s4 = Service::create([
+            'profile_id' => $profile->id,
+            'name' => ['sk' => 'Špeciálna poobedná služba'],
+            'base_duration_minutes' => 30,
+            'base_price' => 50,
+            'is_active' => true,
+            'is_special' => true,
+            'slot_interval_minutes' => null,
+        ]);
         $s4->employees()->sync([$employee->id]);
 
         $s4->availabilityRules()->delete();

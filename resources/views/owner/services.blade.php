@@ -71,7 +71,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="grid grid-cols-2 gap-2">
+                                <div class="grid grid-cols-3 gap-2">
                                     <div>
                                         <label class="text-[10px] uppercase font-bold text-slate-500">{{ __('Duration (min)') }}</label>
                                         <input type="number" name="base_duration_minutes" class="input-control !py-1.5 !text-sm" value="{{ $service->base_duration_minutes }}" required>
@@ -79,6 +79,10 @@
                                     <div>
                                         <label class="text-[10px] uppercase font-bold text-slate-500">{{ __('Price (€)') }}</label>
                                         <input type="number" name="base_price" class="input-control !py-1.5 !text-sm" value="{{ $service->base_price }}" step="0.01" required>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-slate-500">{{ __('Slot interval (min)') }}</label>
+                                        <input type="number" name="slot_interval_minutes" class="input-control !py-1.5 !text-sm" value="{{ $service->slot_interval_minutes }}" placeholder="{{ __('Auto') }}">
                                     </div>
                                 </div>
                                 <div>
@@ -111,29 +115,67 @@
                                         <span class="text-xs font-bold uppercase text-slate-500">{{ __('Special service (exclusive time)') }}</span>
                                     </label>
 
-                                    <div class="space-y-2">
-                                        <label class="text-[10px] uppercase font-bold text-slate-400">{{ __('Availability rules') }}</label>
-                                        @foreach($service->availabilityRules->whereNull('service_variant_id') as $index => $rule)
-                                            <div class="grid grid-cols-3 gap-2">
-                                                <select name="availability_rules[{{ $index }}][day_of_week]" class="input-control !py-1 !text-[10px]">
-                                                    <option value="">{{ __('Every day') }}</option>
-                                                    @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
-                                                        <option value="{{ $i }}" @selected($rule->day_of_week !== null && (int)$rule->day_of_week === $i)>{{ __($day) }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <input type="time" name="availability_rules[{{ $index }}][start_time]" value="{{ substr($rule->start_time, 0, 5) }}" class="input-control !py-1 !text-[10px]">
-                                                <input type="time" name="availability_rules[{{ $index }}][end_time]" value="{{ substr($rule->end_time, 0, 5) }}" class="input-control !py-1 !text-[10px]">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <label class="text-[10px] uppercase font-bold text-slate-400">{{ __('Availability rules') }}</label>
+                                            <p class="text-[9px] text-slate-400 italic">{{ __('If special, service is ONLY available in these windows.') }}</p>
+                                        </div>
+
+                                        @php $rules = $service->availabilityRules->whereNull('service_variant_id'); @endphp
+
+                                        <div class="space-y-3">
+                                            @foreach($rules as $index => $rule)
+                                                <div class="p-3 rounded-xl bg-slate-50/50 border border-slate-100 space-y-3">
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <div class="space-y-1">
+                                                            <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('Day') }}</label>
+                                                            <select name="availability_rules[{{ $index }}][day_of_week]" class="input-control !py-1 !text-xs">
+                                                                <option value="">{{ __('Every day') }}</option>
+                                                                @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
+                                                                    <option value="{{ $i }}" @selected($rule->day_of_week !== null && (int)$rule->day_of_week === $i)>{{ __($day) }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="grid grid-cols-2 gap-2">
+                                                            <div class="space-y-1">
+                                                                <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('From') }}</label>
+                                                                <input type="time" name="availability_rules[{{ $index }}][start_time]" value="{{ substr($rule->start_time, 0, 5) }}" class="input-control !py-1 !text-xs">
+                                                            </div>
+                                                            <div class="space-y-1">
+                                                                <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('To') }}</label>
+                                                                <input type="time" name="availability_rules[{{ $index }}][end_time]" value="{{ substr($rule->end_time, 0, 5) }}" class="input-control !py-1 !text-xs">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+
+                                            <div class="p-3 rounded-xl bg-emerald-50/30 border border-emerald-100/50 space-y-3">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-[9px] font-bold uppercase text-emerald-600">{{ __('Add new window') }}</span>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    <div class="space-y-1">
+                                                        <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('Day') }}</label>
+                                                        <select name="availability_rules[new][day_of_week]" class="input-control !py-1 !text-xs">
+                                                            <option value="">{{ __('Every day') }}</option>
+                                                            @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
+                                                                <option value="{{ $i }}">{{ __($day) }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div class="space-y-1">
+                                                            <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('From') }}</label>
+                                                            <input type="time" name="availability_rules[new][start_time]" class="input-control !py-1 !text-xs">
+                                                        </div>
+                                                        <div class="space-y-1">
+                                                            <label class="text-[9px] uppercase font-bold text-slate-400">{{ __('To') }}</label>
+                                                            <input type="time" name="availability_rules[new][end_time]" class="input-control !py-1 !text-xs">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        @endforeach
-                                        <div class="grid grid-cols-3 gap-2">
-                                            <select name="availability_rules[new][day_of_week]" class="input-control !py-1 !text-[10px]">
-                                                <option value="">{{ __('Every day') }}</option>
-                                                @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
-                                                    <option value="{{ $i }}">{{ __($day) }}</option>
-                                                @endforeach
-                                            </select>
-                                            <input type="time" name="availability_rules[new][start_time]" class="input-control !py-1 !text-[10px]">
-                                            <input type="time" name="availability_rules[new][end_time]" class="input-control !py-1 !text-[10px]">
                                         </div>
                                     </div>
                                 </div>
@@ -188,32 +230,40 @@
                                                 </div>
 
                                                 <div class="mt-2 pt-2 border-t border-slate-200">
-                                                    <label class="flex items-center gap-2 mb-1 cursor-pointer">
-                                                        <input type="checkbox" name="is_special" value="1" @checked($variant->is_special)>
-                                                        <span class="text-[9px] font-bold uppercase text-slate-400">{{ __('Special variant (exclusive time)') }}</span>
-                                                    </label>
-                                                    <div class="space-y-1">
+                                                    <div class="flex items-center justify-between mb-1">
+                                                        <label class="flex items-center gap-2 cursor-pointer">
+                                                            <input type="checkbox" name="is_special" value="1" @checked($variant->is_special)>
+                                                            <span class="text-[9px] font-bold uppercase text-slate-400">{{ __('Special variant (exclusive time)') }}</span>
+                                                        </label>
+                                                        <p class="text-[8px] text-slate-400 italic">{{ __('Variant ONLY available in these windows.') }}</p>
+                                                    </div>
+
+                                                    <div class="space-y-2">
                                                         @foreach($variant->availabilityRules as $index => $rule)
-                                                            <div class="grid grid-cols-3 gap-1">
+                                                            <div class="grid grid-cols-2 gap-2 p-1.5 rounded-lg bg-white border border-slate-100">
                                                                 <select name="availability_rules[{{ $index }}][day_of_week]" class="input-control !py-0.5 !text-[9px]">
                                                                     <option value="">{{ __('Every day') }}</option>
-                                                                    @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $i => $day)
+                                                                    @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
                                                                         <option value="{{ $i }}" @selected($rule->day_of_week !== null && (int)$rule->day_of_week === $i)>{{ __($day) }}</option>
                                                                     @endforeach
                                                                 </select>
-                                                                <input type="time" name="availability_rules[{{ $index }}][start_time]" value="{{ substr($rule->start_time, 0, 5) }}" class="input-control !py-0.5 !text-[9px]">
-                                                                <input type="time" name="availability_rules[{{ $index }}][end_time]" value="{{ substr($rule->end_time, 0, 5) }}" class="input-control !py-0.5 !text-[9px]">
+                                                                <div class="grid grid-cols-2 gap-1">
+                                                                    <input type="time" name="availability_rules[{{ $index }}][start_time]" value="{{ substr($rule->start_time, 0, 5) }}" class="input-control !py-0.5 !text-[9px]">
+                                                                    <input type="time" name="availability_rules[{{ $index }}][end_time]" value="{{ substr($rule->end_time, 0, 5) }}" class="input-control !py-0.5 !text-[9px]">
+                                                                </div>
                                                             </div>
                                                         @endforeach
-                                                        <div class="grid grid-cols-3 gap-1">
+                                                        <div class="grid grid-cols-2 gap-2 p-1.5 rounded-lg bg-emerald-50/50 border border-emerald-100/30">
                                                             <select name="availability_rules[new][day_of_week]" class="input-control !py-0.5 !text-[9px]">
                                                                 <option value="">{{ __('Every day') }}</option>
-                                                                @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $i => $day)
+                                                                @foreach(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $i => $day)
                                                                     <option value="{{ $i }}">{{ __($day) }}</option>
                                                                 @endforeach
                                                             </select>
-                                                            <input type="time" name="availability_rules[new][start_time]" class="input-control !py-0.5 !text-[9px]">
-                                                            <input type="time" name="availability_rules[new][end_time]" class="input-control !py-0.5 !text-[9px]">
+                                                            <div class="grid grid-cols-2 gap-1">
+                                                                <input type="time" name="availability_rules[new][start_time]" class="input-control !py-0.5 !text-[9px]">
+                                                                <input type="time" name="availability_rules[new][end_time]" class="input-control !py-0.5 !text-[9px]">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -315,7 +365,7 @@
                     </div>
                 </div>
 
-                <div class="grid sm:grid-cols-2 gap-4">
+                <div class="grid sm:grid-cols-3 gap-4">
                     <div>
                         <label class="label">{{ __('Base duration (min)') }}</label>
                         <input type="number" name="base_duration_minutes" class="input-control" value="30" min="5" required>
@@ -323,6 +373,10 @@
                     <div>
                         <label class="label">{{ __('Base price (€)') }}</label>
                         <input type="number" name="base_price" class="input-control" value="0" step="0.01" min="0" required>
+                    </div>
+                    <div>
+                        <label class="label">{{ __('Slot interval (min)') }}</label>
+                        <input type="number" name="slot_interval_minutes" class="input-control" placeholder="{{ __('Auto') }}" min="5">
                     </div>
                 </div>
 
