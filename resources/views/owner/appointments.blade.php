@@ -9,12 +9,20 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <form action="{{ route('owner.appointments') }}" method="GET" class="relative group">
-                <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Search appointments...') }}"
-                       class="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none group-hover:border-slate-300">
-                <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <form action="{{ route('owner.appointments') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 group">
+                <div class="relative">
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Search appointments...') }}"
+                           class="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none group-hover:border-slate-300">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
                 </div>
+
+                <select name="per_page" onchange="this.form.submit()" class="bg-white border border-slate-200 rounded-xl text-sm py-2 px-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                    <option value="30" {{ ($perPage ?? 30) == 30 ? 'selected' : '' }}>30 {{ __('per page') }}</option>
+                    <option value="50" {{ ($perPage ?? 30) == 50 ? 'selected' : '' }}>50 {{ __('per page') }}</option>
+                    <option value="100" {{ ($perPage ?? 30) == 100 ? 'selected' : '' }}>100 {{ __('per page') }}</option>
+                </select>
             </form>
         </div>
     </div>

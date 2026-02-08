@@ -501,6 +501,7 @@ class OwnerDashboardController extends Controller
     {
         $profileIds = $this->getOwnerProfileIds($request);
         $search = $request->input('search');
+        $perPage = $request->input('per_page', 30);
 
         $appointments = Appointment::with(['service', 'profile', 'employee'])
             ->whereIn('profile_id', $profileIds);
@@ -517,10 +518,10 @@ class OwnerDashboardController extends Controller
         }
 
         $appointments = $appointments->orderBy('start_at', 'desc')
-            ->paginate(30)
+            ->paginate($perPage)
             ->withQueryString();
 
-        return view('owner.appointments', compact('appointments', 'search'));
+        return view('owner.appointments', compact('appointments', 'search', 'perPage'));
     }
 
     public function bulkUpdateAppointments(Request $request): RedirectResponse
