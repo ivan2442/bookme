@@ -24,6 +24,9 @@ class Service extends Model
         'is_active',
         'is_pakavoz_enabled',
         'pakavoz_api_key',
+        'available_from',
+        'available_to',
+        'slot_interval_minutes',
     ];
 
     protected $translatable = [

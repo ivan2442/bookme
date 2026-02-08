@@ -26,7 +26,17 @@ class AvailabilityService
         $endRange = $start->copy()->addDays($days)->endOfDay();
 
         $settings = $profile->calendarSetting;
+        $targetService = $serviceId ? $profile->services()->find($serviceId) : null;
+        $restrictedServices = $profile->services()
+            ->whereNotNull('available_from')
+            ->whereNotNull('available_to')
+            ->where('is_active', true)
+            ->get();
+
         $slotInterval = max($settings?->slot_interval_minutes ?? 15, 5);
+        if ($targetService && $targetService->slot_interval_minutes) {
+            $slotInterval = $targetService->slot_interval_minutes;
+        }
         $minNotice = $settings?->min_notice_minutes ?? 60;
         $maxAdvance = $settings?->max_advance_days ?? 90;
         $bufferBefore = ($settings?->buffer_before_minutes ?? 0) + $bufferBefore;
@@ -115,6 +125,37 @@ class AvailabilityService
 
             // Flatten all windows for this day to iterate over them
             $mergedWindows = $this->mergeWindows(collect($dailyWindows)->flatten(1)->toArray());
+
+            // If target service has restricted time, we restrict mergedWindows to that window
+            if ($targetService && $targetService->available_from && $targetService->available_to) {
+                $serviceStart = $date->copy()->setTimeFromTimeString($targetService->available_from);
+                $serviceEnd = $date->copy()->setTimeFromTimeString($targetService->available_to);
+
+                $restrictedMergedWindows = [];
+                foreach ($mergedWindows as [$wStart, $wEnd]) {
+                    $overlapStart = $wStart->gt($serviceStart) ? $wStart : $serviceStart;
+                    $overlapEnd = $wEnd->lt($serviceEnd) ? $wEnd : $serviceEnd;
+
+                    if ($overlapStart->lt($overlapEnd)) {
+                        $restrictedMergedWindows[] = [$overlapStart, $overlapEnd];
+                    }
+                }
+                $mergedWindows = $restrictedMergedWindows;
+            }
+
+            // If ANY OTHER services have restricted time windows, we MUST subtract them from mergedWindows
+            // so they are not available for the current target service.
+            $otherRestrictedServices = $restrictedServices->filter(fn($rs) => !$targetService || $rs->id !== $targetService->id);
+            if ($otherRestrictedServices->isNotEmpty()) {
+                $blockedIntervals = [];
+                foreach ($otherRestrictedServices as $rs) {
+                    $blockedIntervals[] = [
+                        $date->copy()->setTimeFromTimeString($rs->available_from),
+                        $date->copy()->setTimeFromTimeString($rs->available_to)
+                    ];
+                }
+                $mergedWindows = $this->subtractIntervals($mergedWindows, $blockedIntervals);
+            }
 
             foreach ($mergedWindows as [$windowStart, $windowEnd]) {
                 for ($slotStart = $windowStart->copy(); $slotStart->lt($windowEnd); $slotStart->addMinutes($slotInterval)) {
