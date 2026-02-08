@@ -179,7 +179,7 @@
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-variant-wrapper>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden" data-variant-wrapper>
                 <div>
                     <label class="label">{{ __('Variant') }}</label>
                     <select name="service_variant_id" class="input-control" data-variant-select>

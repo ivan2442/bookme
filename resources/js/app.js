@@ -516,17 +516,10 @@ function populateVariants(serviceId, selectedVariantId = null) {
         assignEmployeeForVariant(variants[0].id);
         fetchAvailability(true);
     } else {
-        if (variantWrapper) {
-            variantWrapper.style.display = 'none';
-        }
         variantSelect.value = '';
         assignEmployeeForService(serviceId);
         fetchAvailability(true);
         return;
-    }
-
-    if (variantWrapper) {
-        variantWrapper.style.display = '';
     }
 }
 
