@@ -64,7 +64,10 @@
                 <thead>
                     <tr class="bg-slate-50 text-left text-slate-500 uppercase tracking-widest text-[10px] font-bold border-b border-slate-100">
                         <th class="w-12 px-6 py-4">
-                            <input type="checkbox" @click="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" @click="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                <span class="cursor-pointer select-none hidden sm:inline" @click="toggleAll">{{ __('Select all') }}</span>
+                            </div>
                         </th>
                         <th class="px-6 py-4">{{ __('Client & Service') }}</th>
                         <th class="px-6 py-4">{{ __('Employee') }}</th>
