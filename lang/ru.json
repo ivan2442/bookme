@@ -492,6 +492,7 @@
     "Copy link": "Копировать ссылку",
     "Link copied to clipboard": "Ссылка скопирована в буфер обмена",
     "Success": "Успех",
+    "Error": "Ошибка",
     "Failed to load data.": "Ошибка при загрузке данных.",
     "Error during booking.": "Ошибка при бронировании.",
     "Appointment booking": "Бронирование записи",

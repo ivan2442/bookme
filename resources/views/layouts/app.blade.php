@@ -185,10 +185,14 @@
             <script>
                 window.onload = function() {
                     Swal.fire({
-                        title: 'Úspech!',
+                        title: window.translations['Success'] || 'Úspech!',
                         text: "{{ session('status') }}",
                         icon: 'success',
-                        confirmButtonColor: '#10b981'
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true
                     });
                 }
             </script>
@@ -197,10 +201,14 @@
             <script>
                 window.onload = function() {
                     Swal.fire({
-                        title: 'Chyba!',
+                        title: window.translations['Error'] || 'Chyba!',
                         text: "{{ session('error') }}",
                         icon: 'error',
-                        confirmButtonColor: '#ef4444'
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 6000,
+                        timerProgressBar: true
                     });
                 }
             </script>

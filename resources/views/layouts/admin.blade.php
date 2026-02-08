@@ -24,7 +24,9 @@
             "Thursday": "{{ __('Thursday') }}",
             "Friday": "{{ __('Friday') }}",
             "Saturday": "{{ __('Saturday') }}",
-            "Sunday": "{{ __('Sunday') }}"
+            "Sunday": "{{ __('Sunday') }}",
+            "Success": "{{ __('Success') }}",
+            "Error": "{{ __('Error') }}"
         };
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -123,17 +125,6 @@
 
             <!-- Content Area -->
             <main class="flex-1 p-4 sm:p-8">
-                @if(session('status'))
-                    <div class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm font-medium shadow-sm animate-fade-in">
-                        {{ session('status') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-800 text-sm font-medium shadow-sm animate-fade-in">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
                 @yield('content')
             </main>
         </div>
@@ -160,6 +151,32 @@
                 }
             });
         }
+
+        @if(session('status'))
+            Swal.fire({
+                title: window.translations['Success'] || 'Úspech',
+                text: "{{ session('status') }}",
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                title: window.translations['Error'] || 'Chyba',
+                text: "{{ session('error') }}",
+                icon: 'error',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 6000,
+                timerProgressBar: true
+            });
+        @endif
 
         function confirmDelete(event, message = 'Naozaj chcete odstrániť túto položku?') {
             event.preventDefault();

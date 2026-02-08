@@ -493,6 +493,7 @@
     "Copy link": "Kopírovať odkaz",
     "Link copied to clipboard": "Odkaz bol skopírovaný do schránky",
     "Success": "Úspech",
+    "Error": "Chyba",
     "Failed to load data.": "Chyba pri načítaní dát.",
     "Error during booking.": "Chyba pri rezervácii.",
     "Appointment booking": "Rezervácia termínu",
