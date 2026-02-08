@@ -94,17 +94,42 @@
                                 </div>
                             </div>
 
-                            <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}', {{ $service->is_pakavoz_enabled ? 'true' : 'false' }})"
-                                    class="w-full py-4 rounded-[20px] bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200/50 flex flex-col items-center justify-center gap-1 group/btn"
-                                    data-next-slot-button="{{ $service->id }}">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                    <span class="text-lg uppercase tracking-wide">{{ __('Select') }}</span>
+                            @if($service->variants->count() > 0)
+                                <div class="space-y-3 pt-2">
+                                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest ml-1">{{ __('Available variants') }}</p>
+                                    <div class="grid gap-3">
+                                        @foreach($service->variants as $variant)
+                                            <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-200 hover:bg-white transition-all group/variant">
+                                                <div>
+                                                    <p class="font-bold text-slate-900 group-hover/variant:text-emerald-600 transition-colors">{{ $variant->name }}</p>
+                                                    <div class="flex items-center gap-2 mt-1">
+                                                        <span class="text-xs text-slate-500">{{ $variant->duration_minutes }} min</span>
+                                                        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                                        <span class="text-xs font-bold text-emerald-600">€{{ number_format($variant->price, 2) }}</span>
+                                                    </div>
+                                                </div>
+                                                <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}', {{ $service->is_pakavoz_enabled ? 'true' : 'false' }}, {{ $variant->id }}, '{{ addslashes($variant->name) }}')"
+                                                        class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200/50 flex items-center justify-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                                    {{ __('Select term') }}
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
-                                <div class="text-[11px] text-emerald-100 font-medium opacity-0 transition-opacity" data-next-slot-text>
-                                    {{ __('Loading...') }}
-                                </div>
-                            </button>
+                            @else
+                                <button onclick="openBookingModal({{ $profile->id }}, {{ $service->id }}, '{{ addslashes($service->name) }}', {{ $service->is_pakavoz_enabled ? 'true' : 'false' }})"
+                                        class="w-full py-4 rounded-[20px] bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200/50 flex flex-col items-center justify-center gap-1 group/btn"
+                                        data-next-slot-button="{{ $service->id }}">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                        <span class="text-lg uppercase tracking-wide">{{ __('Select') }}</span>
+                                    </div>
+                                    <div class="text-[11px] text-emerald-100 font-medium opacity-0 transition-opacity" data-next-slot-text>
+                                        {{ __('Loading...') }}
+                                    </div>
+                                </button>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -194,18 +219,19 @@
 
             <form class="space-y-4" id="modal-booking-form">
                 @csrf
+                <input type="hidden" name="service_variant_id" id="modal_service_variant_id">
                 <input type="hidden" name="profile_id" id="modal_profile_id">
                 <input type="hidden" name="service_id" id="modal_service_id">
                 <input type="hidden" name="start_at" id="modal_start_at">
                 <input type="hidden" name="date" id="modal_date" value="{{ date('Y-m-d') }}">
                 <input type="hidden" name="employee_id" id="modal_employee_id">
 
-                <div class="grid grid-cols-1 gap-4 hidden" id="modal_variant_wrapper">
-                    <div class="space-y-1">
-                        <label class="label !ml-1">{{ __('Variant') }}</label>
-                        <select name="service_variant_id" id="modal_variant_select" class="input-control">
-                            <option value="">{{ __('Choose variant') }}</option>
-                        </select>
+                <div class="grid grid-cols-1 hidden" id="modal_variant_wrapper">
+                    <div class="space-y-3">
+                        <label class="label !ml-1">{{ __('Choose variant') }}</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="modal_variant_grid">
+                            <!-- Variants will be injected here -->
+                        </div>
                     </div>
                 </div>
 
@@ -298,19 +324,26 @@
         lockToken: null
     };
 
-    async function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false) {
+    async function openBookingModal(shopId, serviceId, serviceName, isPakavoz = false, variantId = null, variantName = null) {
         modalState.shopId = shopId;
         modalState.serviceId = serviceId;
-        modalState.serviceVariantId = null;
+        modalState.serviceVariantId = variantId;
 
         const now = new Date();
         const todayIso = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
         modalState.calendarStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         modalState.selectedDate = todayIso;
 
-        document.getElementById('modal_service_name').textContent = serviceName;
+        let displayName = serviceName;
+        if (variantName) {
+            displayName = `${serviceName} - ${variantName}`;
+        }
+
+        document.getElementById('modal_service_name').textContent = displayName;
         document.getElementById('modal_profile_id').value = shopId;
         document.getElementById('modal_service_id').value = serviceId;
+        document.getElementById('modal_service_variant_id').value = variantId || '';
+
         document.getElementById('bookingModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
 
@@ -326,29 +359,49 @@
 
         // Načítame varianty pre danú službu
         const variantWrapper = document.getElementById('modal_variant_wrapper');
-        const variantSelect = document.getElementById('modal_variant_select');
-        variantSelect.innerHTML = `<option value="">{{ __('None (use service base)') }}</option>`;
+        const variantGrid = document.getElementById('modal_variant_grid');
+        variantGrid.innerHTML = '';
 
-        // Služby máme v Blade, tak ich skúsime nájsť
-        const services = @json($profile->services->load('variants'));
-        const service = services.find(s => s.id === serviceId);
-
-        if (service && service.variants && service.variants.length > 0) {
-            service.variants.forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v.id;
-                opt.textContent = `${v.name} — ${v.duration_minutes} min (€${Number(v.price ?? 0).toFixed(2)})`;
-                variantSelect.appendChild(opt);
-            });
-            variantWrapper.classList.remove('hidden');
-        } else {
+        // Ak už máme vybratý variant zoznamu, skryjeme výber v modale
+        if (variantId) {
             variantWrapper.classList.add('hidden');
-        }
+        } else {
+            // Služby máme v Blade, tak ich skúsime nájsť
+            const services = @json($profile->services->load('variants'));
+            const service = services.find(s => s.id === serviceId);
 
-        variantSelect.onchange = () => {
-            modalState.serviceVariantId = variantSelect.value;
-            fetchModalAvailability();
-        };
+            if (service && service.variants && service.variants.length > 0) {
+                service.variants.forEach(v => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'variant-option w-full p-3 rounded-2xl border border-slate-100 transition-all flex items-center justify-between group text-left';
+                    btn.dataset.variantId = v.id;
+
+                    const priceHtml = v.price ? `<span class="text-[10px] font-bold uppercase text-emerald-500">€${Number(v.price).toFixed(2)}</span>` : '';
+
+                    btn.innerHTML = `
+                        <div class="flex flex-col">
+                            <span class="font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">${v.name}</span>
+                            <span class="text-[10px] text-slate-400 font-medium">${v.duration_minutes} min</span>
+                        </div>
+                        ${priceHtml}
+                    `;
+
+                    btn.onclick = () => {
+                        variantGrid.querySelectorAll('.variant-option').forEach(b => b.classList.remove('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20'));
+                        btn.classList.add('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20');
+                        modalState.serviceVariantId = v.id;
+                        document.getElementById('modal_service_variant_id').value = v.id;
+                        fetchModalAvailability();
+                    };
+
+                    variantGrid.appendChild(btn);
+                });
+                variantWrapper.classList.remove('hidden');
+            } else {
+                variantWrapper.classList.add('hidden');
+            }
+        }
 
         // Predbežne načítame dostupnosť na 30 dní, aby sme našli prvý voľný deň
         try {

@@ -150,7 +150,7 @@
             <p class="text-slate-500 text-sm italic">{{ __('Wide range of variants for everyone') }}</p>
         </div>
     </div>
-    <div class="grid md:grid-cols-3 gap-4 max-w-full" data-services-list>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-full" data-services-list>
         <p class="text-sm text-slate-500">{{ __('Loading services...') }}</p>
     </div>
 </section>

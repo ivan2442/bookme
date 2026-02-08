@@ -320,6 +320,8 @@ function renderServices(shopId = null) {
 
     servicesList.innerHTML = '';
     servicesToRender.forEach((service) => {
+        const variants = state.variantsByService[service.id] || [];
+        const hasVariants = variants.length > 0;
         const duration = service.base_duration_minutes ?? 30;
         const price = service.base_price ?? 0;
         const employeeNames =
@@ -327,47 +329,106 @@ function renderServices(shopId = null) {
             '';
 
         const card = document.createElement('div');
-        card.className = 'service-card';
+        card.className = 'service-card group !p-6 rounded-[32px] bg-white border border-slate-50 hover:border-emerald-100 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-200/20 flex flex-col gap-4';
         card.dataset.serviceCard = '1';
         card.dataset.shopId = service.profile_id;
         card.dataset.serviceId = service.id;
+
+        let variantsHtml = '';
+        if (hasVariants) {
+            variantsHtml = `
+                <div class="space-y-3 pt-4 border-t border-slate-50 mt-2">
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest ml-1">${translations["Available variants"] || 'Dostupné varianty'}</p>
+                    <div class="grid gap-3">
+                        ${variants.map(variant => `
+                            <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-200 hover:bg-white transition-all group/variant">
+                                <div class="flex-1">
+                                    <p class="font-bold text-slate-900 group-hover/variant:text-emerald-600 transition-colors text-sm">${variant.name}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[10px] text-slate-500">${variant.duration_minutes} min</span>
+                                        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                        <span class="text-[10px] font-bold text-emerald-600">€${Number(variant.price ?? 0).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <button class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 text-white text-[10px] font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200/50 flex items-center justify-center gap-2 flex-shrink-0" data-choose-variant="${variant.id}" data-service-id="${service.id}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                    ${translations["Select"] || 'Vybrať termín'}
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         card.innerHTML = `
             <div class="flex flex-col gap-1.5">
                 <span class="inline-flex w-fit px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest leading-tight">${service.category ?? ''}</span>
-                <p class="font-semibold text-lg text-slate-900 leading-snug">${service.name}</p>
+                <p class="font-bold text-xl text-slate-900 group-hover:text-emerald-600 transition-colors leading-snug">${service.name}</p>
             </div>
-            <div class="flex items-center justify-between mt-3 text-xs text-slate-500 gap-2">
-                <div class="flex items-center gap-1.5 flex-shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div class="flex items-center gap-3 text-xs text-slate-500">
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span>${duration} min</span>
                 </div>
-                <span class="font-bold text-emerald-600 text-sm flex-shrink-0">€${Number(price).toFixed(2)}</span>
+                <span class="h-1 w-1 rounded-full bg-slate-200"></span>
+                <span class="font-bold text-emerald-600 text-sm">${hasVariants ? (translations['from'] || 'od') + ' ' : ''}€${Number(price).toFixed(2)}</span>
             </div>
             ${
                 employeeNames
-                    ? `<div class="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100 w-full overflow-hidden">
-                         <div class="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0"></div>
+                    ? `<div class="mt-1 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100 w-fit overflow-hidden">
+                         <div class="h-1.5 w-1.5 rounded-full bg-emerald-400 flex-shrink-0"></div>
                          <p class="text-[10px] font-bold text-slate-600 uppercase tracking-tight truncate">${translations["Employee"] || 'Zamestnanec'}: ${employeeNames}</p>
                        </div>`
                     : ''
             }
-            <button class="mt-3 px-3 py-2 w-full rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" data-choose-service="${service.id}">
-                ${translations["Select"] || 'Vybrať termín'}
-            </button>
+            ${!hasVariants ? `
+                <button class="mt-2 px-4 py-4 w-full rounded-[20px] bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold transition shadow-lg shadow-emerald-200/50 flex items-center justify-center gap-2 group/btn" data-choose-service="${service.id}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                    <span class="uppercase tracking-wide">${translations["Select"] || 'Vybrať termín'}</span>
+                </button>
+            ` : ''}
+            ${variantsHtml}
         `;
         servicesList.appendChild(card);
     });
 
+    // Event Listeners for Service buttons
     servicesList.querySelectorAll('[data-choose-service]').forEach((button) => {
         button.addEventListener('click', () => {
             const serviceId = button.dataset.chooseService;
             const service = state.services.find((s) => String(s.id) === String(serviceId));
             if (serviceSelect && serviceId) {
-                serviceSelect.value = serviceId;
                 if (shopSelect) {
                     shopSelect.value = service.profile_id;
+                    populateServicesForShop(service.profile_id);
                 }
+                serviceSelect.value = serviceId;
                 populateVariants(serviceId);
+            }
+
+            const bookingSection = document.getElementById('booking');
+            if (bookingSection) {
+                bookingSection.classList.remove('hidden');
+                bookingSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Event Listeners for Variant buttons
+    servicesList.querySelectorAll('[data-choose-variant]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const variantId = button.dataset.chooseVariant;
+            const serviceId = button.dataset.serviceId;
+            const service = state.services.find((s) => String(s.id) === String(serviceId));
+
+            if (serviceSelect && serviceId) {
+                if (shopSelect) {
+                    shopSelect.value = service.profile_id;
+                    populateServicesForShop(service.profile_id);
+                }
+                serviceSelect.value = serviceId;
+                populateVariants(serviceId, variantId);
             }
 
             const bookingSection = document.getElementById('booking');
@@ -430,7 +491,7 @@ function updatePakavozFieldsVisibility(serviceId) {
     }
 }
 
-function populateVariants(serviceId) {
+function populateVariants(serviceId, selectedVariantId = null) {
     if (!variantSelect) return;
 
     // Update Pakavoz fields visibility
@@ -446,7 +507,11 @@ function populateVariants(serviceId) {
         variantSelect.appendChild(opt);
     });
 
-    if (variants[0]) {
+    if (selectedVariantId) {
+        variantSelect.value = selectedVariantId;
+        assignEmployeeForVariant(selectedVariantId);
+        fetchAvailability(true);
+    } else if (variants[0]) {
         variantSelect.value = variants[0].id;
         assignEmployeeForVariant(variants[0].id);
         fetchAvailability(true);
