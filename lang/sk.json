@@ -531,5 +531,11 @@
     "Yes, delete it!": "Áno, odstrániť!",
     "Are you sure you want to delete this appointment?": "Skutočne chcete odstrániť túto rezerváciu?",
     "Are you sure you want to delete this item?": "Naozaj chcete odstrániť túto položku?",
-    "Cancel": "Zrušiť"
+    "Cancel": "Zrušiť",
+    "Selected": "Vybrané",
+    "Select all": "Označiť všetky",
+    "Yes, do it!": "Áno, vykonať!",
+    "Yes, delete them!": "Áno, odstrániť vybrané!",
+    "Are you sure you want to perform this action on selected appointments?": "Skutočne chcete vykonať túto akciu na vybraných rezerváciách?",
+    "Are you sure you want to delete selected appointments?": "Skutočne chcete odstrániť vybrané rezervácie?"
 }

@@ -525,5 +525,11 @@
     "Yes, delete it!": "Да, удалить!",
     "Are you sure you want to delete this appointment?": "Вы действительно хотите удалить эту запись?",
     "Are you sure you want to delete this item?": "Вы действительно хотите удалить этот элемент?",
-    "Cancel": "Отмена"
+    "Cancel": "Отмена",
+    "Selected": "Выбрано",
+    "Select all": "Выбрать все",
+    "Yes, do it!": "Да, выполнить!",
+    "Yes, delete them!": "Да, удалить выбранные!",
+    "Are you sure you want to perform this action on selected appointments?": "Вы действительно хотите выполнить это действие над выбранными записями?",
+    "Are you sure you want to delete selected appointments?": "Вы действительно хотите удалить выбранные записи?"
 }

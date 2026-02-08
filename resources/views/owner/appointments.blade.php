@@ -71,7 +71,7 @@
                         <th class="w-12 px-6 py-4">
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" @click="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
-                                <span class="cursor-pointer select-none hidden sm:inline text-indigo-100 hover:text-white transition-colors" @click="toggleAll">{{ __('Select all') }}</span>
+                                <span class="cursor-pointer select-none hidden sm:inline text-slate-500 hover:text-indigo-600 transition-colors font-semibold" @click="toggleAll">{{ __('Select all') }}</span>
                             </div>
                         </th>
                         <th class="px-6 py-4">{{ __('Client & Service') }}</th>
@@ -130,7 +130,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-500 italic">{{ __('No appointments yet.') }}</td>
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-500 italic">{{ __('No appointments yet.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>
