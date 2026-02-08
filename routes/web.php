@@ -88,6 +88,7 @@ Route::prefix('owner')->name('owner.')->middleware('owner')->group(function () {
 
     // Rezervácie
     Route::get('/appointments', [OwnerDashboardController::class, 'appointments'])->name('appointments');
+    Route::post('/appointments/bulk', [OwnerDashboardController::class, 'bulkUpdateAppointments'])->name('appointments.bulk');
     Route::get('/appointments/day', [OwnerDashboardController::class, 'getAppointmentsForDay'])->name('appointments.day');
     Route::get('/appointments/day-full', [OwnerDashboardController::class, 'getAppointmentsForDayFull'])->name('appointments.day-full');
     Route::get('/appointments/free-slots', [OwnerDashboardController::class, 'getFreeSlots'])->name('appointments.free-slots');

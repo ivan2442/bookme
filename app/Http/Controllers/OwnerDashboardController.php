@@ -500,12 +500,68 @@ class OwnerDashboardController extends Controller
     public function appointments(Request $request): View
     {
         $profileIds = $this->getOwnerProfileIds($request);
-        $appointments = Appointment::with(['service', 'profile', 'employee'])
-            ->whereIn('profile_id', $profileIds)
-            ->orderBy('start_at', 'desc')
-            ->paginate(30);
+        $search = $request->input('search');
 
-        return view('owner.appointments', compact('appointments'));
+        $appointments = Appointment::with(['service', 'profile', 'employee'])
+            ->whereIn('profile_id', $profileIds);
+
+        if ($search) {
+            $appointments->where(function ($query) use ($search) {
+                $query->where('customer_name', 'like', '%' . $search . '%')
+                    ->orWhere('customer_email', 'like', '%' . $search . '%')
+                    ->orWhere('customer_phone', 'like', '%' . $search . '%')
+                    ->orWhereHas('service', function ($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $appointments = $appointments->orderBy('start_at', 'desc')
+            ->paginate(30)
+            ->withQueryString();
+
+        return view('owner.appointments', compact('appointments', 'search'));
+    }
+
+    public function bulkUpdateAppointments(Request $request): RedirectResponse
+    {
+        $profileIds = $this->getOwnerProfileIds($request);
+        $data = $request->validate([
+            'appointment_ids' => ['required', 'array'],
+            'appointment_ids.*' => ['exists:appointments,id'],
+            'action' => ['required', 'string', 'in:confirm,cancel,complete,delete'],
+        ]);
+
+        $appointments = Appointment::whereIn('id', $data['appointment_ids'])
+            ->whereIn('profile_id', $profileIds)
+            ->get();
+
+        $count = 0;
+        foreach ($appointments as $appointment) {
+            if ($data['action'] === 'delete') {
+                $appointment->delete();
+                $count++;
+            } elseif ($data['action'] === 'confirm') {
+                $appointment->update(['status' => 'confirmed']);
+                $count++;
+            } elseif ($data['action'] === 'cancel') {
+                $appointment->update(['status' => 'cancelled']);
+                $count++;
+            } elseif ($data['action'] === 'complete') {
+                $appointment->update(['status' => 'completed']);
+                $count++;
+            }
+        }
+
+        $message = match ($data['action']) {
+            'delete' => trans_choice(':count appointment deleted.|:count appointments deleted.', $count),
+            'confirm' => trans_choice(':count appointment confirmed.|:count appointments confirmed.', $count),
+            'cancel' => trans_choice(':count appointment cancelled.|:count appointments cancelled.', $count),
+            'complete' => trans_choice(':count appointment completed.|:count appointments completed.', $count),
+            default => __('Appointments updated.'),
+        };
+
+        return back()->with('status', $message);
     }
 
     public function confirmAppointment(Appointment $appointment): RedirectResponse

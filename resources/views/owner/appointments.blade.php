@@ -1,19 +1,71 @@
 @extends('layouts.owner')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex items-center justify-between gap-3 mb-2">
+<div class="space-y-6" x-data="bulkActions()">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <div>
             <h1 class="font-display text-3xl text-slate-900">{{ __('All appointments') }}</h1>
             <p class="text-sm text-slate-500">{{ __('Complete overview of your business appointments.') }}</p>
         </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <form action="{{ route('owner.appointments') }}" method="GET" class="relative group">
+                <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Search appointments...') }}"
+                       class="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none group-hover:border-slate-300">
+                <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- Bulk Actions Toolbar -->
+    <div x-show="selected.length > 0"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-indigo-200 flex items-center justify-between gap-4 sticky top-4 z-20">
+        <div class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-6 h-6 bg-white/20 rounded-full text-[12px] font-bold" x-text="selected.length"></span>
+            <span class="text-sm font-medium">{{ __('Selected') }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button @click="submitBulk('confirm')" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                {{ __('Confirm') }}
+            </button>
+            <button @click="submitBulk('complete')" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ __('Done') }}
+            </button>
+            <button @click="submitBulk('cancel')" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                {{ __('Refuse') }}
+            </button>
+            <button @click="submitBulk('delete')" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                {{ __('Delete') }}
+            </button>
+        </div>
+    </div>
+
+    <form id="bulkForm" action="{{ route('owner.appointments.bulk') }}" method="POST" class="hidden">
+        @csrf
+        <input type="hidden" name="action" x-model="action">
+        <template x-for="id in selected" :key="id">
+            <input type="hidden" name="appointment_ids[]" :value="id">
+        </template>
+    </form>
 
     <div class="card overflow-hidden !p-0">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="bg-slate-50 text-left text-slate-500 uppercase tracking-widest text-[10px] font-bold">
+                    <tr class="bg-slate-50 text-left text-slate-500 uppercase tracking-widest text-[10px] font-bold border-b border-slate-100">
+                        <th class="w-12 px-6 py-4">
+                            <input type="checkbox" @click="toggleAll" :checked="allSelected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                        </th>
                         <th class="px-6 py-4">{{ __('Client & Service') }}</th>
                         <th class="px-6 py-4">{{ __('Employee') }}</th>
                         <th class="px-6 py-4">{{ __('Time') }}</th>
@@ -24,7 +76,10 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white/50">
                     @forelse($appointments as $appointment)
-                        <tr class="hover:bg-slate-50/50 transition-colors">
+                        <tr class="hover:bg-slate-50/50 transition-colors" :class="selected.includes('{{ $appointment->id }}') ? 'bg-indigo-50/30' : ''">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" value="{{ $appointment->id }}" x-model="selected" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                            </td>
                             <td class="px-6 py-4">
                                 <p class="font-bold text-slate-900 leading-tight">{{ $appointment->customer_name }}</p>
                                 <p class="text-[11px] text-slate-500 font-medium">
@@ -81,4 +136,54 @@
         @endif
     </div>
 </div>
+
+<script>
+    function bulkActions() {
+        return {
+            selected: [],
+            action: '',
+            allSelected: false,
+            allIds: @json($appointments->pluck('id')),
+
+            toggleAll() {
+                if (this.selected.length === this.allIds.length) {
+                    this.selected = [];
+                } else {
+                    this.selected = [...this.allIds.map(id => id.toString())];
+                }
+            },
+
+            get allSelected() {
+                return this.selected.length === this.allIds.length && this.allIds.length > 0;
+            },
+
+            submitBulk(action) {
+                this.action = action;
+                let message = '{{ __("Are you sure you want to perform this action on selected appointments?") }}';
+
+                if (action === 'delete') {
+                    message = '{{ __("Are you sure you want to delete selected appointments?") }}';
+                }
+
+                Swal.fire({
+                    title: '{{ __("Are you sure?") }}',
+                    text: message,
+                    icon: action === 'delete' ? 'warning' : 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: action === 'delete' ? '#ef4444' : '#4f46e5',
+                    cancelButtonColor: '#94a3b8',
+                    confirmButtonText: action === 'delete' ? '{{ __("Yes, delete them!") }}' : '{{ __("Yes, do it!") }}',
+                    cancelButtonText: '{{ __("Cancel") }}',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.$nextTick(() => {
+                            document.getElementById('bulkForm').submit();
+                        });
+                    }
+                });
+            }
+        }
+    }
+</script>
 @endsection
