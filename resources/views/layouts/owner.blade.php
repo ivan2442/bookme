@@ -184,15 +184,34 @@
         }
 
         @if(session('status'))
+            @php
+                $appData = session('last_appointment_data');
+            @endphp
             Swal.fire({
                 title: window.translations['Success'] || 'Úspech',
+                @if($appData)
+                html: `
+                    <p class="mb-4">{{ session('status') }}</p>
+                    <div class="flex flex-col gap-2 mt-4">
+                        <button onclick="downloadIcs('{{ addslashes($appData['title']) }}', '{{ $appData['start'] }}', {{ $appData['duration'] }}, '{{ addslashes($appData['shopName']) }}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
+                            📱 {{ __('Add to iOS calendar') }}
+                        </button>
+                        <button onclick="openGoogleCalendar('{{ addslashes($appData['title']) }}', '{{ $appData['start'] }}', {{ $appData['duration'] }}, '{{ addslashes($appData['shopName']) }}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
+                            🤖 {{ __('Add to Android calendar') }}
+                        </button>
+                    </div>
+                `,
+                @else
                 text: "{{ session('status') }}",
+                @endif
                 icon: 'success',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 4000,
-                timerProgressBar: true
+                toast: @if($appData) false @else true @endif,
+                position: @if($appData) 'center' @else 'top-end' @endif,
+                showConfirmButton: @if($appData) true @else false @endif,
+                confirmButtonText: window.translations['Close'] || 'Zavrieť',
+                confirmButtonColor: '#10b981',
+                timer: @if($appData) null @else 4000 @endif,
+                timerProgressBar: @if($appData) false @else true @endif
             });
         @endif
 

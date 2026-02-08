@@ -590,7 +590,7 @@ class OwnerDashboardController extends Controller
         // alebo ju v budúcne môžeme úplne oddeliť v databáze.
         $service = Service::where('profile_id', $data['profile_id'])->first();
 
-        Appointment::create([
+        $appointment = Appointment::create([
             'profile_id' => $data['profile_id'],
             'service_id' => $service?->id,
             'employee_id' => $data['employee_id'] ?? null,
@@ -611,7 +611,12 @@ class OwnerDashboardController extends Controller
             ],
         ]);
 
-        return back()->with('status', 'Rezervácia bola úspešne pridaná.');
+        return back()->with('status', 'Rezervácia bola úspešne pridaná.')->with('last_appointment_data', [
+            'title' => $data['service_name'],
+            'start' => $startAt->toIso8601String(),
+            'duration' => (int) $data['duration_minutes'],
+            'shopName' => $appointment->profile->name
+        ]);
     }
 
     public function rescheduleAppointment(Request $request, Appointment $appointment): RedirectResponse

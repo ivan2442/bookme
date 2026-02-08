@@ -866,9 +866,9 @@ bookingForm?.addEventListener('submit', (event) => {
 
             if (typeof Swal !== 'undefined') {
                 const translations = window.translations || {};
-                const title = appointment.service?.name ?? 'Služba';
+                const title = (appointment.service?.name ?? 'Služba').replace(/'/g, "\\'");
                 const start = appointment.start_at;
-                const shopName = state.shops.find(s => String(s.id) === String(payload.profile_id))?.name ?? 'BookMe';
+                const shopName = (state.shops.find(s => String(s.id) === String(payload.profile_id))?.name ?? 'BookMe').replace(/'/g, "\\'");
 
                 Swal.fire({
                     title: translations["Booking successful!"] || 'Rezervácia úspešná!',
@@ -1168,18 +1168,26 @@ function initSelectedDate() {
 
         const format = (d) => d.toISOString().replace(/-|:|\.\d+/g, '');
 
+        const escapeICS = (str) => {
+            if (!str) return '';
+            return str.replace(/[\\,;]/g, (match) => '\\' + match)
+                      .replace(/\n/g, '\\n');
+        };
+
         const icsMsg = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
+            'PRODID:-//BookMe//SK',
+            'CALSCALE:GREGORIAN',
             'BEGIN:VEVENT',
             `DTSTART:${format(startDate)}`,
             `DTEND:${format(endDate)}`,
-            `SUMMARY:${title}`,
-            `DESCRIPTION:Rezervácia v ${shopName}`,
-            `LOCATION:${shopName}`,
+            `SUMMARY:${escapeICS(title)}`,
+            `DESCRIPTION:${escapeICS((window.translations?.["Reservation at"] || 'Rezervácia v ') + shopName)}`,
+            `LOCATION:${escapeICS(shopName)}`,
             'END:VEVENT',
             'END:VCALENDAR'
-        ].join('\n');
+        ].join('\r\n');
 
         const blob = new Blob([icsMsg], { type: 'text/calendar;charset=utf-8' });
         const translations = window.translations || {};
