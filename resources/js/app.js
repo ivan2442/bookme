@@ -46,14 +46,14 @@ if (toggleAdvanced && advancedFilters) {
 
 const TIME_ZONE = 'Europe/Bratislava';
 
-const timeFormatter = new Intl.DateTimeFormat('sk-SK', {
+window.timeFormatter = new Intl.DateTimeFormat('sk-SK', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
     timeZone: TIME_ZONE,
 });
 
-const dateTimeFormatter = new Intl.DateTimeFormat('sk-SK', {
+window.dateTimeFormatter = new Intl.DateTimeFormat('sk-SK', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -98,7 +98,7 @@ function formatRelativeSlot(isoDate) {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-    const time = timeFormatter.format(date);
+    const time = window.timeFormatter.format(date);
 
     if (target.getTime() === today.getTime()) {
         return `${translations["today"] || 'dnes'} ${time}`;
@@ -129,7 +129,7 @@ window.formatFullNextSlot = function(isoDate) {
     const dayName = dayNames[date.getDay()];
     const d = date.getDate();
     const m = date.getMonth() + 1;
-    const time = timeFormatter.format(date);
+    const time = window.timeFormatter.format(date);
     const at = translations["at"] || 'o';
 
     return `${dayName} ${d}.${m}. ${at} ${time}`;
@@ -848,7 +848,7 @@ bookingForm?.addEventListener('submit', (event) => {
     try {
         const startDate = new Date(payload.start_at);
         const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
-        endTimeReadable = `${timeFormatter.format(startDate)} - ${timeFormatter.format(endDate)}`;
+        endTimeReadable = `${window.timeFormatter.format(startDate)} - ${window.timeFormatter.format(endDate)}`;
     } catch (e) {
         endTimeReadable = '';
     }
@@ -858,7 +858,7 @@ bookingForm?.addEventListener('submit', (event) => {
         .then((response) => {
             const translations = window.translations || {};
             const appointment = response.data;
-            const successMessage = `${translations["Appointment confirmed:"] || 'Termín potvrdený:'} ${appointment.service?.name ?? 'Služba'} ${dateTimeFormatter.format(
+            const successMessage = `${translations["Appointment confirmed:"] || 'Termín potvrdený:'} ${appointment.service?.name ?? 'Služba'} ${window.dateTimeFormatter.format(
                 new Date(appointment.start_at),
             )} ${endTimeReadable ? `(${endTimeReadable})` : ''}, ${translations["price"] || 'cena'} €${Number(price).toFixed(2)}.`;
 

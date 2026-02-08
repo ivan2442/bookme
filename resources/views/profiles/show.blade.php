@@ -619,11 +619,47 @@
             out.classList.add('text-emerald-600');
             out.textContent = translations["Booking successful!"] || 'Rezervácia bola úspešná!';
 
+            const appointment = response.data;
+            const services = @json($profile->services->load('variants'));
+            const selectedService = services.find(s => String(s.id) === String(payload.service_id));
+            const selectedVariant = selectedService?.variants?.find(v => String(v.id) === String(payload.service_variant_id));
+
+            const durationMinutes = selectedVariant ? (selectedVariant.duration_minutes ?? selectedService?.base_duration_minutes) : (selectedService?.base_duration_minutes || 30);
+            const price = selectedVariant ? (selectedVariant.price ?? selectedService?.base_price) : (selectedService?.base_price ?? 0);
+
+            let endTimeReadable = '';
+            try {
+                const startDate = new Date(appointment.start_at);
+                const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
+                if (window.timeFormatter) {
+                    endTimeReadable = `${window.timeFormatter.format(startDate)} - ${window.timeFormatter.format(endDate)}`;
+                }
+            } catch (e) {
+                console.error('Error formatting end time', e);
+            }
+
+            const successMessage = `${translations["Appointment confirmed:"] || 'Termín potvrdený:'} ${appointment.service?.name ?? 'Služba'} ${window.dateTimeFormatter ? window.dateTimeFormatter.format(new Date(appointment.start_at)) : appointment.start_at} ${endTimeReadable ? `(${endTimeReadable})` : ''}, ${translations["price"] || 'cena'} €${Number(price).toFixed(2)}.`;
+
+            const title = appointment.service?.name ?? 'Služba';
+            const start = appointment.start_at;
+            const shopName = '{{ $profile->name }}';
+
             Swal.fire({
                 title: translations["Booking successful!"] || 'Rezervácia úspešná!',
-                text: translations["Your appointment has been confirmed. We sent information to your email."] || 'Váš termín bol potvrdený. Informácie sme vám zaslali e-mailom.',
+                html: `
+                    <p class="mb-4">${successMessage}</p>
+                    <div class="flex flex-col gap-2 mt-4">
+                        <button onclick="downloadIcs('${title.replace(/'/g, "\\'")}', '${start}', ${durationMinutes}, '${shopName.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
+                            📱 ${translations["Add to iOS calendar"] || 'Pridať do iOS kalendára'}
+                        </button>
+                        <button onclick="openGoogleCalendar('${title.replace(/'/g, "\\'")}', '${start}', ${durationMinutes}, '${shopName.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition flex items-center justify-center gap-2">
+                            🤖 ${translations["Add to Android calendar"] || 'Pridať do Android kalendára'}
+                        </button>
+                    </div>
+                `,
                 icon: 'success',
-                confirmButtonColor: '#10b981'
+                confirmButtonColor: '#10b981',
+                confirmButtonText: translations["Close"] || 'Zavrieť'
             }).then(() => {
                 closeBookingModal();
                 location.reload();
