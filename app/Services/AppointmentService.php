@@ -66,6 +66,12 @@ class AppointmentService
         }
 
         $employeeId = $data['employee_id'] ?? null;
+
+        // Ak zamestnanec nie je zadaný, priradíme prvého dostupného zamestnanca k tejto službe
+        if (is_null($employeeId)) {
+            $employeeId = $service->employees()->where('is_active', true)->first()?->id;
+        }
+
         $requiresConfirmation = (bool) ($settings?->requires_confirmation ?? false);
 
         if ($profile->isApiAvailable('pakavoz') && $service->is_pakavoz_enabled) {

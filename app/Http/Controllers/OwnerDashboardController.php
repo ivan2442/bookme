@@ -601,10 +601,15 @@ class OwnerDashboardController extends Controller
         // alebo ju v budúcne môžeme úplne oddeliť v databáze.
         $service = Service::where('profile_id', $data['profile_id'])->first();
 
+        $employeeId = $data['employee_id'] ?? null;
+        if (is_null($employeeId) && $service) {
+            $employeeId = $service->employees()->where('is_active', true)->first()?->id;
+        }
+
         $appointment = Appointment::create([
             'profile_id' => $data['profile_id'],
             'service_id' => $service?->id,
-            'employee_id' => $data['employee_id'] ?? null,
+            'employee_id' => $employeeId,
             'customer_name' => $data['customer_name'],
             'customer_email' => null, // Email nie je vo formulári
             'customer_phone' => $data['customer_phone'] ?? null,

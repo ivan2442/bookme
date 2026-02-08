@@ -1576,7 +1576,7 @@ function initAdminDashboard() {
                                 ${translations["Reschedule"] || 'Reschedule'}
                             </button>
 
-                            <form method="POST" action="${a.delete_url}" onsubmit="return confirm('${translations["Are you sure you want to delete this appointment?"] || 'Are you sure you want to delete this appointment?'}')">
+                            <form method="POST" action="${a.delete_url}" onsubmit="confirmDeleteAppointment(event, this)">
                                 <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 transition" title="${translations["Delete"] || 'Delete'}">

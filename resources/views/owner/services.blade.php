@@ -26,10 +26,10 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-bold">€{{ number_format($service->base_price, 2) }}</span>
-                                <form action="{{ route('owner.services.delete', $service) }}" method="POST" class="inline">
+                                <form action="{{ route('owner.services.delete', $service) }}" method="POST" class="inline" onsubmit="confirmDelete(event, '{{ __('Are you sure you want to delete this service?') }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirmDelete(event, '{{ __('Are you sure you want to delete this service?') }}')" class="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="{{ __('Delete') }}">
+                                    <button type="submit" class="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="{{ __('Delete') }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 </form>
@@ -116,10 +116,10 @@
                                                 <span class="font-bold text-slate-700">{{ $variant->name }}</span>
                                                 <span class="text-slate-500 ml-2">{{ $variant->duration_minutes }} min • €{{ number_format($variant->price, 2) }}</span>
                                             </div>
-                                            <form action="{{ route('owner.services.variants.delete', [$service, $variant]) }}" method="POST" class="inline">
+                                            <form action="{{ route('owner.services.variants.delete', [$service, $variant]) }}" method="POST" class="inline" onsubmit="confirmDelete(event, '{{ __('Are you sure you want to delete this variant?') }}')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirmDelete(event, '{{ __('Are you sure you want to delete this variant?') }}')" class="text-red-500 hover:text-red-700">
+                                                <button type="submit" class="text-red-500 hover:text-red-700">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                 </button>
                                             </form>

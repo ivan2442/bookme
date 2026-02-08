@@ -212,44 +212,25 @@
             });
         @endif
 
-        function confirmDelete(event, message = 'Naozaj chcete odstrániť túto položku?') {
+        function confirmDelete(event, message) {
             event.preventDefault();
             const form = event.target.closest('form');
-            const button = event.target.closest('button');
+            const translations = window.translations || {};
 
             Swal.fire({
-                title: 'Ste si istý?',
-                text: message,
+                title: translations['Are you sure?'] || 'Ste si istý?',
+                text: message || (translations['Are you sure you want to delete this item?'] || 'Naozaj chcete odstrániť túto položku?'),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#475569',
-                confirmButtonText: 'Áno, odstrániť!',
-                cancelButtonText: 'Zrušiť'
+                confirmButtonText: translations['Yes, delete it!'] || 'Áno, odstrániť!',
+                cancelButtonText: translations['Cancel'] || 'Zrušiť',
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     if (form) {
                         form.submit();
-                    } else if (button && button.hasAttribute('formaction')) {
-                        const newForm = document.createElement('form');
-                        newForm.method = 'POST';
-                        newForm.action = button.getAttribute('formaction');
-
-                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                        const csrfInput = document.createElement('input');
-                        csrfInput.type = 'hidden';
-                        csrfInput.name = '_token';
-                        csrfInput.value = csrfToken;
-
-                        const methodInput = document.createElement('input');
-                        methodInput.type = 'hidden';
-                        methodInput.name = '_method';
-                        methodInput.value = button.getAttribute('formmethod') || 'DELETE';
-
-                        newForm.appendChild(csrfInput);
-                        newForm.appendChild(methodInput);
-                        document.body.appendChild(newForm);
-                        newForm.submit();
                     }
                 }
             });
