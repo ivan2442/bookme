@@ -137,7 +137,8 @@ class AvailabilityController extends Controller
             $validated['employee_id'] ?? null,
             $variant?->id,
             $bufferBefore,
-            $bufferAfter
+            $bufferAfter,
+            $serviceId
         );
 
         return response()->json([

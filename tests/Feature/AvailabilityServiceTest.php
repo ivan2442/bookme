@@ -70,11 +70,10 @@ class AvailabilityServiceTest extends TestCase
             'status' => 'confirmed',
         ]);
 
-        // Teraz by mal byť deň v closed_days, pretože jediný slot je busy
+        // Teraz by mal byť deň v closed_days, pretože jediný slot je busy a skrytý
         $result = $serviceAvailability->slots($profile, 60, $targetDate, 1);
         $this->assertContains($targetDate->toDateString(), $result['closed_days']);
-        $this->assertCount(1, $result['slots']);
-        $this->assertEquals('busy', $result['slots'][0]['status']);
+        $this->assertCount(0, $result['slots']);
 
         Carbon::setTestNow();
     }
